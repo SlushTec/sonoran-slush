@@ -2,214 +2,161 @@
 
 **Last updated:** 2026-08-11  
 **Service area:** Tucson & Southern Arizona (travel beyond by quote)  
-**Machines:** **xTool F2** (portable surface engraving) · **Jet Mini Original** (3D subsurface crystal)
-
-Live engraving turns guests into participants. They watch their name, date, or photo become a keepsake — not a generic favor from a box.
+**Machines:** **xTool F2** (portable surface) · **Jet Mini Original** (3D crystal)
 
 ---
 
-## Which machine for which event?
+## Which machine?
 
-| | **xTool F2** | **Jet Mini Original** |
-|--|--------------|------------------------|
-| **What it does** | Fast surface engraving / marking | 3D photo etched *inside* crystal |
-| **Best for** | High guest volume, live activation | Premium photo gifts, controlled counts |
-| **Typical items** | Wood tags, keychains, glasses, metal | **Event-stock crystal sizes only** (see below) |
-| **Time per piece** | Seconds to a few minutes | Longer (photo + burn) |
-| **Guest experience** | “Watch it engrave now” | “Your photo becomes art in glass” |
-
-**Both machines** can be booked alone or together.
+| | **xTool F2** | **Jet Mini** |
+|--|--------------|--------------|
+| Role | Volume guest favors, live tags | Photo crystals + crystal keychains |
+| Best for | Many short engravings | Couple crystal + guest keychain sets |
 
 ---
 
-## Hard rule — crystal packages
+# Wedding packages (Jet Mini)
 
-Package counts apply **only** to **event-stock sizes**.  
-Larger / premium shapes are **never** substituted 1:1 into “included” counts.
+Each package includes:
+1. **One couple crystal** (size locked by tier — see below)  
+2. **Guest crystal keychains** (heart **or** rectangle — one style for the run)  
+3. On-site time, setup, photo guidance, background optimize + up to 2 lines text on included crystals/keychains  
 
-### Event-stock sizes (allowed in package tallies)
+**Guest keychains = one shared design** (e.g. names + date, or monogram).  
+Per-guest unique names on every keychain = custom quote or add **F2** station.
 
-| Code | Size | Approx |
-|------|------|--------|
-| **RS** | Rectangle Small 60×40 | Entry crystal |
-| **RM** | Rectangle Medium 80×50 | Standard gift |
-| **HS** | Heart Small 80×70 | Romantic / VIP |
-| **DS** | Diamond Small 50×50 | Optional alt |
-
-### Not in package counts (always paid upgrade)
-
-| Size | How it’s sold at events |
-|------|-------------------------|
-| Rectangle Large / XLarge | Add-on at event rate |
-| **Mini Mantel 150×100** | Add-on at event rate — **not** “one of the 25” |
-| Prestige / Notched / Dog Bone / Candle | Add-on / quote |
-| LED bases | Add-on per piece |
-
-If a client wants 25 Mini Mantels, that is a **custom quote**, not Tier 3.
+**Extra keychains:** ordered only in **packs of 50** (blank MOQ). Order ahead of the event.
 
 ---
 
-# Wedding packages (specific inclusions)
+## Couple crystal by tier (locked)
 
-Built for wedding party + close family photo gifts. Guest-count favors stay on **F2** (tags, etc.).
+| Package | Couple crystal (choose one) | Notes |
+|---------|----------------------------|--------|
+| **Intimate** | **Heart Medium** **or** **Rectangle Large** | Can upgrade (see table) |
+| **Party** | **Heart Large** **or** **Rectangle XLarge** | Can upgrade to Mini Mantel |
+| **VIP** | **Mini Mantel** | Largest size — no further size upgrade |
 
-### Wedding Crystal — Intimate  
-**$650 · up to 2 hours on-site**
-
-**You get exactly:**
-
-| Item | Qty |
-|------|-----|
-| Rectangle Medium (**RM**) **or** Heart Small (**HS**) | **6** total (any mix of RM + HS) |
-| Operator + setup/breakdown | Yes |
-| Photo guidance (what converts well) | Yes |
-| Background optimize on included pieces | Yes |
-| Up to 2 lines text on included pieces | Yes |
-
-**Not included:** LED bases, Large/XLarge/Mantel, extra crystals beyond 6.
-
-**Example:** 4× RM for parents + 2× HS for couple.
+Mini Mantel is the top size we offer. No upgrade past VIP couple crystal.
 
 ---
 
-### Wedding Crystal — Party  
-**$1,100 · up to 3 hours on-site**
+## Intimate  
+**$895 · up to 2 hours on-site**
 
-**You get exactly:**
+| Included | Detail |
+|----------|--------|
+| **Couple crystal** | **1×** Heart Medium **or** Rectangle Large |
+| **Guest keychains** | **25×** Heart **or** Rectangle crystal keychains (one style, one design) |
+| Photo / text on included pieces | Yes |
+| LED base for couple crystal | Optional add-on |
 
-| Item | Qty |
-|------|-----|
-| Rectangle Medium (**RM**) | **8** |
-| Heart Small (**HS**) **or** Rectangle Small (**RS**) | **4** (any mix) |
-| **Total event-stock crystals** | **12** |
-| Operator + setup/breakdown | Yes |
-| Pre-event photo collection guide | Yes |
-| Background + text on included pieces | Yes |
-
-**Optional add-ons (priced extra):** LED base per crystal · swap one RM up to Rectangle Large (upgrade fee) · extra RM/HS at event rate.
-
-**Example:** 8× RM bridal party + 2× HS couple + 2× RS for readers/officiant.
+**Example:** 1× Heart Medium (couple photo) + 25× rectangle keychains “Jamie & Alex · 10.12.26” for guests.
 
 ---
 
-### Wedding Crystal — Full VIP  
-**$1,800 · up to 4 hours on-site**
+## Party  
+**$1,495 · up to 3 hours on-site**
 
-**You get exactly:**
+| Included | Detail |
+|----------|--------|
+| **Couple crystal** | **1×** Heart Large **or** Rectangle XLarge |
+| **Guest keychains** | **50×** Heart **or** Rectangle crystal keychains (one style, one design) |
+| Photo / text on included pieces | Yes |
+| Pre-event photo guide | Yes |
+| LED base for couple crystal | Optional add-on |
 
-| Item | Qty |
-|------|-----|
-| Rectangle Medium (**RM**) | **12** |
-| Heart Small (**HS**) | **4** |
-| Rectangle Small (**RS**) | **4** |
-| **Total event-stock crystals** | **20** |
-| Operator + setup/breakdown | Yes |
+**Example:** 1× Rectangle XLarge (ceremony photo) + 50× heart keychains with wedding date for the reception.
+
+---
+
+## VIP  
+**$2,295 · up to 4 hours on-site**
+
+| Included | Detail |
+|----------|--------|
+| **Couple crystal** | **1× Mini Mantel** (largest) |
+| **Guest keychains** | **50×** Heart **or** Rectangle crystal keychains (one style, one design) |
+| Photo / text on included pieces | Yes |
 | Pre-event photo upload + processing | Yes |
-| Background + text on included pieces | Yes |
-| Priority queue for couple / parents | Yes |
+| Priority finishing for couple piece | Yes |
+| LED base for couple crystal | Optional add-on (recommended) |
 
-**Still not included as “free upgrades”:** Mini Mantel, XLarge, Prestige, etc.  
-Those may be added **per piece** at event rates (see below).
+**Example:** 1× Mini Mantel on LED base for sweetheart table + 50× rectangle keychains for guests.
 
-**Example:** 12× RM wedding party + 4× HS couple & parents + 4× RS grandparents/readers.
-
----
-
-### Wedding crystal upgrades (per piece, on top of package)
-
-| Upgrade | Event rate (from) |
-|---------|-------------------|
-| Extra **RS** | **$55** |
-| Extra **RM** | **$75** |
-| Extra **HS** | **$75** |
-| Rectangle Large | **$95** |
-| Rectangle XLarge | **$140** |
-| **Mini Mantel** | **$200** |
-| LED base (square/rect) | **$22** |
-| Rotating LED | **$26** |
+**Want 100 guest keychains?** Add one extra **pack of 50** (see add-ons).
 
 ---
 
-# General Jet Mini packages (non-wedding)
+## Couple crystal upgrades
 
-Same size locks. Counts are **event-stock only**.
+| From package | Upgrade to | Add |
+|--------------|------------|-----|
+| Intimate (Med Heart / Large Rect) | Heart Large **or** Rect XLarge | **+$120** |
+| Intimate | **Mini Mantel** | **+$280** |
+| Party (Large Heart / XL Rect) | **Mini Mantel** | **+$160** |
+| VIP (Mini Mantel) | — | **None** (already max size) |
 
-### Keepsake Bar — $650 · 2 hrs  
-**Included:** **6 × RM** (or mix RM/HS totaling 6). No Mantels in the six.
-
-### Gallery — $1,100 · 3 hrs  
-**Included:** **8 × RM + 4 × RS/HS** (12 event-stock total).
-
-### Showcase — $1,800 · 4 hrs  
-**Included:** **12 × RM + 4 × HS + 4 × RS** (20 event-stock total).
-
-Extra pieces and large sizes = upgrade table above.
+Shape swaps within the same tier (Heart ↔ Rect at that tier’s size) = **no charge** when both options are listed for that tier.
 
 ---
 
-# xTool F2 packages (surface — volume)
+## Keychain & other add-ons
 
-### Spark — $450 · 2 hrs  
-**Included blanks (you choose mix up to count):**
-- Up to **40** pieces from event kit: wood tags, wood keychains, bottle-opener keychains  
-- Simple text / monogram from our font menu  
-
-**Not auto-included:** tumblers, Libbey glasses, metal money clips (those = add-on blank + engrave fee).
-
-### Glow — $750 · 3 hrs  
-**Included:**
-- Up to **75** event-kit pieces (tags / keychains / openers as stocked)  
-- One event graphic (monogram or simple logo) prepped ahead  
-
-### Full Station — $1,200 · 4 hrs  
-**Included:**
-- Up to **120** event-kit pieces  
-- Guest-brought items: engraving labor included within time; blank not ours unless purchased  
-- Second layout optional  
-
-**F2 add-ons:** extra hour **$150** · extra kit pieces **$3–$6** · premium blanks quote.
+| Add-on | Price |
+|--------|-------|
+| **Extra keychains** | **Pack of 50 only** — **$350**/pack engrave-only same design (order ahead) |
+| Extra pack, color-fill keychains | Quote (cure time — usually **not** same-day on-site) |
+| Second couple crystal (same tier size) | 50% of that tier’s couple upgrade value / quote |
+| LED base (couple) | **$22** square/rect · **$26** rotating |
+| Extra on-site hour | **$200** |
+| Travel outside metro Tucson | Quote |
 
 ---
 
-# Wedding combo (recommended)
+## What is *not* included
 
-**F2 Full Station or Glow** for guest favors (tags)  
-**+ Wedding Crystal Party or Full VIP** for wedding party crystals  
-
-**Example total:** Glow ($750) + Wedding Crystal Party ($1,100) = **$1,850**  
-→ ~75 wood place tags for guests + 12 event-stock crystals for party/family.
-
----
-
-# What’s included in every booking
-
-- On-site operator  
-- Machine setup & safety  
-- **Only the blanks listed in the package table**  
-- Breakdown  
-
-**Venue:** power, table (~6–8 ft), indoor or shaded space.
+- Unlimited size swaps (e.g. 25 Mini Mantels as “guests”)  
+- Per-guest unique artwork on all keychains without a custom quote  
+- Color-fill bake on-site same hour  
+- F2 wood tags (that’s a separate F2 package / combo)  
 
 ---
 
-# What we don’t do
+# F2 packages (surface — volume favors)
 
-- Treat Mini Mantel / XLarge as equal to “one included crystal”  
-- Same-hour color-fill bake on glass  
-- Unlimited large crystals inside a flat package price  
+Unchanged role: wood tags, openers, non-crystal guest items.
+
+| Tier | Price | Time | Included |
+|------|-------|------|----------|
+| Spark | **$450** | 2 hrs | Up to **40** event-kit pieces (wood tags / keychains / openers) |
+| Glow | **$750** | 3 hrs | Up to **75** kit pieces + 1 event graphic |
+| Full Station | **$1,200** | 4 hrs | Up to **120** kit pieces; guest-brought items OK within time |
+
+Extra hour **$150**. Kit extras **$3–$6** each.
 
 ---
 
-# How to book
+# Wedding combo example
 
-1. Date, venue, guest count, **which package** (name it)  
-2. We confirm **exact size mix** from the allowed table  
-3. Deposit  
-4. Photos / design prep  
-5. Event day  
+| Build | Pieces | Price |
+|-------|--------|-------|
+| **Party** crystal package | 1× XL couple crystal + 50 crystal keychains | **$1,495** |
+| **+ Glow** F2 | ~75 wood place tags for larger guest list | **+$750** |
+| **Total** | Crystal VIP gifts + high volume tags | **$2,245** |
+
+---
+
+# Booking
+
+1. Choose package name (**Intimate / Party / VIP**)  
+2. Choose couple shape (heart vs rect where applicable)  
+3. Choose keychain shape (heart **or** rect) + shared design text  
+4. Optional: extra **pack(s) of 50** keychains, LED base, upgrades  
+5. Deposit · photo prep · event day  
 
 **Contact:** [event email / form]
 
 ---
 
-*Package prices = Tucson-area starting rates. Out-of-area, multi-day, or all-Mantel orders = custom quote.*
+*Tucson-area starting prices. Out-of-area / multi-day / fully custom = quote.*
