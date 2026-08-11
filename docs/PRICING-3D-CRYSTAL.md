@@ -2,16 +2,17 @@
 
 **Last updated:** 2026-08-11  
 **Sources:** Your blank unit costs + 3dcrystal.com retail comps  
-**Rule:** Stay competitive with 3dcrystal.com; do **not** undercut much. Local + event + service is the edge, not a race to the bottom.
+**Adjustment:** Prior list × **1.05**, rounded **up** to nearest dollar  
+**Rule:** Stay competitive with 3dcrystal.com; local + event + service is the edge.
 
 ---
 
-## Add-ons (fixed)
+## Add-ons (fixed, +5% rounded up)
 
 | Add-on | Price |
 |--------|-------|
-| Background removal / photo optimize | **$30** |
-| Custom text (up to 2 lines) | **$10** |
+| Background removal / photo optimize | **$32** |
+| Custom text (up to 2 lines) | **$11** |
 
 These stack on top of the crystal list price.
 
@@ -42,7 +43,7 @@ These stack on top of the crystal list price.
 | A0005 | Rectangle Necklace | $12 |
 | — | Heart Necklace | **same as Rectangle Necklace** ($12 blank class) |
 
-### LED / wood bases (add-on product prices)
+### LED / wood bases (blank costs)
 | SKU | Base | Blank $/unit |
 |-----|------|--------------|
 | A0033 | Square Silver LED | $8.75 |
@@ -71,52 +72,52 @@ These stack on top of the crystal list price.
 
 ## Recommended Sonoran Slush retail (crystal only)
 
-*Includes free-ship absorb for orders $75+. Background $30 and text $10 are extra.*
+*Prior list × 1.05, ceil to whole dollar. Free-ship absorb for orders $75+. Background $32 and text $11 are extra.*
 
 ### Rectangles
-| Size | Blank | **Retail** | vs 3dcrystal |
-|------|-------|------------|--------------|
-| Small 60×40 | $13 | **$69** | Match their sale |
-| Medium 80×50 | $15 | **$89** | Match |
-| Large 90×60 | $18 | **$109** | Match |
-| XLarge 120×80 | $26 | **$159** | Slightly under $169 |
-| Mini Mantel 150×100 | $40 | **$239** | Slightly under $259 |
+| Size | Blank | **Retail** |
+|------|-------|------------|
+| Small 60×40 | $13 | **$73** |
+| Medium 80×50 | $15 | **$94** |
+| Large 90×60 | $18 | **$115** |
+| XLarge 120×80 | $26 | **$167** |
+| Mini Mantel 150×100 | $40 | **$251** |
 
 ### Hearts
 | Size | Blank | **Retail** |
 |------|-------|------------|
-| Small 80×70 | $21 | **$89** |
-| Medium 100×90 | $28 | **$119** |
-| Large (when available) | $35 | **$149** |
+| Small 80×70 | $21 | **$94** |
+| Medium 100×90 | $28 | **$125** |
+| Large (when available) | $35 | **$157** |
 
 ### Diamonds / prestige / special
 | Shape | Blank | **Retail** |
 |-------|-------|------------|
-| Cut Corner Diamond Small | $14 | **$69** |
-| Cut Corner Diamond Medium | $16 | **$79** |
-| Cut Corner Diamond Large | $24 | **$109** |
-| Prestige Iceberg Small | $40 | **$189** |
-| Candle 100×60 | $22 | **$99** |
-| Notched Small 150×100 | $42 | **$189** |
-| Dog Bone Large 150×100 | $50 | **$199** |
+| Cut Corner Diamond Small | $14 | **$73** |
+| Cut Corner Diamond Medium | $16 | **$83** |
+| Cut Corner Diamond Large | $24 | **$115** |
+| Prestige Iceberg Small | $40 | **$199** |
+| Candle 100×60 | $22 | **$104** |
+| Notched Small 150×100 | $42 | **$199** |
+| Dog Bone Large 150×100 | $50 | **$209** |
 
 ### Keychains / necklace / ornament
 | Shape | Blank | **Retail** |
 |-------|-------|------------|
-| Rectangle Keychain | $8 | **$45** |
-| Heart Keychain | $10 | **$49** |
-| Rectangle Necklace | $12 | **$42** |
-| **Heart Necklace** | $12 class | **$42** (same as rectangle) |
-| Circle Ornament | $10 | **$39** |
+| Rectangle Keychain | $8 | **$48** |
+| Heart Keychain | $10 | **$52** |
+| Rectangle Necklace | $12 | **$45** |
+| **Heart Necklace** | $12 class | **$45** (same as rectangle) |
+| Circle Ornament | $10 | **$41** |
 
 ### Bases (sold as add-ons)
 | Base | Blank | **Retail** |
 |------|-------|------------|
-| Square Silver LED | $8.75 | **$24** |
-| Rectangle Silver LED | $8.75 | **$24** |
-| Rotating LED | $9.75 | **$28** |
-| Medium Wooden | $22.75 | **$45** |
-| Large Long Wooden | $29.75 | **$55** |
+| Square Silver LED | $8.75 | **$26** |
+| Rectangle Silver LED | $8.75 | **$26** |
+| Rotating LED | $9.75 | **$30** |
+| Medium Wooden | $22.75 | **$48** |
+| Large Long Wooden | $29.75 | **$58** |
 
 ---
 
@@ -124,23 +125,20 @@ These stack on top of the crystal list price.
 
 | Line | Price |
 |------|-------|
-| Rectangle Medium crystal | $89 |
-| Background optimize | $30 |
-| 2 lines text | $10 |
-| Rectangle LED base | $24 |
-| **Subtotal** | **$153** |
+| Rectangle Medium crystal | $94 |
+| Background optimize | $32 |
+| 2 lines text | $11 |
+| Rectangle LED base | $26 |
+| **Subtotal** | **$163** |
 | Shipping | Free (≥ $75) |
-
-Healthy margin after blank + burn + pack + fees.
 
 ---
 
 ## Positioning notes
 
-1. **Match or sit just under 3dcrystal.com sale prices** on core rectangles — don’t race lower.
-2. **Keychains / necklaces / ornament** can sit a bit under their keychain list to win local + event volume.
-3. **Background $30 + text $10** are explicit add-ons (same idea as their inscription / art fees).
-4. **Bases** priced ~2.5–3× blank so they’re profitable and still reasonable vs their light-base add-ons.
-5. Heart necklace = rectangle necklace at **$42**.
+1. **+5% ceil** applied across crystal, bases, and add-ons (Aug 11 adjustment).
+2. Core rectangles now sit **slightly above** 3dcrystal.com sale floors — justified by local/event service.
+3. **Background $32 + text $11** remain explicit add-ons.
+4. Heart necklace = rectangle necklace at **$45**.
 
 *Update if blank costs or 3dcrystal.com list prices move.*
