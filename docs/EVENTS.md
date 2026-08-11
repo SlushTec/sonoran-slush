@@ -2,7 +2,8 @@
 
 **Last updated:** 2026-08-11  
 **Service area:** Tucson & Southern Arizona (travel beyond by quote)  
-**Machines:** **xTool F2** (portable surface) · **Jet Mini Original** (3D crystal)
+**Machines:** **xTool F2** (portable surface) · **Jet Mini Original** (3D crystal)  
+**Tax:** All prices **exclude tax**. Tax on invoice / at checkout. See [TAX-DISCLAIMER.md](./TAX-DISCLAIMER.md).
 
 ---
 
@@ -10,170 +11,226 @@
 
 | | **xTool F2** | **Jet Mini** |
 |--|--------------|--------------|
-| Role | Volume guest favors, live tags | Photo crystals + crystal keychains |
-| Best for | Many short engravings | Couple crystal + guest keychain sets |
+| Role | Volume employee/guest favors, live branding | Executive crystals + crystal keychains |
+| Best for | High headcount, logos on tags/tumblers | Leadership gifts + smaller premium sets |
 
 ---
 
-# Event crystal pricing (discounted)
+# Event crystal pricing (~15% off)
 
-**All crystals sold at an event are discounted vs online retail.**  
-Applies to: package upgrades, extra pieces the host buys on-site, and guest purchases at the station (when offered).
+Extras beyond any package use this menu. Full list: [DISCOUNT-POLICY.md](./DISCOUNT-POLICY.md).
 
-**Event rate = ~15% off** listed retail (rounded). Background optimize + up to 2 lines text still follow standard add-on rules unless noted.
-
-| Crystal | Online retail (ref) | **Event price** |
-|---------|---------------------|-----------------|
-| Rectangle Small 60×40 | $73 | **$62** |
-| Rectangle Medium 80×50 | $94 | **$80** |
-| Rectangle Large 90×60 | $115 | **$98** |
-| Rectangle XLarge 120×80 | $167 | **$142** |
-| Rectangle Mini Mantel 150×100 | $251 | **$213** |
-| Heart Small 80×70 | $94 | **$80** |
-| Heart Medium 100×90 | $125 | **$106** |
-| Heart Large 120×110 | $157 | **$133** |
-| Diamond Small 50×50 | $73 | **$62** |
-| Diamond Medium 80×80 | $125 | **$106** |
+| Crystal | Online | **Event** |
+|---------|--------|-----------|
+| Rect Small / Diamond Small | $73 | **$62** |
+| Rect Medium / Heart Small | $94 | **$80** |
+| Rect Large | $115 | **$98** |
+| Heart Medium | $125 | **$106** |
+| Heart Large | $157 | **$133** |
+| Rect XLarge | $167 | **$142** |
+| Mini Mantel | $251 | **$213** |
+| Rect keychain | $48 | **$41** |
 | Heart keychain | $52 | **$44** |
-| Rectangle keychain | $48 | **$41** |
-| LED base (std) | $28 | **$24** |
-| LED rotating | $31 | **$26** |
-
-Package **included** pieces are already in the package price — not double-charged at event rates.  
-Event menu prices are for **extras beyond the package**.
+| LED base / rotating | $26 / $30 | **$22 / $26** |
 
 ---
 
-# Wedding guest online code
+# Online guest / employee codes — 15% off
 
-Out-of-town guests (or anyone who couldn’t buy on-site) can order later on the website.
+| Event type | Code use |
+|------------|----------|
+| **Wedding** | Unique code for guests (30 days) |
+| **Corporate** | Unique code for employees / clients who missed the station (30 days) |
 
-| Setting | Policy |
-|---------|--------|
-| **Discount** | **15% off** eligible products |
-| **Code format** | Unique per wedding, e.g. `JAMIEALEX15` or `MILLERWED` |
-| **Who gets it** | Couple shares with guests (program, QR, thank-you note) |
-| **Window** | **30 days** from event date (extend on request) |
-| **Stacking** | Does **not** stack with SERVICE10 or other % order discounts |
-| **Scope** | Site-wide crystals + engraving catalog (exclude event-package bookings / gift cards if needed) |
-
-**Shopify setup:** one discount code per wedding · usage limit optional · end date = event + 30 days · customer-facing note: “Wedding guest rate.”
-
-**Couple deliverable:** we provide the code + a short blurb / QR they can paste into programs or a follow-up text.
-
-Example blurb:
-> Couldn’t grab a crystal at the wedding? Use code **JAMIEALEX15** for 15% off at sonoranslush… — valid 30 days.
+Same rules: **15%**, no stack with SERVICE10, couple or company shares the code.  
+Format examples: `JAMIEALEX15` · `ACMEHOLIDAY26`
 
 ---
 
 # Wedding packages (Jet Mini)
 
-Each package includes:
-1. **One couple crystal** (size locked by tier)  
-2. **Guest crystal keychains** (heart **or** rectangle — one style for the run)  
-3. On-site time, setup, photo guidance, background optimize + up to 2 lines text on included pieces  
+Each package = **1 couple crystal** (size locked) + **guest keychains** (one style, one design) + time.
 
-**Guest keychains = one shared design.**  
-Per-guest unique names = custom quote or add **F2**.  
-**Extra keychains:** **packs of 50 only**, order ahead.
+| Package | Price | Time | Couple crystal | Guest keychains |
+|---------|-------|------|----------------|-----------------|
+| **Intimate** | **$895** | 2 hrs | Heart Med **or** Rect Large | **25** H or R |
+| **Party** | **$1,495** | 3 hrs | Heart Large **or** Rect XL | **50** H or R |
+| **VIP** | **$2,295** | 4 hrs | **Mini Mantel** | **50** H or R |
 
----
+Upgrades / extra keychain packs of 50 / LED: see prior wedding section detail or quote.  
+Extra keychains: **packs of 50 only** · **$350**/pack same design.
 
-## Couple crystal by tier
-
-| Package | Couple crystal (choose one) | Notes |
-|---------|----------------------------|--------|
-| **Intimate** | **Heart Medium** **or** **Rectangle Large** | Can upgrade |
-| **Party** | **Heart Large** **or** **Rectangle XLarge** | Can upgrade to Mini Mantel |
-| **VIP** | **Mini Mantel** | Largest — no size upgrade |
+**Couple upgrades:** Intimate→XL/Large Heart +$120 · →Mantel +$280 · Party→Mantel +$160 · VIP max size.
 
 ---
 
-## Intimate — **$895** · up to 2 hours
+# Corporate packages
+
+Built for **holiday parties, client appreciation, all-hands, trade activations**.  
+Same rules as weddings: **locked counts and sizes** — no “25 Mini Mantels in the package.”
+
+**Logo:** one company mark prepared in advance (vector/PNG).  
+**Employee keychains / tags:** one shared design (logo + year, or logo + “Team 2026”) unless F2 name station is added.
+
+---
+
+## Corporate — Jet Mini (premium gifts)
+
+### Team Spark — **$995** · up to 2 hours
 
 | Included | Detail |
 |----------|--------|
-| Couple crystal | **1×** Heart Medium **or** Rectangle Large |
-| Guest keychains | **25×** Heart **or** Rectangle (one style, one design) |
-| Photo / text on included | Yes |
+| **Leadership crystal** | **1×** Rectangle Medium **or** Heart Small |
+| **Employee / guest keychains** | **25×** Rect **or** Heart crystal keychains (logo + shared text) |
+| Logo prep (one mark) | Yes |
+| Background/text on included | Yes |
 
-Extras beyond package → **event price table** above.  
-Guest online code issued for this wedding.
+**Example — small Christmas party (≤30):**  
+1× RM crystal for the host/CEO photo or year mark + 25 keychains “Acme · Holiday 2026.”
 
 ---
 
-## Party — **$1,495** · up to 3 hours
+### Team Glow — **$1,695** · up to 3 hours
 
 | Included | Detail |
 |----------|--------|
-| Couple crystal | **1×** Heart Large **or** Rectangle XLarge |
-| Guest keychains | **50×** Heart **or** Rectangle (one style, one design) |
-| Pre-event photo guide | Yes |
+| **Leadership crystal** | **1×** Rectangle Large **or** Heart Medium |
+| **Employee keychains** | **50×** Rect **or** Heart (logo + shared text) |
+| Logo prep | Yes |
+| Pre-event art proof | Yes |
 
-Extras → event prices. Guest online code included.
+**Example — mid-size holiday party (~50):**  
+1× Large rect on LED for the company display table + 50 keychains for attendees.
 
 ---
 
-## VIP — **$2,295** · up to 4 hours
+### Team Showcase — **$2,595** · up to 4 hours
 
 | Included | Detail |
 |----------|--------|
-| Couple crystal | **1× Mini Mantel** |
-| Guest keychains | **50×** Heart **or** Rectangle (one style, one design) |
-| Pre-event photo processing | Yes |
-| Priority couple piece | Yes |
+| **Leadership crystal** | **1× Mini Mantel** **or** **1× Rectangle XLarge** |
+| **Employee keychains** | **50×** Rect **or** Heart |
+| **Extra leadership pieces** | **2×** Rectangle Medium (e.g. two directors / awards) |
+| Logo prep + pre-event processing | Yes |
+| Priority leadership queue | Yes |
 
-Extras → event prices. Guest online code included.  
-**+50 keychains:** one extra pack of 50 (add-on).
+**Example — company Christmas party / client night:**  
+Mini Mantel for the office + 2× RM award crystals + 50 branded keychains.  
+**+50 keychains:** add pack of 50 (**$350**).
 
 ---
 
-## Couple crystal upgrades
+### Corporate Jet Mini upgrades
 
 | From | To | Add |
 |------|----|-----|
-| Intimate | Heart Large or Rect XLarge | **+$120** |
-| Intimate | Mini Mantel | **+$280** |
-| Party | Mini Mantel | **+$160** |
-| VIP | — | None |
-
-Same-tier Heart ↔ Rect swap = no charge.
-
----
-
-## Other add-ons
-
-| Add-on | Price |
-|--------|-------|
-| Extra keychains | **Pack of 50 only** — **$350**/pack (same design, order ahead) |
-| LED base (couple) | Event rate **$24** / rotating **$26** |
-| Extra hour | **$200** |
-| Travel outside metro Tucson | Quote |
+| Team Spark leadership (RM/HS) | Rect Large or Heart Med | **+$80** |
+| Team Spark | Rect XL or Heart Large | **+$150** |
+| Team Spark / Glow | Mini Mantel | **+$200 / +$160** |
+| Extra RM (beyond package) | Event rate | **$80** |
+| Extra keychain pack (50) | Same design | **$350** |
+| LED under leadership piece | Event rate | **$22–$26** |
 
 ---
 
-# F2 packages (surface)
+## Corporate — F2 (volume surface)
 
-| Tier | Price | Time | Included |
-|------|-------|------|----------|
-| Spark | **$450** | 2 hrs | Up to **40** event-kit pieces |
-| Glow | **$750** | 3 hrs | Up to **75** + 1 event graphic |
-| Full Station | **$1,200** | 4 hrs | Up to **120**; guest-brought OK within time |
+Best for **high headcount** Christmas parties where everyone gets a fast favor.
 
-Extra hour **$150**.
+### Corp Spark — **$550** · 2 hours
+
+| Included | Detail |
+|----------|--------|
+| Engravings | Up to **50** event-kit pieces |
+| Kit blanks | Wood tags, wood keychains, openers (as stocked) |
+| Logo | One company mark |
+
+**Example:** 50 wood ornaments / tags “Holiday 2026 + logo.”
 
 ---
 
-# Booking checklist
+### Corp Glow — **$900** · 3 hours
 
-1. Package (**Intimate / Party / VIP**)  
-2. Couple shape + keychain shape + shared design text  
-3. Optional extras / upgrades (event prices)  
-4. **Create guest online code** (15% · 30 days · unique name)  
-5. Deposit · photo prep · event day · hand couple the code + blurb  
+| Included | Detail |
+|----------|--------|
+| Engravings | Up to **100** kit pieces |
+| Logo + optional second layout | Year mark + department line |
+
+**Example:** 80 employee ornaments + 20 client tags.
+
+---
+
+### Corp Full Station — **$1,400** · 4 hours
+
+| Included | Detail |
+|----------|--------|
+| Engravings | Up to **150** kit pieces |
+| Guest-brought items | OK within time (tumblers, etc. — materials confirmed ahead) |
+| Name personalization | Available (slower throughput — plan counts) |
+
+**Example:** Holiday party — 120 branded tags + live names on 30 guest tumblers.
+
+**F2 extras:** hour **$150** · kit piece overage **$3–$6** · travel quote.
+
+---
+
+## Corporate combo (recommended for Christmas parties)
+
+| Build | What they get | From |
+|-------|---------------|------|
+| **Team Glow + Corp Glow** | 1 leadership crystal + 50 crystal keychains + ~100 wood tags | **~$2,595** |
+| **Team Showcase + Corp Full** | Mantel/XL + 2× RM + 50 crystal keys + up to 150 surface pieces | **~$3,995** |
+
+**Example — 80-person Christmas party:**  
+Team Glow (leadership crystal + 50 crystal keychains for VIPs/clients) + Corp Glow (wood ornaments for full staff) + employee online code `ACMEHOLIDAY26` for anyone who left early.
+
+---
+
+## Corporate online code
+
+| Setting | Value |
+|---------|--------|
+| Discount | **15%** |
+| Code | Unique per company/event (`ACMEHOLIDAY26`) |
+| Window | Event + **30 days** |
+| Who shares | HR / event organizer → employees & clients |
+| Stacking | No stack with SERVICE10 |
+
+Blurb:  
+> Missed the engraving station? Use **ACMEHOLIDAY26** for 15% off at [site] — 30 days. Tax at checkout.
+
+---
+
+## What corporate packages do *not* include
+
+- Open-ended “up to N crystals” of any size  
+- Mini Mantel counted as a keychain equivalent  
+- Unlimited unique-name crystal keychains without quote  
+- Same-hour color-fill bake  
+
+---
+
+## F2 general (non-corp) packages
+
+| Tier | Price | Time | Kit pieces |
+|------|-------|------|------------|
+| Spark | **$450** | 2 hrs | 40 |
+| Glow | **$750** | 3 hrs | 75 |
+| Full Station | **$1,200** | 4 hrs | 120 |
+
+---
+
+## Booking checklist (corporate)
+
+1. Package name(s) — Jet Mini and/or F2  
+2. Logo file (vector preferred)  
+3. Leadership crystal size/shape + keychain shape  
+4. Headcount → confirm keychain packs / F2 counts  
+5. **Create employee/client online code** (15% · 30 days)  
+6. Deposit · art proof · event day · invoice (**prices exclude tax**)  
 
 **Contact:** [event email / form]
 
 ---
 
-*Tucson-area starting prices. Out-of-area / multi-day / custom = quote.*
+*Tucson-area starting prices. Multi-day, out-of-area, or custom awards programs = quote.*
