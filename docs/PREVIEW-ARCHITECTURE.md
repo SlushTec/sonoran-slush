@@ -1,171 +1,167 @@
-# Photo Optimize + Live Crystal Preview Architecture
+# Photo Optimize + Crystal Preview Architecture
 
-**Goal:** Customer uploads a photo → automatic optimization for subsurface engraving → rotatable preview of how it will look in the crystal → approve → burn on Jet Mini Original.
-
-**Stack split**
-- **Public-facing optimize:** fal.ai (Nano Banana 2 or similar)
-- **Production 2D→3D + accurate preview:** Cockpit3D FastPass (you already have this)
-- **Optional later:** Lightweight Three.js “approximate” crystal rotation on the product page using our masks
+**Goal:** Customer uploads a photo → automatic optimization for subsurface engraving → clear preview of how it will look in the crystal → approve → burn on Jet Mini Original.
 
 ---
 
-## 1. Realistic Flow (recommended)
+## Recommended near-term path: **Mask-based (non-rotating) preview**
+
+You already have the crystal shape masks. Use them.
 
 ```
 Customer photo
     ↓
-[Your site / Shopify] upload
+Upload on site / Shopify
     ↓
-fal.ai Nano Banana 2 (edit)
-  • brighten subject / fix underexposure
+Optimize (fal.ai Nano Banana 2 or simpler enhance)
+  • brighten subject, fix underexposure
   • boost contrast
   • optional background removal
-  • crystal-oriented prompt
     ↓
-Optimized 2D image stored + shown to customer
+Composite optimized photo into the matching crystal mask
+  (Heart, Rectangle Tall/Wide, Dog Bone, Notched, Circle Ornament, Keychain, etc.)
     ↓
-Operator (or future automation) submits optimized image to FastPass
+Show static “photo inside crystal” preview on the product / order page
     ↓
-Cockpit3D FastPass
-  • 2D → 3D point-cloud conversion (credits)
-  • rotatable crystal-style preview
+Customer approves (or requests changes)
     ↓
-Preview link / screenshot / PDF sent to customer for approval
-    ↓
-Customer approves
-    ↓
-Burn on Jet Mini Original → ship or hand off at event
+Staff: FastPass conversion → Jet Mini Original burn → ship / event handoff
 ```
 
-This matches what you already promise: free digitize/enhance/optimize + preview before engraving.
+**Why this is the right first version**
+- No FastPass API required
+- Uses assets you already own
+- Fast, cheap, works on Shopify or a custom site
+- Honest: it’s a mockup of the *shape and placement*, not a full subsurface point-cloud simulation
+- Still pairs with the real FastPass preview before you burn (operator-side)
+
+Label it clearly for customers:
+> *Preview of your photo inside this crystal shape. Final 3D depth and internal lighting are prepared after approval.*
 
 ---
 
-## 2. fal.ai role (auto-optimize)
+## How the mask composite works
 
-**What it is good for**
-- Fixing dark / underexposed photos (critical: dark → fewer dots → weak crystal)
-- Increasing contrast so faces and subjects read clearly
-- Background removal or simplification
-- Fast, cheap, API-native (~$0.08/image, seconds)
+1. **Choose shape** — customer picks Heart, Rectangle Tall, Dog Bone, etc.
+2. **Load the matching mask** — PNG with transparent crystal silhouette (from `Masks for website` / keep set).
+3. **Fit the photo** — scale/crop the optimized image into the mask’s content area (object-fit: cover or a guided crop UI).
+4. **Stack**
+   - Bottom: optional soft shadow / reflection for desk realism
+   - Middle: photo clipped to mask
+   - Top: crystal edge / highlight overlay if the mask includes one (or a subtle bevel PNG)
+5. **Output** — single PNG/WebP preview the customer sees and you store with the order.
 
-**What it is not**
-- It does not produce a subsurface point cloud
-- It does not produce a true rotatable “inside the crystal” preview
+Optional light polish:
+- Soft inner glow or slight desaturation to hint at “inside glass”
+- Very subtle CSS parallax on mouse move (still non-rotating 3D)
+- Side-by-side: original upload vs optimized-in-crystal
 
-**Example edit prompt direction**
+---
+
+## Shapes that have (or need) masks
+
+| Shape | Mask status | Notes |
+|-------|-------------|--------|
+| Heart | Have / keep | High priority |
+| Rectangle Tall / Wide | Have / keep | High priority |
+| Cut Corner / Prestige | Have / keep | |
+| Dog Bone V / H | Have templates | Pet line |
+| Keychains (Heart / Rectangle) | Have | Favors / events |
+| Circle Ornament | Confirm / add | Holiday + memorial |
+| Small Notched | Confirm / add | |
+| Candle | Optional | Specialty |
+
+If a mask is missing for a shape you sell, generate or request one before that product goes live with live preview.
+
+---
+
+## Optimize layer (still recommended)
+
+Even with masks only, auto-optimize helps:
+
+- Dark photos → fewer dots → weak crystals. Brighten subjects first.
+- fal.ai Nano Banana 2 edit (~$0.08, seconds) or a simpler enhance pipeline.
+- Background removal makes the composite cleaner inside the mask.
+
+Example prompt direction:
 ```
 Optimize this portrait for subsurface 3D crystal engraving.
-Brighten the subject’s face and eyes, increase overall contrast,
-reduce heavy shadows, keep natural skin texture, and remove or
-soften a busy background so the subject is clearly separated.
-Do not stylize or change identity.
+Brighten the subject’s face and eyes, increase contrast,
+reduce heavy shadows, keep natural identity, and remove or
+soften a busy background.
 ```
 
-Store the optimized image; optionally show a before/after on the order page.
+---
+
+## Where FastPass still fits
+
+| Stage | Tool |
+|-------|------|
+| Customer-facing preview on site | **Mask composite** (this section) |
+| Production 2D→3D point cloud | **FastPass / Cockpit3D** |
+| Final “this is what we will burn” check | FastPass rotatable preview (operator) or screenshot sent to customer |
+| Laser file | FastPass / Cockpit3D export → Jet Mini Original |
+
+Mask preview sells the shape and placement. FastPass still owns accuracy before the laser runs.
 
 ---
 
-## 3. Cockpit3D FastPass role (real preview + production)
+## Implementation sketch (Shopify or custom)
 
-FastPass is the conversion engine that belongs with the Jet Mini.
+**Frontend**
+- Shape selector → loads corresponding mask URL
+- Photo upload → shows crop/position UI inside mask bounds
+- “Generate preview” → calls backend (or client-side canvas if simple)
 
-**What it does**
-- Accepts the (optimized) photo
-- Runs AI 2D→3D conversion into a point cloud suited for green-beam subsurface lasers
-- Produces a rotatable preview that closely matches the final crystal
-- Exports the production file for the Jet Mini Original
+**Backend / worker**
+- Optional: fal optimize
+- Composite: photo + mask (+ optional edge overlay)
+- Store preview URL on the order
+- Return preview to the browser
 
-**Credits**
-- FastPass uses conversion credits (per image / complexity)
-- Keep a credit balance for production volume
-
----
-
-## 4. FastPass “API key” — current reality
-
-**Important:** Cockpit3D FastPass does **not** appear to expose a public, self-serve developer API with a simple API key for third-party sites (unlike fal.ai).
-
-What exists today is primarily:
-- Web UI (FastPass upload + preview)
-- Desktop Cockpit3D app for positioning, density, export
-- Credit-based conversion
-- Operator / reseller workflow
-
-### How to get access / clarify API options
-
-1. **Log into your existing FastPass / Cockpit3D account**  
-   Look under Account, Settings, Integrations, Developer, or API for any token or webhook options.
-
-2. **Contact 3D Crystal / Cockpit3D support as a Jet Mini Original owner**  
-   Ask specifically:
-   - Is there a **reseller or production API** for FastPass (upload image → get preview URL + scene file)?
-   - Is there a **webhook** when a conversion finishes?
-   - Can preview links be generated and shared with end customers automatically?
-   - Any documentation for automating FastPass from an external store (Shopify, custom site)?
-
-3. **Until an API exists, use the hybrid manual/semi-auto path**  
-   - Site collects photo + order  
-   - fal optimizes automatically  
-   - You (or staff) drop the optimized file into FastPass  
-   - You send the FastPass preview to the customer  
-   - On approval, you burn  
-
-This is still far better than raw uploads and matches how many crystal shops operate.
+**Tech options**
+- Client-side: Canvas 2D or CSS `mask-image` for a quick v1
+- Server-side: Sharp / ImageMagick / Pillow for consistent production composites
+- Later: fal for optimize, then same composite step
 
 ---
 
-## 5. Concrete implementation phases
+## Phased plan (updated)
 
-### Phase A — Design / post-reset (do first)
-- Product pages use the scaffolding + photo conversion guide
-- Upload field on crystal products
-- Order stores original photo + notes
-- Staff workflow: optimize (fal or manual) → FastPass → send preview → burn
+### Phase 1 — Mask previews (do this first)
+- Wire product pages to shape-specific masks
+- Upload + composite + show static crystal mockup
+- Store original + preview on the order
+- Staff still uses FastPass before burning
 
-### Phase B — fal on the storefront
-- Shopify app or small backend service:
-  1. Customer uploads photo
-  2. Backend calls fal.ai `nano-banana-2/edit` (or photo-restoration + edit)
-  3. Returns optimized image URL to the order and to the customer
-- Still use FastPass offline for the real 3D preview
+### Phase 2 — Auto-optimize
+- Add fal.ai (or equivalent) before composite
+- Show optimized-in-crystal as the default preview
 
-### Phase C — Closer automation (if support grants API/webhook)
-- On order paid → optimized image auto-submitted to FastPass
-- On conversion complete → preview URL emailed / shown in customer account
-- Approval button → marks order ready to burn
+### Phase 3 — Faster production loop
+- If Cockpit3D grants API/webhook: auto-submit optimized image after approval
+- Until then: staff drops optimized file into FastPass as today
 
-### Phase D — Optional marketing preview on-site
-- Three.js (or similar) viewer that places the optimized photo into your crystal shape masks with light parallax/rotation
-- Label clearly: “Approximate preview — final 3D crystal preview follows after we process your photo”
+### Phase 4 — Optional motion
+- Light parallax or slow auto-tilt on the mask composite
+- Or full Three.js rotation later — still secondary to mask + FastPass accuracy
 
 ---
 
-## 6. Environment / keys you will need
+## Customer-facing copy
 
-| Service | Key / access | Where |
-|---------|--------------|--------|
-| **fal.ai** | API key from fal dashboard | https://fal.ai → account / API keys |
-| **FastPass / Cockpit3D** | Login credentials + conversion credits | Your existing account; ask support for any API/reseller token |
-| **Shopify** (later) | Admin API / app credentials | When building the upload + order bridge |
-
-Never commit keys to the public repo. Use env vars / Shopify secrets / a small private backend.
+> **See your photo in the crystal.**  
+> Upload a picture, choose a shape, and we’ll show you a preview of how it sits inside the crystal. We optimize every image for engraving and only burn after you approve.
 
 ---
 
-## 7. Customer-facing copy (short)
+## Next actions
 
-> Upload your photo. We automatically optimize it for 3D crystal engraving, then prepare a true preview of how it will look inside the crystal. You approve before we engrave. Most remote orders ship within 24 hours after approval.
+1. Inventory masks for every keep-list shape; fill any gaps (Circle Ornament, Small Notched).
+2. Build a simple composite prototype (one shape — e.g. Heart or Rectangle Tall).
+3. Attach preview generation to the crystal product upload flow post-reset.
+4. Keep FastPass as the production truth before the Jet Mini runs.
 
----
-
-## 8. Next actions
-
-1. Log into FastPass/Cockpit3D and note any Settings → API / Integrations / Developer options.
-2. Email or chat 3D Crystal support: “Jet Mini Original owner — do you offer a FastPass API or webhook for automated customer previews from our store?”
-3. Create a fal.ai account and generate an API key for later Phase B.
-4. Keep production path as: optimize → FastPass preview → approve → Jet Mini Original burn.
-
-*This keeps marketing honest, production accurate, and the door open for full automation if/when FastPass exposes an API.*
+*Mask-based non-rotating preview is the fastest honest path using what you already have.*
 
 *Last updated: 2026-08-11*
