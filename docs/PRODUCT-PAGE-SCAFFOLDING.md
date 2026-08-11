@@ -10,6 +10,9 @@ Use as the blueprint for Shopify product pages and the website catalog.
 - Photo upload + free digitize/enhance/optimize
 - 24-hour ship after approval (major holidays excepted) or same-day at events
 
+**Voice**  
+Warm, specific, honest. Speak to the person who will live with the crystal — not to a generic “gift buyer.” Permanence is the product; the shape is how the feeling sits in the room or on the body.
+
 ---
 
 ## 1. Rectangle Tall
@@ -34,7 +37,7 @@ Small → Mini Mantel (up to 6″ × 4″)
 6. Preview → approve → ship / event CTA
 
 **Emotional hook**  
-Some memories deserve to stand up and be seen.
+Some people change a room just by being in it. This keeps that presence — upright, clear, impossible to overlook. For the graduate who finally made it. For the face you still turn toward. For the portrait that should never lie flat in a drawer.
 
 ---
 
@@ -60,7 +63,7 @@ Small → Mini Mantel (up to 6″ × 4″)
 6. CTA
 
 **Emotional hook**  
-When one person isn’t the whole memory.
+One face is a memory. Several faces together are a life. Wide is for the table that was full, the pack that ran together, the team that actually showed up. No one gets cropped out of the story they belonged to.
 
 ---
 
@@ -86,7 +89,7 @@ Small / Medium / Large (up to 5″)
 6. CTA
 
 **Emotional hook**  
-Some gifts don’t need words. This one is the word.
+You don’t have to explain a heart. It already knows what it is. Put their face inside it and the gift stops being “a crystal” and becomes the thing you meant all along — still here, still held, still yours.
 
 ---
 
@@ -111,7 +114,7 @@ Small only (≈ 5″ × 4.3 × 2.4)
 5. CTA for awards and premium gifts
 
 **Emotional hook**  
-For the moments that deserve a pedestal.
+Some achievements are too quiet on a certificate. This one takes space on the desk and keeps taking it — a daily reminder that the work mattered, that someone noticed, that the standard was met.
 
 ---
 
@@ -136,7 +139,7 @@ Small / Medium / Large (up to 3″ cube)
 5. CTA
 
 **Emotional hook**  
-A different angle on the same forever.
+Not every forever needs soft edges. Some memories sit better with clean lines and light that breaks a little differently — sharp enough to feel current, deep enough to last.
 
 ---
 
@@ -161,7 +164,7 @@ One size: 6″ × 4″ (vertical or horizontal)
 5. CTA
 
 **Emotional hook**  
-They gave you their whole world. Give them a place that lasts.
+They met you at the door. They took the bad days without asking why. They loved you in a language that never needed words. This is not “a pet product.” This is a place for the one who was family — still seen, still named, still home.
 
 ---
 
@@ -186,7 +189,7 @@ One size: 4″ × 2.4 × 2.4
 5. CTA
 
 **Emotional hook**  
-A light you can still sit with.
+Grief doesn’t always want a speech. Sometimes it wants a small light in the room and a face you can still sit with. Light the candle. Let the crystal hold them. Stay as long as you need.
 
 ---
 
@@ -210,7 +213,7 @@ Small Notched (within 6×4)
 4. CTA
 
 **Emotional hook**  
-Small enough to live on a desk. Distinct enough to be remembered.
+Not everything important is large. Some of the best things live at the edge of the desk — seen every day, chosen on purpose, finished enough that you never wish you’d gone bigger.
 
 ---
 
@@ -234,7 +237,7 @@ Circle ornament (confirmed producible)
 4. CTA
 
 **Emotional hook**  
-Some memories belong on the tree — and in the room long after.
+Every year the tree asks the same question: what still matters enough to hang? This answers it — a face, a pet, a year you refuse to forget — catching the light in December and still catching it in July if you leave it in the window.
 
 ---
 
@@ -258,7 +261,7 @@ Wedding favors • Event giveaways • Everyday keepers • On-site volume
 4. CTA (especially strong for events)
 
 **Emotional hook**  
-A little heart that goes where you go.
+Keys are ordinary until they aren’t. One small heart on the ring turns every unlock into a quiet return — to the day, to the person, to the promise you actually meant.
 
 ---
 
@@ -282,7 +285,7 @@ Event favors • Corporate giveaways • Everyday carry • On-site production
 4. CTA
 
 **Emotional hook**  
-The smallest permanent reminder.
+The smallest permanent reminder. Not a trophy. Not a speech. Just their face (or your mark) riding along in the pocket you reach for without thinking — proof that some things were worth keeping close.
 
 ---
 
@@ -306,7 +309,7 @@ Wearable gifts • Anniversaries • Mother’s Day • Personal keepsakes
 4. CTA
 
 **Emotional hook**  
-Some memories are meant to be worn.
+Some memories don’t want a shelf. They want the pulse. Wear them against the skin where only you feel the weight — a private forever that still shows when you choose to let it.
 
 ---
 
@@ -329,7 +332,7 @@ Wearable gifts • Minimal aesthetic • Everyday pendants
 3. CTA
 
 **Emotional hook**  
-Quiet. Close. Permanent.
+Quiet. Close. Permanent. No big statement — just a small clear window over the heart, holding the one face that still steadies you when the day doesn’t.
 
 ---
 
@@ -349,5 +352,6 @@ Quiet. Close. Permanent.
 3. Light base and inscription as add-on products or line-item options.
 4. Use only keep-list imagery and size charts.
 5. Hero copy should stay emotional; specs stay accurate and limited to Original capacity.
+6. Prefer the deepened hooks on the page; keep short descriptions for cards and SEO meta where needed.
 
-*Last updated: 2026-08-11 — full keep-list coverage*
+*Last updated: 2026-08-11 — emotional hooks deepened*
