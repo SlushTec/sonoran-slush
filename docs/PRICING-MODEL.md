@@ -52,7 +52,7 @@ You collect TPT (state 5.6% + local) on taxable sales once you have nexus. Tax i
 
 Average shipping you will actually pay (commercial rates, 2026):
 - Small item (keychain, opener, ornament, journal, wine stopper): **$5–$8**
-- Tumbler / water bottle / rimmer: **$8–$12**
+- Tumbler / water bottle / rimmer / single glass: **$8–$12**
 - Single cutting board: **$10–$15**
 - Board set or whiskey set: **$14–$20**
 
@@ -78,6 +78,13 @@ Premium branded / end-grain can hit $75–$105.
 | 40oz engraved tumbler | $34–$55 |
 | 32oz water bottle | $28–$45 |
 | Electroplated / rainbow reveal | $45–$60 |
+
+### Engraved glassware (Libbey-class)
+| Product | Market range |
+|---------|--------------|
+| Personalized rocks / DOF (1 side) | $15–$28 |
+| Mixing / pint glass engraved | $15–$28 |
+| Multi-side or sets | higher / bundle |
 
 ### Small goods
 | Product | Market range |
@@ -116,6 +123,16 @@ These assume you are buying blanks in reasonable volume and want **competitive b
 | **Crystal wine / bottle stopper** | **$22** |
 | Shot glass set (wood box) | **$38** |
 | Whiskey decanter sets | **$79–$110** (by complexity) |
+
+### Libbey engraved glasses
+**Placement options:** 1 side · 2 sides · bottom (combinable)
+
+| Product | 1 side | 2 sides | Bottom only | 1 side + bottom | 2 sides + bottom |
+|---------|--------|---------|-------------|-----------------|------------------|
+| **Libbey 1639** (16 oz mixing/pint) | **$18** | **$24** | **$16** | **$26** | **$32** |
+| **Libbey 2339** (12.5 oz Lexington DOF) | **$18** | **$24** | **$16** | **$26** | **$32** |
+
+See product docs: [LIBBEY-1639-MIXING-GLASS.md](./products/LIBBEY-1639-MIXING-GLASS.md) · [LIBBEY-2339-DOF.md](./products/LIBBEY-2339-DOF.md)
 
 ### Small / volume / favors
 | Product | Retail |
