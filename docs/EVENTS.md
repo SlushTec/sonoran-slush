@@ -13,149 +13,171 @@ Live engraving turns guests into participants. They watch their name, date, or p
 | | **xTool F2** | **Jet Mini Original** |
 |--|--------------|------------------------|
 | **What it does** | Fast surface engraving / marking | 3D photo etched *inside* crystal |
-| **Best for** | High guest volume, live activation | Premium photo gifts, smaller counts |
-| **Typical items** | Wood tags, keychains, glasses, tumblers, metal, leather | Optical crystal shapes (rect, heart, etc.) |
-| **Time per piece** | Seconds to a few minutes | Longer (photo process + burn) |
+| **Best for** | High guest volume, live activation | Premium photo gifts, controlled counts |
+| **Typical items** | Wood tags, keychains, glasses, metal | **Event-stock crystal sizes only** (see below) |
+| **Time per piece** | Seconds to a few minutes | Longer (photo + burn) |
 | **Guest experience** | “Watch it engrave now” | “Your photo becomes art in glass” |
-| **Power / space** | Compact, standard outlet | Station setup; discuss venue needs |
 
-**Both machines** can be booked alone or together for larger productions.
-
----
-
-## Event types we book
-
-- Weddings & receptions (favors, place markers, his & hers)  
-- Corporate (branded swag, client gifts, trade-show activation)  
-- Bachelor / bachelorette & showers  
-- Birthdays, anniversaries, reunions  
-- Fundraisers & galas  
-- Markets / pop-ups (hourly station)  
-- Private parties & holiday gatherings  
+**Both machines** can be booked alone or together.
 
 ---
 
-# Packages — xTool F2 (portable surface)
+## Hard rule — crystal packages
 
-Fast dual laser (diode + IR). Wood, glass surface, coated metals, leather, acrylic, and more. Ideal when many guests each get a personalized piece.
+Package counts apply **only** to **event-stock sizes**.  
+Larger / premium shapes are **never** substituted 1:1 into “included” counts.
 
-### Tier 1 — Spark  
-**$450 · 2 hours on-site**
+### Event-stock sizes (allowed in package tallies)
 
-- Setup + breakdown  
-- Up to **40** included engravings (simple text / monogram on our stock blanks)  
-- Guest chooses from a short menu of fonts / layouts  
-- Stock blanks: wood tags, keychains, or similar from our event kit  
+| Code | Size | Approx |
+|------|------|--------|
+| **RS** | Rectangle Small 60×40 | Entry crystal |
+| **RM** | Rectangle Medium 80×50 | Standard gift |
+| **HS** | Heart Small 80×70 | Romantic / VIP |
+| **DS** | Diamond Small 50×50 | Optional alt |
 
-**Example:** Bridal shower — 30 wood tags with first names + date.  
-**Example:** Small birthday — 25 keychains with nicknames.
+### Not in package counts (always paid upgrade)
 
----
+| Size | How it’s sold at events |
+|------|-------------------------|
+| Rectangle Large / XLarge | Add-on at event rate |
+| **Mini Mantel 150×100** | Add-on at event rate — **not** “one of the 25” |
+| Prestige / Notched / Dog Bone / Candle | Add-on / quote |
+| LED bases | Add-on per piece |
 
-### Tier 2 — Glow  
-**$750 · 3 hours on-site**
-
-- Everything in Spark  
-- Up to **75** included engravings  
-- Mix of stock blanks (tags, openers, small glass, etc.)  
-- One custom event graphic (e.g. monogram or simple logo) prepared in advance  
-
-**Example:** Wedding cocktail hour — 60 place tags + couple monogram.  
-**Example:** Corporate mixer — 50 wood coasters with company mark + guest name.
+If a client wants 25 Mini Mantels, that is a **custom quote**, not Tier 3.
 
 ---
 
-### Tier 3 — Full Station  
-**$1,200 · 4 hours on-site**
+# Wedding packages (specific inclusions)
 
-- Everything in Glow  
-- Up to **120** included engravings  
-- Guest-brought items allowed within capacity (tumblers, flasks, etc. — we confirm materials)  
-- Priority lane for VIPs / wedding party  
-- Optional second simple design layout  
+Built for wedding party + close family photo gifts. Guest-count favors stay on **F2** (tags, etc.).
 
-**Example:** Reception — 100 guest favors + 10 groomsmen glasses.  
-**Example:** Trade show day — branded metal cards + name on soft goods.
+### Wedding Crystal — Intimate  
+**$650 · up to 2 hours on-site**
 
----
+**You get exactly:**
 
-### F2 add-ons
+| Item | Qty |
+|------|-----|
+| Rectangle Medium (**RM**) **or** Heart Small (**HS**) | **6** total (any mix of RM + HS) |
+| Operator + setup/breakdown | Yes |
+| Photo guidance (what converts well) | Yes |
+| Background optimize on included pieces | Yes |
+| Up to 2 lines text on included pieces | Yes |
 
-| Add-on | From |
-|--------|------|
-| Extra hour | **$150** |
-| Extra engravings beyond package | **$3–$8** each (by item) |
-| Guest-provided premium blanks (tumblers, etc.) | Engrave fee only (quote) |
-| Travel outside metro Tucson | Quote |
-| Color fill on glass (if scheduled) | Not live-same-hour; pre-event or post-ship only |
+**Not included:** LED bases, Large/XLarge/Mantel, extra crystals beyond 6.
+
+**Example:** 4× RM for parents + 2× HS for couple.
 
 ---
 
-# Packages — Jet Mini Original (3D crystal)
+### Wedding Crystal — Party  
+**$1,100 · up to 3 hours on-site**
 
-Photo becomes a point-cloud **inside** optical crystal. Fewer pieces, higher perceived value. Best when the gift is the photo itself.
+**You get exactly:**
 
-### Tier 1 — Keepsake Bar  
-**$650 · 2 hours on-site**
+| Item | Qty |
+|------|-----|
+| Rectangle Medium (**RM**) | **8** |
+| Heart Small (**HS**) **or** Rectangle Small (**RS**) | **4** (any mix) |
+| **Total event-stock crystals** | **12** |
+| Operator + setup/breakdown | Yes |
+| Pre-event photo collection guide | Yes |
+| Background + text on included pieces | Yes |
 
-- Setup + breakdown  
-- Up to **8** 3D crystal pieces included (small/medium rect or similar from event stock)  
-- Guest or host provides photos (phone transfer / USB); we advise on what converts well  
-- Standard crystal sizes from our Jet Mini catalog  
+**Optional add-ons (priced extra):** LED base per crystal · swap one RM up to Rectangle Large (upgrade fee) · extra RM/HS at event rate.
 
-**Example:** Anniversary party — 6 medium crystals from couple’s photos for family.  
-**Example:** Small memorial gathering — photo crystals for immediate family.
-
----
-
-### Tier 2 — Gallery  
-**$1,100 · 3 hours on-site**
-
-- Everything in Keepsake Bar  
-- Up to **15** crystals included  
-- Mix of sizes (within Jet Mini envelope)  
-- Optional LED base upgrade available per piece (add-on)  
-
-**Example:** Wedding VIP table — bridal party + parents, photo crystals.  
-**Example:** Corporate executive dinner — 12 client photo/logo crystals.
+**Example:** 8× RM bridal party + 2× HS couple + 2× RS for readers/officiant.
 
 ---
 
-### Tier 3 — Showcase  
-**$1,800 · 4 hours on-site**
+### Wedding Crystal — Full VIP  
+**$1,800 · up to 4 hours on-site**
 
-- Everything in Gallery  
-- Up to **25** crystals included  
-- Pre-event photo collection recommended (we send a simple upload guide)  
-- Priority finishing for hosts / speakers  
-- LED bases available as package add-on bundle  
+**You get exactly:**
 
-**Example:** Gala — donor recognition crystals from event photos.  
-**Example:** Reunion — family photo crystals for multiple households.
+| Item | Qty |
+|------|-----|
+| Rectangle Medium (**RM**) | **12** |
+| Heart Small (**HS**) | **4** |
+| Rectangle Small (**RS**) | **4** |
+| **Total event-stock crystals** | **20** |
+| Operator + setup/breakdown | Yes |
+| Pre-event photo upload + processing | Yes |
+| Background + text on included pieces | Yes |
+| Priority queue for couple / parents | Yes |
 
----
+**Still not included as “free upgrades”:** Mini Mantel, XLarge, Prestige, etc.  
+Those may be added **per piece** at event rates (see below).
 
-### Jet Mini add-ons
-
-| Add-on | From |
-|--------|------|
-| Extra hour | **$200** |
-| Extra crystal beyond package | Per retail size (event rate quote) |
-| LED base per crystal | Package rate (~$20–$28) |
-| Background optimize / text | Included or small add per piece |
-| Pre-event photo processing | Included in Tier 2–3 when files sent ahead |
-| Travel outside metro Tucson | Quote |
-
-**Important:** 3D crystal is **not** a 30-second favor. Throughput is lower than F2 by design. Packages are sized for quality, not infinite queue.
+**Example:** 12× RM wedding party + 4× HS couple & parents + 4× RS grandparents/readers.
 
 ---
 
-# Combo booking (both machines)
+### Wedding crystal upgrades (per piece, on top of package)
 
-**From $1,600 · 3+ hours** — F2 for volume guest favors + Jet Mini for VIP photo crystals.  
-Quote by guest count and mix of pieces.
+| Upgrade | Event rate (from) |
+|---------|-------------------|
+| Extra **RS** | **$55** |
+| Extra **RM** | **$75** |
+| Extra **HS** | **$75** |
+| Rectangle Large | **$95** |
+| Rectangle XLarge | **$140** |
+| **Mini Mantel** | **$200** |
+| LED base (square/rect) | **$22** |
+| Rotating LED | **$26** |
 
-**Example:** Wedding — F2 does 80 wood place tags; Jet Mini does 10 crystal gifts for wedding party & parents.
+---
+
+# General Jet Mini packages (non-wedding)
+
+Same size locks. Counts are **event-stock only**.
+
+### Keepsake Bar — $650 · 2 hrs  
+**Included:** **6 × RM** (or mix RM/HS totaling 6). No Mantels in the six.
+
+### Gallery — $1,100 · 3 hrs  
+**Included:** **8 × RM + 4 × RS/HS** (12 event-stock total).
+
+### Showcase — $1,800 · 4 hrs  
+**Included:** **12 × RM + 4 × HS + 4 × RS** (20 event-stock total).
+
+Extra pieces and large sizes = upgrade table above.
+
+---
+
+# xTool F2 packages (surface — volume)
+
+### Spark — $450 · 2 hrs  
+**Included blanks (you choose mix up to count):**
+- Up to **40** pieces from event kit: wood tags, wood keychains, bottle-opener keychains  
+- Simple text / monogram from our font menu  
+
+**Not auto-included:** tumblers, Libbey glasses, metal money clips (those = add-on blank + engrave fee).
+
+### Glow — $750 · 3 hrs  
+**Included:**
+- Up to **75** event-kit pieces (tags / keychains / openers as stocked)  
+- One event graphic (monogram or simple logo) prepped ahead  
+
+### Full Station — $1,200 · 4 hrs  
+**Included:**
+- Up to **120** event-kit pieces  
+- Guest-brought items: engraving labor included within time; blank not ours unless purchased  
+- Second layout optional  
+
+**F2 add-ons:** extra hour **$150** · extra kit pieces **$3–$6** · premium blanks quote.
+
+---
+
+# Wedding combo (recommended)
+
+**F2 Full Station or Glow** for guest favors (tags)  
+**+ Wedding Crystal Party or Full VIP** for wedding party crystals  
+
+**Example total:** Glow ($750) + Wedding Crystal Party ($1,100) = **$1,850**  
+→ ~75 wood place tags for guests + 12 event-stock crystals for party/family.
 
 ---
 
@@ -163,43 +185,31 @@ Quote by guest count and mix of pieces.
 
 - On-site operator  
 - Machine setup & safety  
-- Standard stock blanks listed in package  
-- Basic design layouts / fonts  
+- **Only the blanks listed in the package table**  
 - Breakdown  
 
-**Venue needs:** Standard power, a table (~6–8 ft preferred), reasonable indoor or shaded space. We confirm smoke/vent needs for F2 by material.
+**Venue:** power, table (~6–8 ft), indoor or shaded space.
 
 ---
 
-# What we don’t do on-site
+# What we don’t do
 
-- Same-hour **color fill** bake/cure on glass (oven process — offer pre-event or ship-after)  
-- Unsafe materials or restricted laser jobs  
-- Unrealistic “everyone gets a large 3D crystal in 2 hours” counts  
+- Treat Mini Mantel / XLarge as equal to “one included crystal”  
+- Same-hour color-fill bake on glass  
+- Unlimited large crystals inside a flat package price  
 
 ---
 
 # How to book
 
-1. Tell us **date, venue city, guest count, machine preference**  
-2. We confirm package + blank list  
-3. Deposit to hold the date  
-4. Design / photo prep as needed  
-5. Event day — live station  
+1. Date, venue, guest count, **which package** (name it)  
+2. We confirm **exact size mix** from the allowed table  
+3. Deposit  
+4. Photos / design prep  
+5. Event day  
 
-**Contact:** [your event email / form]  
-**SERVICE10:** 10% for verified veterans, first responders, and teachers on eligible packages (not always combinable with deep event discounts — confirm).
+**Contact:** [event email / form]
 
 ---
 
-## Site page structure (Shopify)
-
-1. Hero: “Live engraving for your event”  
-2. Two columns: **F2** vs **Jet Mini**  
-3. Package cards (3 tiers each)  
-4. Example scenarios  
-5. Combo blurb  
-6. FAQ (power, timing, guest count, photo tips)  
-7. Inquiry form / CTA  
-
-*Prices are starting points for Tucson-area standard events. Large corporate, multi-day, or out-of-area = custom quote.*
+*Package prices = Tucson-area starting rates. Out-of-area, multi-day, or all-Mantel orders = custom quote.*
