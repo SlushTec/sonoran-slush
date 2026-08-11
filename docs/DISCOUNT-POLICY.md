@@ -7,29 +7,34 @@
 ## Service discount — 10% off
 
 **Who qualifies**
-- Verified **veterans** (and military, per ID.me Military/Veteran segment)
+- Verified **veterans**
 - Verified **first responders** (police, fire, EMS, etc.)
 - Verified **teachers** / educators
 
 **Amount:** **10% off** the order (product subtotal)
 
-**Scope:** Shop-wide — 3D crystal, surface engraving, boards, tumblers, smalls, bases, and listed add-ons (background, text) unless a future exclusion is noted.
+**Scope:** Shop-wide — 3D crystal, surface engraving, boards, tumblers, smalls, bases, and listed add-ons unless a future exclusion is noted.
 
 ---
 
-## Verification
+## Verification (current method: code)
 
-### Online (preferred)
-**ID.me Community Verification** (Shopify app)
+**Primary:** Manual verification → Shopify discount code
 
-- Customer verifies via ID.me at cart/checkout or landing page
-- Discount applies **automatically** after successful verification
-- Segments: Military/Veteran · First Responder · Teacher
-- Full setup: **[IDME-INTEGRATION.md](./IDME-INTEGRATION.md)**
+1. Customer requests the discount (email, contact form, or in person at events)
+2. You verify eligibility (ID / credentials)
+3. Issue discount code **`SERVICE10`** (or a single-use code)
+4. Customer enters code at checkout → **10% off**
 
-### Until ID.me is live / in-person events
-- Manual proof (ID, credentials)
-- Issue limited Shopify code (e.g. **SERVICE10**) after verify
+| Setting | Recommendation |
+|---------|----------------|
+| Code | `SERVICE10` |
+| Type | Percentage — **10%** off order |
+| Usage | Limit per customer if desired; or single-use codes after each verify |
+| Stacking | Do **not** combine with other % order discounts |
+| Min purchase | None |
+
+**ID.me:** Deferred. Optional later when volume justifies ~$50/mo. See `docs/IDME-INTEGRATION.md` if you revisit.
 
 ---
 
@@ -38,17 +43,17 @@
 | Rule | Detail |
 |------|--------|
 | Base | 10% off product subtotal |
-| Stacking | Does **not** stack with other % order discounts unless explicitly allowed |
-| Free shipping | Default: threshold evaluated on cart rules as configured in Shopify (prefer clarity on policy page) |
-| Tax | AZ tax on the discounted taxable amount |
-| Events / on-site | Same 10% with ID check at the table |
+| Stacking | Does **not** stack with other % order discounts |
+| Free shipping | Per Shopify free-ship rules ($75 target) |
+| Tax | Calculated on discounted taxable amount |
+| Events / on-site | Same 10% with ID check; apply code or POS discount |
 
 ---
 
 ## Site copy (suggested)
 
 > **10% off for verified veterans, first responders, and teachers.**  
-> Verify with ID.me at checkout — or show ID at events.
+> Contact us to verify and receive your code — or show ID at events.
 
 ---
 
@@ -56,4 +61,3 @@
 
 - Standing policy, not a limited promo.
 - Corporate / bulk / QR+ reseller pricing remains separate.
-- ID.me app cost (~$50/mo + overage) is an operating expense; track vs redemption volume.
