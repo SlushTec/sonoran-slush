@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "project": "sonoran-slush-native",
+  "agents_activated": false,
+  "deadline": null,
+  "scope": "Independent full-production target; scaffold does not complete these tasks.",
+  "items": [
+    {
+      "id": "UX-01",
+      "owner_lane": "AGENT-01",
+      "title": "Approved design/assets and catalog navigation",
+      "status": "planned",
+      "acceptance": "All families discoverable; real assets approved; mobile and keyboard checks pass.",
+      "evidence": []
+    },
+    {
+      "id": "UX-02",
+      "owner_lane": "AGENT-01",
+      "title": "Product detail and category-aware search",
+      "status": "planned",
+      "acceptance": "Approved prices/options, relevant filters, typo/no-result recovery and scale imagery verified.",
+      "evidence": []
+    },
+    {
+      "id": "UX-03",
+      "owner_lane": "AGENT-01",
+      "title": "Persistent accessible personalization",
+      "status": "planned",
+      "acceptance": "Refresh/back/interrupted upload retain permitted data; non-drag positioning; price breakdown.",
+      "evidence": []
+    },
+    {
+      "id": "UX-04",
+      "owner_lane": "AGENT-01",
+      "title": "Guest checkout and gift experience",
+      "status": "planned",
+      "acceptance": "Required configuration survives express checkout; gift recipient is not contacted inadvertently.",
+      "evidence": []
+    },
+    {
+      "id": "UX-05",
+      "owner_lane": "AGENT-01",
+      "title": "Quotes/events/proofs/order portal",
+      "status": "planned",
+      "acceptance": "Distinct requested/held/confirmed and exact proof-version approval; unauthorized links denied.",
+      "evidence": []
+    },
+    {
+      "id": "UX-06",
+      "owner_lane": "AGENT-01",
+      "title": "Owner dashboard and complete journey polish",
+      "status": "planned",
+      "acceptance": "Paid/artwork/production states distinct; real phone and assistive-technology verification.",
+      "evidence": []
+    },
+    {
+      "id": "COM-01",
+      "owner_lane": "AGENT-02",
+      "title": "Approve normalized catalog and business policies",
+      "status": "planned",
+      "acceptance": "Source provenance and contradictions resolved; no fixture price/inventory is sellable.",
+      "evidence": []
+    },
+    {
+      "id": "COM-02",
+      "owner_lane": "AGENT-02",
+      "title": "Durable pricing/cart/stock contracts",
+      "status": "planned",
+      "acceptance": "Integer money, shared blank stock, quantity/set/name rules and server validation tested.",
+      "evidence": []
+    },
+    {
+      "id": "COM-03",
+      "owner_lane": "AGENT-02",
+      "title": "Payment adapter and reconciliation",
+      "status": "planned",
+      "acceptance": "Hosted test checkout; signed/idempotent webhook; duplicate/retry/failure tests; no card data.",
+      "evidence": []
+    },
+    {
+      "id": "COM-04",
+      "owner_lane": "AGENT-02",
+      "title": "Artwork/proof/production state machines",
+      "status": "planned",
+      "acceptance": "Exact proof version and verified payment/capacity gate production; revision invalidates approval.",
+      "evidence": []
+    },
+    {
+      "id": "COM-05",
+      "owner_lane": "AGENT-02",
+      "title": "Quotes and event booking/deposits",
+      "status": "planned",
+      "acceptance": "Authoritative capacity/hold expiry, quote version, deposit/balance and staff approval tested.",
+      "evidence": []
+    },
+    {
+      "id": "COM-06",
+      "owner_lane": "AGENT-02",
+      "title": "Fulfillment/refunds/notifications",
+      "status": "planned",
+      "acceptance": "Durable outbox, shipping/pickup/status, approved refunds and customer ownership tests.",
+      "evidence": []
+    },
+    {
+      "id": "AI-01",
+      "owner_lane": "AGENT-03",
+      "title": "Approved public knowledge pipeline",
+      "status": "planned",
+      "acceptance": "Only reviewed public data; no archive/costs/private files; provenance and refresh tested.",
+      "evidence": []
+    },
+    {
+      "id": "AI-02",
+      "owner_lane": "AGENT-03",
+      "title": "Bounded Bedrock tool assistant",
+      "status": "planned",
+      "acceptance": "Strict tool schemas and budgets; no raw database or money/production write privileges.",
+      "evidence": []
+    },
+    {
+      "id": "AI-03",
+      "owner_lane": "AGENT-03",
+      "title": "Useful product recommendations",
+      "status": "planned",
+      "acceptance": "Real eligible products and authoritative prices/deadlines; baseline comparison and held-out scenarios.",
+      "evidence": []
+    },
+    {
+      "id": "AI-04",
+      "owner_lane": "AGENT-03",
+      "title": "Artwork screening and honest previews",
+      "status": "planned",
+      "acceptance": "Supported formats/consent; uncertainty and staff handoff; no guarantee of final engraving.",
+      "evidence": []
+    },
+    {
+      "id": "AI-05",
+      "owner_lane": "AGENT-03",
+      "title": "Safety/privacy/failure evaluation",
+      "status": "planned",
+      "acceptance": "Injection, tool abuse, PII leakage, timeout and budget tests; commerce works without AI.",
+      "evidence": []
+    },
+    {
+      "id": "AI-06",
+      "owner_lane": "AGENT-03",
+      "title": "Owner assistance and human controls",
+      "status": "planned",
+      "acceptance": "Draft-only replies/actions; high-impact changes require deterministic authorization/approval.",
+      "evidence": []
+    },
+    {
+      "id": "OPS-01",
+      "owner_lane": "AGENT-04",
+      "title": "AWS environment and resource implementation",
+      "status": "planned",
+      "acceptance": "Owner-approved account/region/budget; least-privilege reviewed Terraform plan before apply.",
+      "evidence": []
+    },
+    {
+      "id": "OPS-02",
+      "owner_lane": "AGENT-04",
+      "title": "Authentication/files/secrets boundaries",
+      "status": "planned",
+      "acceptance": "Cognito roles and API ownership; private validated uploads; no secret or customer data exposure.",
+      "evidence": []
+    },
+    {
+      "id": "OPS-03",
+      "owner_lane": "AGENT-04",
+      "title": "Verified CI and non-production delivery",
+      "status": "planned",
+      "acceptance": "Build/test/scan immutable images; scoped OIDC; gated deploy/rollback; archive excluded.",
+      "evidence": []
+    },
+    {
+      "id": "OPS-04",
+      "owner_lane": "AGENT-04",
+      "title": "Observability and recovery",
+      "status": "planned",
+      "acceptance": "Redacted logs, alarms, bounded retries, backup restore and payment reconciliation drill.",
+      "evidence": []
+    },
+    {
+      "id": "OPS-05",
+      "owner_lane": "AGENT-04",
+      "title": "Whole-system production acceptance",
+      "status": "planned",
+      "acceptance": "Retail/bulk/event/gift/proof failure journeys; real phones; WCAG and performance evidence.",
+      "evidence": []
+    },
+    {
+      "id": "OPS-06",
+      "owner_lane": "AGENT-04",
+      "title": "Live launch and operating handoff",
+      "status": "planned",
+      "acceptance": "All gates passed; owner approves DNS/payment/mail cutover; maintenance and incident ownership.",
+      "evidence": []
+    }
+  ]
+}

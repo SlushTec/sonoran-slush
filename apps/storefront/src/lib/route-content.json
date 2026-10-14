@@ -1,0 +1,167 @@
+{
+  "custom-orders": {
+    "title": "Custom & bulk orders",
+    "description": "A separate journey for shared designs, individual names and larger projects.",
+    "topics": [
+      "Product mix and quantity",
+      "Shared artwork versus individual names",
+      "Required date and delivery requirements",
+      "Artwork review, quote version and acceptance"
+    ],
+    "status": "The inquiry form and quote portal are planned. This preview does not submit a request."
+  },
+  "events": {
+    "title": "Live event engraving",
+    "description": "Packages and availability deserve more than an add-to-cart button.",
+    "topics": [
+      "Date, location and guest count",
+      "Package inclusions and personalization limits",
+      "Preparation deadlines and operator capacity",
+      "Reviewed proposal, deposit and confirmed booking"
+    ],
+    "status": "Event requests, holds and bookings are not enabled. Viewing this page does not reserve a date."
+  },
+  "our-work": {
+    "title": "Our work",
+    "description": "Real finished products and real event setups will be shown here.",
+    "topics": [
+      "Approved product close-ups",
+      "Scale and packaging photography",
+      "Customer photographs with explicit permission"
+    ],
+    "status": "No portfolio images or customer reviews have been invented for this scaffold."
+  },
+  "help": {
+    "title": "How can we help?",
+    "description": "The help center will support every step from choosing a gift to caring for it.",
+    "topics": [
+      "Photo and artwork guidance",
+      "Shipping, pickup and deadlines",
+      "Proof approval and order questions",
+      "Care, damage reports and customer support"
+    ],
+    "status": "This is a development preview, not a monitored support channel."
+  },
+  "about": {
+    "title": "About Sonoran Slush",
+    "description": "Custom engraving, personalized gifts and live event experiences.",
+    "topics": [
+      "The studio and its people",
+      "Our manufacturing processes",
+      "Real product and workshop photography"
+    ],
+    "status": "Approved studio copy and brand assets will be incorporated before launch."
+  },
+  "privacy": {
+    "title": "Privacy information",
+    "description": "Private artwork and customer information need deliberate protection.",
+    "topics": [
+      "Separate public product images and private uploads",
+      "Clear retention, access and deletion controls",
+      "No silent marketing or model-training consent"
+    ],
+    "status": "Final reviewed privacy terms are not published here. No upload or customer-data form is active."
+  },
+  "terms": {
+    "title": "Ordering terms",
+    "description": "Clear commitments before a customer pays or approves production.",
+    "topics": [
+      "Pricing, taxes and delivery estimates",
+      "Customization and proof approval",
+      "Returns, damage and engraving errors",
+      "Event and quotation terms"
+    ],
+    "status": "These are planned policy topics, not legally approved terms or an active sales agreement."
+  },
+  "cart": {
+    "title": "Your cart",
+    "description": "A persistent, transparent cart will be part of the native store.",
+    "topics": [
+      "Exact personalization and artwork reference",
+      "Server-confirmed price breakdown",
+      "Guest checkout and gift options"
+    ],
+    "status": "Cart persistence and payments are not implemented in this foundation. No order has been created."
+  },
+  "checkout": {
+    "title": "Checkout is not enabled",
+    "description": "Payments remain off until the complete order flow is verified.",
+    "topics": [
+      "Hosted payment collection",
+      "Required personalization retained",
+      "Signed payment confirmation and duplicate protection"
+    ],
+    "status": "No payment form is active and no payment details should be entered into this preview."
+  },
+  "account": {
+    "title": "Your account",
+    "description": "Saved designs, order history and proof management will live here.",
+    "topics": [
+      "Optional customer registration",
+      "Secure order ownership",
+      "Guest-access alternatives"
+    ],
+    "status": "Authentication is not connected. No login form or customer data is exposed."
+  },
+  "orders": {
+    "title": "Order updates",
+    "description": "Useful progress from artwork to delivery.",
+    "topics": [
+      "Artwork review and customer approval",
+      "Production and quality check",
+      "Shipment or pickup",
+      "Issue reporting and reorder"
+    ],
+    "status": "Order lookup is not connected. No customer order information is exposed."
+  },
+  "proofs": {
+    "title": "Review your proof",
+    "description": "Approve the exact version intended for production.",
+    "topics": [
+      "Readable preview and version identity",
+      "Approve or request changes",
+      "Confirmation of approval implications"
+    ],
+    "status": "Proof access and approvals are not enabled. No design can be approved from this scaffold."
+  },
+  "admin": {
+    "title": "Owner workspace",
+    "description": "One place for the work that needs attention.",
+    "topics": [
+      "Paid and unpaid orders",
+      "Awaiting artwork or approval",
+      "Production, packing and event preparation"
+    ],
+    "status": "Staff authentication and the dashboard are not connected. This page contains no private business data."
+  },
+  "help/photo-guide": {
+    "title": "Photo & artwork guide",
+    "description": "Useful guidance without guarantees the source file cannot support.",
+    "topics": [
+      "Supported formats and safe upload",
+      "Quality warnings and human review",
+      "Placement mockup versus production proof"
+    ],
+    "status": "Uploads and automated screening are not enabled."
+  },
+  "help/shipping": {
+    "title": "Shipping & pickup",
+    "description": "Clear timing from approval through delivery.",
+    "topics": [
+      "Approval deadline",
+      "Production lead time",
+      "Arrival estimate and pickup instructions"
+    ],
+    "status": "No shipping rates, pickup availability or arrival guarantees are asserted yet."
+  },
+  "help/returns": {
+    "title": "Order problems & care",
+    "description": "A clear route when something needs attention.",
+    "topics": [
+      "Damage or delivery problems",
+      "Differences from an approved proof",
+      "Care instructions and support"
+    ],
+    "status": "Final policies and issue-submission workflows require review and implementation."
+  }
+}

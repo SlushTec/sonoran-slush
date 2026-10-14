@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "deployment_enabled": false,
+  "live_payments_enabled": false,
+  "live_email_enabled": false,
+  "customer_data_import_enabled": false,
+  "owner_approval": null,
+  "blockers": [
+    "approved-business-data",
+    "durable-commerce-and-authorization",
+    "verified-payments-and-proofs",
+    "private-upload-security",
+    "aws-resources-and-budget-review",
+    "whole-system-acceptance",
+    "backup-restore-and-rollback",
+    "current-policy-review",
+    "explicit-live-launch-approval"
+  ]
+}

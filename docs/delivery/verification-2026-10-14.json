@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "verified_at": "2026-10-14T17:10:01.779618+00:00",
+  "base_commit": "8238fd378ca54dcfd654aa1c099b4f21416f2826",
+  "scope": "Local source foundation verification; not production commerce acceptance.",
+  "archive": {
+    "archived_files_verified": 67,
+    "unchanged_business_files_verified": 41,
+    "base_commit": "8238fd378ca54dcfd654aa1c099b4f21416f2826"
+  },
+  "documentation_links": "20 active-document internal links verified",
+  "python": {
+    "passed": 28,
+    "failed": 0,
+    "warnings": [
+      "Starlette TestClient reports httpx deprecation; current tests pass."
+    ]
+  },
+  "browser": {
+    "passed": 27,
+    "failed": 0,
+    "accessibility_scanned_routes": 18,
+    "viewport_widths": [
+      320,
+      390,
+      768,
+      1440
+    ],
+    "engine": "Chromium headless",
+    "standalone_runtime": true
+  },
+  "javascript_dependency_audit": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "build": "Next.js production compilation and TypeScript checks passed locally.",
+  "terraform": "fmt and init -backend=false / validate passed for dev, staging and production contracts; no AWS resources defined.",
+  "docker": "Local Docker unavailable in this WSL distro; CI container validation pending.",
+  "aws_resources_provisioned": false,
+  "live_checkout_enabled": false,
+  "agents_activated": false,
+  "runtime": {
+    "node": "v24.15.0",
+    "python": "Python 3.12.3"
+  },
+  "limitations": [
+    "Scaffold routes only, not implemented customer transactions.",
+    "Not a security certification or full WCAG conformance audit.",
+    "No real phone or live production performance results.",
+    "No live AWS/payment/mail/identity/AI integration."
+  ]
+}
