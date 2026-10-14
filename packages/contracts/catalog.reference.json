@@ -1,0 +1,410 @@
+{
+  "schema_version": 1,
+  "data_classification": "public_reference_fixture",
+  "source_commit": "8238fd378ca54dcfd654aa1c099b4f21416f2826",
+  "production_approved": false,
+  "categories": [
+    {
+      "slug": "drinkware",
+      "name": "Drinkware",
+      "description": "Personalized tumblers and water bottles."
+    },
+    {
+      "slug": "glassware-bar",
+      "name": "Glassware & bar gifts",
+      "description": "Engraved glasses, gift sets and bar accessories."
+    },
+    {
+      "slug": "kitchen",
+      "name": "Kitchen & entertaining",
+      "description": "Cutting boards, board sets and salt rimmers."
+    },
+    {
+      "slug": "small-gifts",
+      "name": "Small gifts & accessories",
+      "description": "Journals, keychains, openers and money clips."
+    },
+    {
+      "slug": "jewelry-pets",
+      "name": "Jewelry & pet gifts",
+      "description": "Personalized pendants, earrings, tags and bowls."
+    },
+    {
+      "slug": "ornaments",
+      "name": "Surface-engraved ornaments",
+      "description": "Surface designs, clearly distinct from subsurface photo crystals."
+    },
+    {
+      "slug": "photo-crystals",
+      "name": "3D photo crystals",
+      "description": "Keep-list shapes, photo keepsakes and compatible bases."
+    }
+  ],
+  "products": [
+    {
+      "slug": "makertwist-40oz-tumbler",
+      "name": "MakerTwist 40 oz tumbler",
+      "category": "drinkware",
+      "source_paths": [
+        "docs/products/MAKERTWIST-40OZ-TUMBLER.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "makerflo-32oz-water-bottle",
+      "name": "32 oz water bottle",
+      "category": "drinkware",
+      "source_paths": [
+        "docs/products/MAKERFLO-32OZ-WATER-BOTTLE.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "makerflo-40oz-electroplated",
+      "name": "Electroplated 40 oz tumbler",
+      "category": "drinkware",
+      "source_paths": [
+        "docs/products/MAKERFLO-40OZ-ELECTROPLATED.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "libbey-1639-mixing-glass",
+      "name": "Libbey mixing glass",
+      "category": "glassware-bar",
+      "source_paths": [
+        "docs/products/LIBBEY-1639-MIXING-GLASS.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "libbey-2339-dof",
+      "name": "Libbey rocks glass",
+      "category": "glassware-bar",
+      "source_paths": [
+        "docs/products/LIBBEY-2339-DOF.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "shot-glass-2oz-square",
+      "name": "Square shot glasses",
+      "category": "glassware-bar",
+      "source_paths": [
+        "docs/products/SHOT-GLASS-2OZ-SQUARE.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "shot-glass-2oz-wood-box",
+      "name": "Boxed shot glass set",
+      "category": "glassware-bar",
+      "source_paths": [
+        "docs/products/SHOT-GLASS-2OZ-WOOD-BOX.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "whiskey-decanter-26oz-set",
+      "name": "Whiskey decanter set",
+      "category": "glassware-bar",
+      "source_paths": [
+        "docs/products/WHISKEY-DECANTER-26OZ-SET.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "whiskey-decanter-4-glass-stones",
+      "name": "Decanter, four glasses & stones",
+      "category": "glassware-bar",
+      "source_paths": [
+        "docs/products/WHISKEY-DECANTER-4-GLASS-STONES.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "cocktail-smoker-kit",
+      "name": "Cocktail smoker kit",
+      "category": "glassware-bar",
+      "source_paths": [
+        "docs/products/COCKTAIL-SMOKER-KIT.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "crystal-wine-stopper",
+      "name": "Surface-engraved wine stopper",
+      "category": "glassware-bar",
+      "source_paths": [
+        "docs/products/CRYSTAL-WINE-STOPPER.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "acacia-cutting-boards",
+      "name": "Acacia cutting boards & sets",
+      "category": "kitchen",
+      "source_paths": [
+        "docs/products/ACACIA-CUTTING-BOARDS.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "bamboo-cutting-board",
+      "name": "Bamboo cutting board",
+      "category": "kitchen",
+      "source_paths": [
+        "docs/products/BAMBOO-CUTTING-BOARD.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "salt-rimmer-acacia",
+      "name": "Acacia salt rimmer",
+      "category": "kitchen",
+      "source_paths": [
+        "docs/products/SALT-RIMMER-ACACIA.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "laserette-journal",
+      "name": "Personalized journal",
+      "category": "small-gifts",
+      "source_paths": [
+        "docs/products/LASERETTE-JOURNAL.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "aluminum-rfid-money-clip",
+      "name": "RFID money clip",
+      "category": "small-gifts",
+      "source_paths": [
+        "docs/products/ALUMINUM-RFID-MONEY-CLIP.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "credit-card-bottle-opener",
+      "name": "Card bottle opener",
+      "category": "small-gifts",
+      "source_paths": [
+        "docs/products/CREDIT-CARD-BOTTLE-OPENER.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "steel-flat-bottle-opener",
+      "name": "Steel bottle opener",
+      "category": "small-gifts",
+      "source_paths": [
+        "docs/products/STEEL-FLAT-BOTTLE-OPENER.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "wood-bottle-opener-keychain",
+      "name": "Wood bottle-opener keychain",
+      "category": "small-gifts",
+      "source_paths": [
+        "docs/products/WOOD-BOTTLE-OPENER-KEYCHAIN.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "wood-keychain-rectangle",
+      "name": "Rectangle wood keychain",
+      "category": "small-gifts",
+      "source_paths": [
+        "docs/products/WOOD-KEYCHAIN-RECTANGLE.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "wood-keychain-round",
+      "name": "Round wood keychain",
+      "category": "small-gifts",
+      "source_paths": [
+        "docs/products/WOOD-KEYCHAIN-ROUND.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "crystal-heart-ornament",
+      "name": "Surface-engraved heart ornament",
+      "category": "ornaments",
+      "source_paths": [
+        "docs/products/CRYSTAL-HEART-ORNAMENT.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "crystal-round-ornament-60-80",
+      "name": "Surface-engraved round ornament",
+      "category": "ornaments",
+      "source_paths": [
+        "docs/products/CRYSTAL-ROUND-ORNAMENT-60-80.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "photo-crystal-collection",
+      "name": "3D photo crystal collection",
+      "category": "photo-crystals",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "crystal-bases",
+      "name": "Crystal light & wood bases",
+      "category": "photo-crystals",
+      "source_paths": [
+        "docs/PRICING-3D-CRYSTAL.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "balsa-earrings",
+      "name": "Hand-painted balsa earrings",
+      "category": "jewelry-pets",
+      "source_paths": [
+        "docs/FAQ.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "stainless-pendants",
+      "name": "Stainless steel pendants",
+      "category": "jewelry-pets",
+      "source_paths": [
+        "docs/FAQ.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "pet-tags",
+      "name": "Personalized pet tags",
+      "category": "jewelry-pets",
+      "source_paths": [
+        "docs/FAQ.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "pet-bowls",
+      "name": "Engraved pet bowls",
+      "category": "jewelry-pets",
+      "source_paths": [
+        "docs/FAQ.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    }
+  ],
+  "service_paths": [
+    {
+      "slug": "custom-orders",
+      "name": "Custom & bulk orders",
+      "source_paths": [
+        "docs/GLASSWARE-PRICING.md"
+      ]
+    },
+    {
+      "slug": "events",
+      "name": "Live event engraving",
+      "source_paths": [
+        "docs/EVENTS.md",
+        "docs/ON-SITE-EVENTS.md"
+      ]
+    }
+  ]
+}

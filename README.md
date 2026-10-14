@@ -1,68 +1,56 @@
-# Sonoran Slush Creative Creations
+# Sonoran Slush — native commerce platform
 
-**Custom laser engraving & 3D crystal gifts · Tucson, Arizona**  
-Part of the [SlushTec](https://github.com/SlushTec) studio family.
+Personalized gifts, custom engraving, bulk work and live event experiences.
+This is our own production-targeted build, developed across four work-agent lanes. It is not a class project.
 
----
+## Current status
 
-## Overview
+**Rescaffolded foundation; NOT a production-ready store.** The storefront route skeleton, reference catalog,
+read-only commerce API, disabled assistant boundary, contract tests, CI and AWS infrastructure layout are present.
+Payments, accounts, uploads, quotations, booking, proof approval, fulfillment and live AI remain release-gated.
+No AWS resources have been provisioned and no domain, checkout or customer data has been migrated by this reset.
 
-Sonoran Slush Creative Creations is a fully custom-order laser engraving business specializing in high-quality personalized gifts, with a strong focus on **3D crystal photo gifts** and related keepsakes.
+## Start here
 
-It operates under the **SlushTec** umbrella and will also serve as a future sales channel for official SlushTec / VARP / Ashcourt brand merchandise when those lines are ready.
+- [Current architecture](docs/architecture/README.md)
+- [Production requirements and release gates](docs/requirements/PRODUCTION.md)
+- [Customer experience specification](docs/requirements/CUSTOMER-EXPERIENCE.md)
+- [Four work-agent lanes](docs/delivery/WORKSTREAMS.md)
+- [Machine-readable backlog](docs/delivery/backlog.json)
+- [Business sources and unresolved decisions](docs/business/SOURCE-REGISTER.md)
+- [Local development](docs/runbooks/LOCAL-DEVELOPMENT.md)
+- [Archive and preservation manifest](archive/2026-10-14-pre-native/README.md)
 
-**Domain:** [sonoranslush.net](https://sonoranslush.net)  
-**Facebook:** [Sonoran Slush Creative Creations](https://www.facebook.com/p/Sonoran-Slush-Creative-Creations-61571209264606/)
+## Repository layout
 
----
+| Path | Purpose |
+| --- | --- |
+| `apps/storefront/` | Next.js/TypeScript customer routes and owner-area shell |
+| `services/commerce/` | FastAPI catalog/domain boundary; future authoritative order workflows |
+| `services/assistant/` | Separate, optional AI boundary; no payment or fulfillment authority |
+| `packages/contracts/` | Shared reference catalog, API contract and domain schemas |
+| `infra/terraform/` | Environment/module contracts for Amplify, ECS/Fargate and managed AWS services |
+| `tests/`, `scripts/` | Unit/contract/browser/preservation checks |
+| `docs/` | Current engineering specifications plus preserved business references |
+| `archive/` | Immutable pre-native snapshot, excluded from application builds |
 
-## Current Focus
+## Local preview
 
-- 3D laser-engraved crystal gifts made from customer photos
-- Custom graduation, memorial, anniversary, and personal keepsakes
-- Additional laser engraving work (wood, acrylic, metal, etc. as capacity allows)
-- Local Tucson market presence + online custom orders
+```bash
+npm ci
+npm run dev --workspace @sonoran/storefront
+# http://localhost:3000 — non-transactional scaffold, no live integrations
+```
 
-The ordering experience is modeled after high-quality photo-to-crystal configurators (size selection, add-ons such as light bases / keychains / inscriptions, photo upload, clean checkout).
+Use the local-development runbook for Python services and the full verification suite.
+Do not publish the reference catalog as purchasable stock: prices, availability and product photography require approval.
 
----
+## Platform direction
 
-## Relationship to SlushTec
+Custom storefront on AWS Amplify Hosting; containerized commerce and optional AI on ECS/Fargate.
+Managed Cognito, DynamoDB, private S3, SES, Secrets Manager and CloudWatch are planned integrations.
+A hosted payment provider collects card details; Sonoran Slush owns prices, orders, proofs and fulfillment state.
+Bedrock assistance is optional and cannot change commercial rules. Kubernetes and custom model training are not requirements.
 
-| Role | Description |
-|------|-------------|
-| **Primary** | Independent custom laser engraving & gift business |
-| **Secondary (future)** | Official merchandise channel for SlushTec studio brands (VARP, Ashcourt — Hell Rises, studio apparel, residual-themed items, etc.) |
-| **Ownership** | Operates under the SlushTec organization |
-
-This keeps creative and commercial control consolidated while allowing the engraving business to generate revenue and brand presence in the local market.
-
----
-
-## Technical Notes
-
-- Website target: Shopify (custom theme + product configurator for photo uploads and options)
-- Domain already owned: `sonoranslush.net` (currently on Squarespace placeholder)
-- Google Workspace already in use
-
----
-
-## Repo Purpose
-
-This repository holds:
-
-- Company documentation and strategy notes
-- Website / Shopify setup notes and assets
-- Future brand merchandise planning
-- Any shared design or production references
-
----
-
-## Status
-
-**Active** — custom order business in operation.  
-Website and formal Shopify storefront in progress.
-
----
-
-*SlushTec · Tucson, Arizona*
+See `AGENTS.md` before editing. Existing Shopify mentions in preserved business sources are historical context,
+not current platform decisions. The archive is recoverable; it must never become a public route or AI knowledge source.

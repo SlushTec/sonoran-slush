@@ -1,0 +1,33 @@
+name: sonoran-native-local
+services:
+  storefront:
+    build:
+      context: .
+      dockerfile: apps/storefront/Dockerfile
+    ports: ["127.0.0.1:3000:3000"]
+    environment:
+      SONORAN_STAGE: scaffold
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+  commerce:
+    build:
+      context: .
+      dockerfile: services/commerce/Dockerfile
+    ports: ["127.0.0.1:8187:8000"]
+    environment:
+      SONORAN_STAGE: scaffold
+    read_only: true
+    tmpfs: ["/tmp"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+  assistant:
+    build:
+      context: .
+      dockerfile: services/assistant/Dockerfile
+    ports: ["127.0.0.1:8188:8000"]
+    environment:
+      SONORAN_STAGE: scaffold
+    read_only: true
+    tmpfs: ["/tmp"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
