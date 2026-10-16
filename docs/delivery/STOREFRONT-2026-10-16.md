@@ -59,3 +59,21 @@ Source integration is on a feature branch above the October 14 AWS scaffold.
 This is a private review delivery, not a declaration that the production release gates pass.
 The implementation and API consumer were reviewed together by the implementing agent; independent peer review is pending.
 See [the local workflow runbook](../runbooks/STOREFRONT-REVIEW.md) for verification boundaries and rollback.
+
+## Final build and publication receipt
+
+- Standalone Next.js build: **passed**.
+- Static review export: **passed**; **59 pages**, **7 collections**, **29 offerings**.
+- Export checker: **3,458 internal links resolved**, one main heading per page, zero initial product images, no public archive.
+- npm dependency audit: **0 reported vulnerabilities** at the time checked.
+- Preservation: **67 archived files** and **41 active business documents** verified byte-for-byte unchanged.
+- Private deployment: **succeeded**, [open the storefront](https://sonoran-slush-studio.russetant33.chatgpt.site).
+- Exact storefront code: `aa7a94a6dd4f23095c6dc4e9cf70fc9186e21618`; source tree `4089ae58bc8da1776ed45b01080f06ea90678af4`.
+- Published Site source: `e415c38b89a08382709ef5a72ef88c69783c94b1`.
+- Machine-readable identity, version, deployment and artifact digest: [PRIVATE_REVIEW.json](PRIVATE_REVIEW.json).
+
+A transient `ENOTEMPTY` while removing Next's generated `.next/export` directory was resolved with bounded native filesystem retries for that temporary directory only. No dependencies or application runtime were patched.
+
+The direct Git CLI had no write credential. The connected GitHub service saved the same source tree, and the local branch was reconciled against the matching remote tree. No merge to main was performed.
+
+Docker/container builds were not run in this environment. Browser and device QA remain unverified; production gates remain closed.
