@@ -1,0 +1,41 @@
+{
+  "delivered_at": "2026-10-16T16:33:35.187286+00:00",
+  "site_url": "https://sonoran-slush-studio.russetant33.chatgpt.site",
+  "audience": "owner_private",
+  "project_id": "appgprj_6ad2476f36248191bb3863aedfdd7f6e",
+  "site_version_id": "appgprj_6ad2476f36248191bb3863aedfdd7f6e~appgver_9839bb4e3a408191afb340970bba45df",
+  "deployment_id": "appgdep_6ad251cfce088191b505185d3d13af57",
+  "deployment_status": "succeeded",
+  "site_source_commit": "e415c38b89a08382709ef5a72ef88c69783c94b1",
+  "storefront_source_commit": "aa7a94a6dd4f23095c6dc4e9cf70fc9186e21618",
+  "storefront_source_tree": "4089ae58bc8da1776ed45b01080f06ea90678af4",
+  "repository": "SlushTec/sonoran-slush",
+  "branch": "feature/storefront-build-20261016",
+  "archive_sha256": "b2f992ae4f126dbbc1693f613ef0ebb9859ef069e3e14bb64da082080d11756a",
+  "verification": {
+    "python_tests_passed": 52,
+    "dom_tests_passed": 15,
+    "standalone_build": "passed",
+    "static_build": "passed",
+    "pages_checked": 59,
+    "categories": 7,
+    "products": 29,
+    "internal_links_checked": 3458,
+    "initial_images": 0,
+    "npm_audit_vulnerabilities": 0,
+    "archive_files_unchanged": 67,
+    "business_documents_unchanged": 41,
+    "real_browser_qa": "not_run",
+    "mobile_device_qa": "not_run",
+    "independent_peer_review": "pending"
+  },
+  "services_in_private_deployment": {
+    "commerce": false,
+    "customer_accounts": false,
+    "live_payments": false,
+    "email": false,
+    "live_ai": false,
+    "private_uploads": false
+  },
+  "note": "The private static storefront is deployed. Production AWS integration and qualification are separate; the local API adapter is not production-ready."
+}

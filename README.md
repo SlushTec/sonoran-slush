@@ -1,56 +1,57 @@
-# Sonoran Slush — native commerce platform
+# Sonoran Slush — native storefront
 
-Personalized gifts, custom engraving, bulk work and live event experiences.
-This is our own production-targeted build, developed across four work-agent lanes. It is not a class project.
+Personalized gifts, custom laser engraving, custom/bulk work, and live event experiences from Tucson, Arizona.
 
-## Current status
+## Current delivery
 
-**Rescaffolded foundation; NOT a production-ready store.** The storefront route skeleton, reference catalog,
-read-only commerce API, disabled assistant boundary, contract tests, CI and AWS infrastructure layout are present.
-Payments, accounts, uploads, quotations, booking, proof approval, fulfillment and live AI remain release-gated.
-No AWS resources have been provisioned and no domain, checkout or customer data has been migrated by this reset.
+The storefront is implemented across **seven product families and 29 offerings**, with responsive navigation,
+search and filters, product-specific personalization, local artwork layouts, saved designs, favorites, a persistent
+bag, guest quote requests, bulk/event/contact forms, a gift finder, customer record/proof portals, and a staff workspace.
+**Product imagery is intentionally omitted at Brian's request.**
 
-## Start here
+A private static review is published separately from the planned AWS production deployment.
+It has no connected customer submission, payment, sign-in, or email service.
+Its local designs are real browser drafts; they are not paid orders, inventory reservations, or production proofs.
 
-- [Current architecture](docs/architecture/README.md)
-- [Production requirements and release gates](docs/requirements/PRODUCTION.md)
-- [Customer experience specification](docs/requirements/CUSTOMER-EXPERIENCE.md)
-- [Four work-agent lanes](docs/delivery/WORKSTREAMS.md)
-- [Machine-readable backlog](docs/delivery/backlog.json)
-- [Business sources and unresolved decisions](docs/business/SOURCE-REGISTER.md)
-- [Local development](docs/runbooks/LOCAL-DEVELOPMENT.md)
-- [Archive and preservation manifest](archive/2026-10-14-pre-native/README.md)
+The commerce source now includes opt-in durable **local** requests, exact-version quote acceptance and proof approval,
+an owner workflow, shipment updates, and a **test-mode-only** hosted payment adapter with signed event verification.
+Production commerce remains blocked. No AWS resources, domain changes, live charges, customer imports,
+or notification campaigns have been activated.
 
-## Repository layout
+- [Delivery and verification](docs/delivery/STOREFRONT-2026-10-16.md)
+- [Private review and local workflow](docs/runbooks/STOREFRONT-REVIEW.md)
+- [AWS architecture](docs/architecture/README.md)
+- [Production release requirements](docs/requirements/PRODUCTION.md)
+- [Preserved business sources](docs/business/SOURCE-REGISTER.md)
+- [Pre-native archive](archive/2026-10-14-pre-native/README.md)
 
-| Path | Purpose |
-| --- | --- |
-| `apps/storefront/` | Next.js/TypeScript customer routes and owner-area shell |
-| `services/commerce/` | FastAPI catalog/domain boundary; future authoritative order workflows |
-| `services/assistant/` | Separate, optional AI boundary; no payment or fulfillment authority |
-| `packages/contracts/` | Shared reference catalog, API contract and domain schemas |
-| `infra/terraform/` | Environment/module contracts for Amplify, ECS/Fargate and managed AWS services |
-| `tests/`, `scripts/` | Unit/contract/browser/preservation checks |
-| `docs/` | Current engineering specifications plus preserved business references |
-| `archive/` | Immutable pre-native snapshot, excluded from application builds |
-
-## Local preview
+## Run the storefront
 
 ```bash
 npm ci
-npm run dev --workspace @sonoran/storefront
-# http://localhost:3000 — non-transactional scaffold, no live integrations
+npm run dev
 ```
 
-Use the local-development runbook for Python services and the full verification suite.
-Do not publish the reference catalog as purchasable stock: prices, availability and product photography require approval.
+The approved architecture remains Next.js/TypeScript on Amplify with a FastAPI commerce boundary on ECS,
+and managed AWS identity, storage, data, notifications, and optional AI integrations.
+The local SQLite adapter is for private development, not a replacement production architecture.
+The gift finder works from the catalog without a model; live AI is still disconnected.
 
-## Platform direction
+## Verify
 
-Custom storefront on AWS Amplify Hosting; containerized commerce and optional AI on ECS/Fargate.
-Managed Cognito, DynamoDB, private S3, SES, Secrets Manager and CloudWatch are planned integrations.
-A hosted payment provider collects card details; Sonoran Slush owns prices, orders, proofs and fulfillment state.
-Bedrock assistance is optional and cannot change commercial rules. Kubernetes and custom model training are not requirements.
+```bash
+npm run typecheck
+npm run test:frontend
+npm run build:review
+npm run check:review
+python3 -m venv .venv
+.venv/bin/pip install -r requirements-dev.lock
+.venv/bin/python -m pytest -q
+.venv/bin/python scripts/verify_archive.py
+```
 
-See `AGENTS.md` before editing. Existing Shopify mentions in preserved business sources are historical context,
-not current platform decisions. The archive is recoverable; it must never become a public route or AI knowledge source.
+`npm run build` retains the AWS-targeted standalone server build.
+`npm run build:review` generates the private static review.
+Browser end-to-end tests are maintained in CI; local DOM tests do not establish real-browser or device qualification.
+
+See `AGENTS.md` before editing. The original 67-file archive and 41 retained business documents stay unchanged.

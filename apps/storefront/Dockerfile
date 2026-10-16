@@ -6,6 +6,10 @@ RUN npm ci
 FROM dependencies AS build
 COPY apps/storefront apps/storefront
 COPY packages/contracts packages/contracts
+COPY scripts/build-storefront.mjs scripts/next-cleanup-retry.cjs ./scripts/
+ARG NEXT_PUBLIC_COMMERCE_API_URL=
+ARG NEXT_PUBLIC_CUSTOMER_LOGIN_URL=
+ENV NEXT_PUBLIC_COMMERCE_API_URL=$NEXT_PUBLIC_COMMERCE_API_URL NEXT_PUBLIC_CUSTOMER_LOGIN_URL=$NEXT_PUBLIC_CUSTOMER_LOGIN_URL
 ENV NEXT_TELEMETRY_DISABLED=1 SONORAN_STAGE=scaffold
 RUN npm run build
 FROM node:22-alpine AS runtime
