@@ -1,9 +1,61 @@
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { catalog } from '@/lib/catalog';
-export function generateStaticParams(){return catalog.products.map(p=>({slug:p.slug}));}
-export default async function ProductPage({params}:{params:Promise<{slug:string}>}){
- const {slug}=await params;const product=catalog.products.find(p=>p.slug===slug);if(!product)notFound();
- const family=catalog.categories.find(c=>c.slug===product.category);
- return <div className="container section"><Link href={'/shop/'+product.category}>← {family?.name}</Link><div className="product-detail"><div className="asset-placeholder large"><span>Approved product photography pending</span></div><section><p className="eyebrow">Reference product</p><h1>{product.name}</h1><p>{family?.description}</p><div className="notice"><h2>Configuration is not enabled yet</h2><p>Pricing, dimensions, options, availability and production timing need approved data. No price or stock is being implied by this preview.</p></div><button type="button" disabled>Purchasing not yet enabled</button><p className="status-label">No payment or personal information is collected.</p><Link href="/custom-orders">Explore the custom-order workflow</Link></section></div></div>;
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { catalog } from "@/lib/catalog";
+import { infoFor, categoryShort } from "@/lib/shop";
+import Customizer from "@/components/Customizer";
+import ProductCard from "@/components/ProductCard";
+export const dynamicParams = false;
+export function generateStaticParams() {
+  return catalog.products.map((p) => ({ slug: p.slug }));
+}
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const p = catalog.products.find((p) => p.slug === slug);
+  return {
+    title: p ? infoFor(p).title : "Personalized gift",
+    description: p ? infoFor(p).description : undefined,
+  };
+}
+export default async function ProductPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const p = catalog.products.find((p) => p.slug === slug);
+  if (!p) notFound();
+  const related = catalog.products
+    .filter((x) => x.category === p.category && x.slug !== p.slug)
+    .slice(0, 4);
+  return (
+    <div className="container">
+      <p className="breadcrumb product-breadcrumb">
+        <Link href="/">Home</Link>
+        <span>/</span>
+        <Link href="/shop">Shop gifts</Link>
+        <span>/</span>
+        <Link href={"/shop/" + p.category}>{categoryShort[p.category]}</Link>
+      </p>
+      <Customizer product={p} />
+      {related.length > 0 && (
+        <section className="section">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">A few more ways to make it personal</p>
+              <h2>In good company.</h2>
+            </div>
+          </div>
+          <div className="product-grid">
+            {related.map((x) => (
+              <ProductCard product={x} key={x.slug} />
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  );
 }

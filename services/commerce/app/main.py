@@ -1,4 +1,4 @@
-"""Reference catalog only. Mutation paths deliberately fail closed."""
+"""Reference catalog and opt-in local workflows. Production remains disabled."""
 import json
 from pathlib import Path
 from fastapi import HTTPException, Query, Request
@@ -8,6 +8,10 @@ from services.commerce.app.models import ReferenceCatalog, ReferenceProduct
 ROOT = Path(__file__).resolve().parents[3]
 REFERENCE = ReferenceCatalog.model_validate(json.loads((ROOT / "packages/contracts/catalog.reference.json").read_text()))
 app = create_app("commerce")
+from services.commerce.app.workflows import router as workflow_router
+app.include_router(workflow_router)
+from services.commerce.app.payments import router as payment_router
+app.include_router(payment_router)
 
 @app.get("/v1/catalog", response_model=ReferenceCatalog, tags=["reference"])
 def catalog():
@@ -29,13 +33,7 @@ async def pending_capability(request: Request):
 
 for route, method in [
     ("/v1/cart", "POST"),
-    ("/v1/checkout/sessions", "POST"),
     ("/v1/uploads", "POST"),
-    ("/v1/quotes", "POST"),
-    ("/v1/events/requests", "POST"),
-    ("/v1/proofs/{proof_id}/approve", "POST"),
-    ("/v1/webhooks/payments", "POST"),
-    ("/v1/orders/{order_id}", "GET"),
 ]:
     app.add_api_route(route, pending_capability, methods=[method], status_code=503,
                       response_model=ProblemResponse, tags=["not implemented"],

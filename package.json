@@ -13,11 +13,17 @@
     "build": "npm run build --workspace @sonoran/storefront",
     "typecheck": "npm run typecheck --workspace @sonoran/storefront",
     "test:e2e": "playwright test",
-    "test:archive": "python3 scripts/verify_archive.py"
+    "test:archive": "python3 scripts/verify_archive.py",
+    "test:frontend": "node --test tests/frontend/storefront.test.cjs",
+    "build:review": "node scripts/build-review.mjs",
+    "check:review": "node scripts/check-storefront-export.mjs"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
     "@playwright/test": "1.64.1",
-    "@axe-core/playwright": "4.13.0"
+    "@testing-library/react": "16.3.0",
+    "jsdom": "26.1.0",
+    "prettier": "3.6.2"
   },
   "overrides": {
     "postcss": "8.5.30"
