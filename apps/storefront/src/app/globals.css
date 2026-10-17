@@ -4366,3 +4366,12 @@ main:focus {
     min-width: 37px;
   }
 }
+
+.hero-editorial .editorial-top,
+.hero-editorial .editorial-bottom,
+.hero-editorial .southwest-editorial {
+  color: var(--paper);
+}
+.hero-editorial .photo-pending {
+  color: var(--gold-light);
+}

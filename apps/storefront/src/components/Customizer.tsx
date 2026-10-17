@@ -412,6 +412,7 @@ export default function Customizer({ product }: { product: Product }) {
                 <label className="field" key={o.label}>
                   {o.label}
                   <select
+                    aria-label={o.label}
                     value={design.options[o.label] || o.values[0]}
                     onChange={(e) => setOption(o.label, e.target.value)}
                   >
