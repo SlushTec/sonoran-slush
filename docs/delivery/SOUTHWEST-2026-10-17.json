@@ -17,7 +17,7 @@
   "archive_files_unchanged": 67,
   "business_documents_unchanged": 41,
   "source_asset_hash_bindings": "40 passed",
-  "browser_qa": "Not run in this managed environment; browser control capability unavailable. Updated GitHub browser checks have not yet run for this branch.",
+  "browser_qa": "GitHub run 39042089335 passed all 32 browser checks for application commit 0564813e3bb3bd5c880f48a52850947753206b22. Brochure-photo update qualification pending.",
   "independent_peer_review": "pending",
   "audience": "owner_private",
   "production_commerce": "not connected; existing release gates unchanged",
@@ -28,5 +28,7 @@
   ],
   "pages_checked": 72,
   "internal_links_checked": 4402,
-  "active_document_links_checked": 27
+  "active_document_links_checked": 27,
+  "brochure_photos": 11,
+  "supplier_photo_references": 29
 }

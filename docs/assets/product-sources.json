@@ -7,105 +7,145 @@
       "name": "Tall rectangle photo crystal",
       "supplier": "3D Crystal",
       "source_url": "https://3dcrystal.com/3d-crystal-rectangle-tall",
-      "source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/3/d/3d-crystal-rectangle-tall_05.jpg",
+      "source_image_url": null,
       "match": "documented_shape",
       "note": "",
-      "caption": "Supplier engraving example · your photo replaces the sample. Only the sizes listed here are offered.",
-      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+      "rights": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
       "source_paths": [
         "docs/CRYSTAL-SIZE-KEEP-LIST.md"
       ],
-      "source_sha256": "6419610369143e7860176c5305e45f74ace54d528da6825004185e9781dbb2d2",
-      "asset_sha256": "b1ef7b409e4e5b55904c03cc1422788e3a7869d94a5ec97a0abe99f6d41edd85",
+      "source_sha256": "845d8f6b5cd9d63d2395826383a95a8126e72b11e27bea6b92f6a547a17c1abf",
+      "asset_sha256": "461d2169961edc66e36f728458305f31872d2f749cff871a8061552dcc4ad606",
       "asset_path": "apps/storefront/public/products/photo-crystal-rectangle-tall.webp",
-      "width": 265,
-      "height": 265,
+      "width": 240,
+      "height": 342,
       "fetched_at": "2026-10-17",
-      "public_display": "owner_private_review"
+      "public_display": "owner_private_review",
+      "source_kind": "owner_business_brochure_extraction",
+      "previous_source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/3/d/3d-crystal-rectangle-tall_05.jpg",
+      "source_brochure": {
+        "filename": "Sonoran Slush Brocure.pdf",
+        "native_path": "E:\\Business\\Sonoran Slush\\Sonoran Slush Brocure.pdf",
+        "extracted_image_index": 5,
+        "sha256": "a5f9081af1b19951ae6f88d84eeeacfcee18582628a73a6a7660164d50859a42"
+      }
     },
     "photo-crystal-rectangle-wide": {
       "slug": "photo-crystal-rectangle-wide",
       "name": "Wide rectangle photo crystal",
       "supplier": "3D Crystal",
       "source_url": "https://3dcrystal.com/3d-crystal-rectangle-wide",
-      "source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/p/i/picsart_26-07-03_14-41-11-097.jpg",
+      "source_image_url": null,
       "match": "documented_shape",
       "note": "",
-      "caption": "Supplier engraving example · your photo replaces the sample. Only the sizes listed here are offered.",
-      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+      "rights": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
       "source_paths": [
         "docs/CRYSTAL-SIZE-KEEP-LIST.md"
       ],
-      "source_sha256": "577395d18984e0e8abdd5f6969c68e11f1982ec6c4ddb083f451a34cc67d4f86",
-      "asset_sha256": "03d9e73e0277d5dc1b3fb22bfd3afd0155c3d0be17d00f6f391f6e343bc3a849",
+      "source_sha256": "3d6130df53cf2e3487f69ec636610e216b98739f984061e31684aa108595803a",
+      "asset_sha256": "fe61dcc11df4acc842f66c016d28b04bd9b584b830b84779d662ced29e0e8d10",
       "asset_path": "apps/storefront/public/products/photo-crystal-rectangle-wide.webp",
-      "width": 265,
-      "height": 265,
+      "width": 595,
+      "height": 424,
       "fetched_at": "2026-10-17",
-      "public_display": "owner_private_review"
+      "public_display": "owner_private_review",
+      "source_kind": "owner_business_brochure_extraction",
+      "previous_source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/p/i/picsart_26-07-03_14-41-11-097.jpg",
+      "source_brochure": {
+        "filename": "Sonoran Slush Brocure.pdf",
+        "native_path": "E:\\Business\\Sonoran Slush\\Sonoran Slush Brocure.pdf",
+        "extracted_image_index": 4,
+        "sha256": "a5f9081af1b19951ae6f88d84eeeacfcee18582628a73a6a7660164d50859a42"
+      }
     },
     "photo-crystal-heart": {
       "slug": "photo-crystal-heart",
       "name": "Heart photo crystal",
       "supplier": "3D Crystal",
       "source_url": "https://3dcrystal.com/3d-crystal-heart",
-      "source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/p/i/picsart_26-07-03_14-40-32-726.jpg",
+      "source_image_url": null,
       "match": "documented_shape",
       "note": "",
-      "caption": "Supplier engraving example · your photo replaces the sample. Only the sizes listed here are offered.",
-      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+      "rights": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
       "source_paths": [
         "docs/CRYSTAL-SIZE-KEEP-LIST.md"
       ],
-      "source_sha256": "071348f8bb73ef3322b21fc9f83966d1bd8f5434b335c9e8fab783f0f953d2c9",
-      "asset_sha256": "9b17ee00b668cfae4085581a58b98456e7979268ba858f0d518df915beb132f9",
+      "source_sha256": "698c28f1609533f46f4e7f61b179ab31c0800dc5231f00648f162cef838d12d3",
+      "asset_sha256": "007ad97d86834aa2371e149320a28860befef3e9db557a2ee110c457381f76d4",
       "asset_path": "apps/storefront/public/products/photo-crystal-heart.webp",
-      "width": 265,
-      "height": 265,
+      "width": 405,
+      "height": 381,
       "fetched_at": "2026-10-17",
-      "public_display": "owner_private_review"
+      "public_display": "owner_private_review",
+      "source_kind": "owner_business_brochure_extraction",
+      "previous_source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/p/i/picsart_26-07-03_14-40-32-726.jpg",
+      "source_brochure": {
+        "filename": "Sonoran Slush Brocure.pdf",
+        "native_path": "E:\\Business\\Sonoran Slush\\Sonoran Slush Brocure.pdf",
+        "extracted_image_index": 3,
+        "sha256": "a5f9081af1b19951ae6f88d84eeeacfcee18582628a73a6a7660164d50859a42"
+      }
     },
     "photo-crystal-cut-corner-diamond": {
       "slug": "photo-crystal-cut-corner-diamond",
       "name": "Cut-corner diamond photo crystal",
       "supplier": "3D Crystal",
       "source_url": "https://3dcrystal.com/3d-crystal-cut-corner-diamond",
-      "source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/3/d/3d-crystal-cut-corner-diamond_03.jpg",
+      "source_image_url": null,
       "match": "documented_shape",
       "note": "",
-      "caption": "Supplier engraving example · your photo replaces the sample. Only the sizes listed here are offered.",
-      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+      "rights": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
       "source_paths": [
         "docs/CRYSTAL-SIZE-KEEP-LIST.md"
       ],
-      "source_sha256": "e4babd24a0c1ef6b4e9ef72798854dab2cd3929cc2593355bdc65ca6393dc02f",
-      "asset_sha256": "a2179d35057cd15e7dbb2531a878c9a37b688a4d3d430b35975b64b9472f237c",
+      "source_sha256": "182683e6bc9c83064b59be9311a682f3651f6b331f979faae654387b474b9785",
+      "asset_sha256": "48d51e81810041ec5c79f2fa3445638879d7c829e1e82d4d9a4b960eeb2a11ee",
       "asset_path": "apps/storefront/public/products/photo-crystal-cut-corner-diamond.webp",
-      "width": 265,
-      "height": 265,
+      "width": 728,
+      "height": 727,
       "fetched_at": "2026-10-17",
-      "public_display": "owner_private_review"
+      "public_display": "owner_private_review",
+      "source_kind": "owner_business_brochure_extraction",
+      "previous_source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/3/d/3d-crystal-cut-corner-diamond_03.jpg",
+      "source_brochure": {
+        "filename": "Sonoran Slush Brocure.pdf",
+        "native_path": "E:\\Business\\Sonoran Slush\\Sonoran Slush Brocure.pdf",
+        "extracted_image_index": 7,
+        "sha256": "a5f9081af1b19951ae6f88d84eeeacfcee18582628a73a6a7660164d50859a42"
+      }
     },
     "photo-crystal-prestige": {
       "slug": "photo-crystal-prestige",
       "name": "Prestige iceberg photo crystal",
       "supplier": "3D Crystal",
       "source_url": "https://3dcrystal.com/3d-crystal-prestige",
-      "source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/p/r/prestige_041.jpg",
+      "source_image_url": null,
       "match": "documented_shape",
       "note": "",
-      "caption": "Supplier engraving example · your photo replaces the sample. Only the sizes listed here are offered.",
-      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+      "rights": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
       "source_paths": [
         "docs/CRYSTAL-SIZE-KEEP-LIST.md"
       ],
-      "source_sha256": "685b55a983ad3c0c4e9e12dd9f0203597ef84e306035096099f42eb4a54cf2c3",
-      "asset_sha256": "80fd5f77608ca353235c292ab55e91131c03b85e839512511a5f9df0d355c354",
+      "source_sha256": "02d6612de3a179f0af028fd2dcc9f2643506e156757cc19608722aeec4ef2027",
+      "asset_sha256": "7ede6a845078336d1842645a81ade567d646cb36c7504cdc1a239e1c133a60e8",
       "asset_path": "apps/storefront/public/products/photo-crystal-prestige.webp",
-      "width": 265,
-      "height": 265,
+      "width": 433,
+      "height": 533,
       "fetched_at": "2026-10-17",
-      "public_display": "owner_private_review"
+      "public_display": "owner_private_review",
+      "source_kind": "owner_business_brochure_extraction",
+      "previous_source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/p/r/prestige_041.jpg",
+      "source_brochure": {
+        "filename": "Sonoran Slush Brocure.pdf",
+        "native_path": "E:\\Business\\Sonoran Slush\\Sonoran Slush Brocure.pdf",
+        "extracted_image_index": 6,
+        "sha256": "a5f9081af1b19951ae6f88d84eeeacfcee18582628a73a6a7660164d50859a42"
+      }
     },
     "photo-crystal-dog-bone": {
       "slug": "photo-crystal-dog-bone",
@@ -133,21 +173,29 @@
       "name": "Candle photo crystal",
       "supplier": "3D Crystal",
       "source_url": "https://3dcrystal.com/3d-crystal-candle",
-      "source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/c/a/candle_motherday_new.png",
+      "source_image_url": null,
       "match": "documented_shape",
       "note": "",
-      "caption": "Supplier engraving example · your photo replaces the sample. Only the sizes listed here are offered.",
-      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+      "rights": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
       "source_paths": [
         "docs/CRYSTAL-SIZE-KEEP-LIST.md"
       ],
-      "source_sha256": "29137c9d8e174ed76925671aabc11ecf3f537c4c8f742fbc2d9ff963d4e2f757",
-      "asset_sha256": "4fba6cdf1adebe12d186144b66cbbbfce55f264cfc7169b8bae2048d96f83c86",
+      "source_sha256": "327e9d45fb392851a7264b1992fc9ef7eb3096bbe9ccbd8eaf6f63a9af964cc1",
+      "asset_sha256": "f562a9a7bb101afb0bce51d657a691336f4e669fa5a039c79d9ff7b0c70cb7c4",
       "asset_path": "apps/storefront/public/products/photo-crystal-candle.webp",
-      "width": 265,
-      "height": 265,
+      "width": 515,
+      "height": 811,
       "fetched_at": "2026-10-17",
-      "public_display": "owner_private_review"
+      "public_display": "owner_private_review",
+      "source_kind": "owner_business_brochure_extraction",
+      "previous_source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/c/a/candle_motherday_new.png",
+      "source_brochure": {
+        "filename": "Sonoran Slush Brocure.pdf",
+        "native_path": "E:\\Business\\Sonoran Slush\\Sonoran Slush Brocure.pdf",
+        "extracted_image_index": 8,
+        "sha256": "a5f9081af1b19951ae6f88d84eeeacfcee18582628a73a6a7660164d50859a42"
+      }
     },
     "photo-crystal-notched": {
       "slug": "photo-crystal-notched",
@@ -175,84 +223,116 @@
       "name": "Round crystal photo ornament",
       "supplier": "3D Crystal",
       "source_url": "https://3dcrystal.com/sun-catcher",
-      "source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/2/d/2d-crystal-ornament_04.jpg",
+      "source_image_url": null,
       "match": "documented_shape",
       "note": "",
-      "caption": "Supplier engraving example · your photo replaces the sample. Only the sizes listed here are offered.",
-      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+      "rights": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
       "source_paths": [
         "docs/CRYSTAL-SIZE-KEEP-LIST.md"
       ],
-      "source_sha256": "b7054685067a439b3ef21367d8607d084da13c2b584835ac3b7042331c48b9bb",
-      "asset_sha256": "e5ca503c7c372a9364f1b0ba9b3f345e8455c186ebcece5e7b1223ac98db7dec",
+      "source_sha256": "14d5fb1525addaa656d3017c1bf06dc19c7ffbb990b2d2dbac630da42c163307",
+      "asset_sha256": "d5e44f280601e10150ec58a58175d6ec5595be33a346e28f144ab312e945c737",
       "asset_path": "apps/storefront/public/products/photo-crystal-circle-ornament.webp",
-      "width": 265,
-      "height": 265,
+      "width": 452,
+      "height": 424,
       "fetched_at": "2026-10-17",
-      "public_display": "owner_private_review"
+      "public_display": "owner_private_review",
+      "source_kind": "owner_business_brochure_extraction",
+      "previous_source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/2/d/2d-crystal-ornament_04.jpg",
+      "source_brochure": {
+        "filename": "Sonoran Slush Brocure.pdf",
+        "native_path": "E:\\Business\\Sonoran Slush\\Sonoran Slush Brocure.pdf",
+        "extracted_image_index": 11,
+        "sha256": "a5f9081af1b19951ae6f88d84eeeacfcee18582628a73a6a7660164d50859a42"
+      }
     },
     "photo-crystal-heart-keychain": {
       "slug": "photo-crystal-heart-keychain",
       "name": "Heart crystal photo keychain",
       "supplier": "3D Crystal",
       "source_url": "https://3dcrystal.com/3d-crystal-heart-keychains",
-      "source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/3/d/3d-crystal-heart-keychains_04.jpg",
+      "source_image_url": null,
       "match": "documented_shape",
       "note": "",
-      "caption": "Supplier engraving example · your photo replaces the sample. Only the sizes listed here are offered.",
-      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+      "rights": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
       "source_paths": [
         "docs/CRYSTAL-SIZE-KEEP-LIST.md"
       ],
-      "source_sha256": "f5dfa3c77c9d3efd253325b94dde8b6b2f6c29716fab36b6b455e339bfcaf44c",
-      "asset_sha256": "c3586ebb30b03a7a471d5d968eb7bd16d9008e78bf6d84b60d57532a44c6b4fe",
+      "source_sha256": "6e55b006e28dc0d2218a2fb30675e50e057cfb592ab518c3348bf92454f7fbe7",
+      "asset_sha256": "c4560d739085ae68bd712cccf8bdfa85f6060767cd1d214eb53f9774805ca725",
       "asset_path": "apps/storefront/public/products/photo-crystal-heart-keychain.webp",
-      "width": 265,
-      "height": 265,
+      "width": 398,
+      "height": 524,
       "fetched_at": "2026-10-17",
-      "public_display": "owner_private_review"
+      "public_display": "owner_private_review",
+      "source_kind": "owner_business_brochure_extraction",
+      "previous_source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/3/d/3d-crystal-heart-keychains_04.jpg",
+      "source_brochure": {
+        "filename": "Sonoran Slush Brocure.pdf",
+        "native_path": "E:\\Business\\Sonoran Slush\\Sonoran Slush Brocure.pdf",
+        "extracted_image_index": 14,
+        "sha256": "a5f9081af1b19951ae6f88d84eeeacfcee18582628a73a6a7660164d50859a42"
+      }
     },
     "photo-crystal-rectangle-keychain": {
       "slug": "photo-crystal-rectangle-keychain",
       "name": "Rectangle crystal photo keychain",
       "supplier": "3D Crystal",
       "source_url": "https://3dcrystal.com/3d-crystal-rectangle-keychains",
-      "source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/3/d/3d-crystal-rectangle-keychains_04.jpg",
+      "source_image_url": null,
       "match": "documented_shape",
       "note": "",
-      "caption": "Supplier engraving example · your photo replaces the sample. Only the sizes listed here are offered.",
-      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+      "rights": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
       "source_paths": [
         "docs/CRYSTAL-SIZE-KEEP-LIST.md"
       ],
-      "source_sha256": "49f5f29c9deba61acd2734d26bc1e18352b9929265ca328bc054fe8fc10973c6",
-      "asset_sha256": "23175710dcffc3cd1d792c100acb91b9ac030287c4e295c88e250191640d8d36",
+      "source_sha256": "2d97421fc11d514840f9db60a95eed0f59f25c0d22889e8cca3ab57ffa772283",
+      "asset_sha256": "ff61df1157a29584684985edc645154dd632d010da255fbe0674c3c1d0f67e1e",
       "asset_path": "apps/storefront/public/products/photo-crystal-rectangle-keychain.webp",
-      "width": 265,
-      "height": 265,
+      "width": 444,
+      "height": 620,
       "fetched_at": "2026-10-17",
-      "public_display": "owner_private_review"
+      "public_display": "owner_private_review",
+      "source_kind": "owner_business_brochure_extraction",
+      "previous_source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/3/d/3d-crystal-rectangle-keychains_04.jpg",
+      "source_brochure": {
+        "filename": "Sonoran Slush Brocure.pdf",
+        "native_path": "E:\\Business\\Sonoran Slush\\Sonoran Slush Brocure.pdf",
+        "extracted_image_index": 9,
+        "sha256": "a5f9081af1b19951ae6f88d84eeeacfcee18582628a73a6a7660164d50859a42"
+      }
     },
     "photo-crystal-heart-necklace": {
       "slug": "photo-crystal-heart-necklace",
       "name": "Heart crystal photo necklace",
       "supplier": "3D Crystal",
       "source_url": "https://3dcrystal.com/2d-crystal-heart-necklaces",
-      "source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/2/d/2d-crystal-heart-necklaces_03.jpg",
+      "source_image_url": null,
       "match": "documented_shape",
       "note": "",
-      "caption": "Supplier engraving example · your photo replaces the sample. Only the sizes listed here are offered.",
-      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+      "rights": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
       "source_paths": [
         "docs/CRYSTAL-SIZE-KEEP-LIST.md"
       ],
-      "source_sha256": "94754de1789dd85c6a95f728dfc01234b2bdd997efb7c1aa67efcce7392f1eaa",
-      "asset_sha256": "50ad5429b910d6b19f702b550a0bf8b30ce5ecbd24dc9d066c514c29b5d3aa50",
+      "source_sha256": "12b3c304b5fbb7090a651d4201044c0707db19f317d3345e7bf09f0e202ea484",
+      "asset_sha256": "aeb16a7cd3479d90a098c796ae5a7695bce2e5b8acdeb6a9897edb6251446db0",
       "asset_path": "apps/storefront/public/products/photo-crystal-heart-necklace.webp",
-      "width": 265,
-      "height": 265,
+      "width": 589,
+      "height": 568,
       "fetched_at": "2026-10-17",
-      "public_display": "owner_private_review"
+      "public_display": "owner_private_review",
+      "source_kind": "owner_business_brochure_extraction",
+      "previous_source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/2/d/2d-crystal-heart-necklaces_03.jpg",
+      "source_brochure": {
+        "filename": "Sonoran Slush Brocure.pdf",
+        "native_path": "E:\\Business\\Sonoran Slush\\Sonoran Slush Brocure.pdf",
+        "extracted_image_index": 10,
+        "sha256": "a5f9081af1b19951ae6f88d84eeeacfcee18582628a73a6a7660164d50859a42"
+      }
     },
     "photo-crystal-rectangle-necklace": {
       "slug": "photo-crystal-rectangle-necklace",
@@ -839,21 +919,29 @@
       "name": "Crystal light & wood bases",
       "supplier": "3D Crystal",
       "source_url": "https://3dcrystal.com/light-bases/index/index",
-      "source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/s/q/square_base.jpg",
+      "source_image_url": null,
       "match": "documented_shape",
       "note": "",
-      "caption": "Supplier base example · compatibility is checked against your selected crystal.",
-      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "caption": "Base example from our brochure · compatibility confirmed for your selected crystal.",
+      "rights": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
       "source_paths": [
         "docs/PRICING-3D-CRYSTAL.md"
       ],
-      "source_sha256": "b641b22ec0738743a5c4ab82857f72927dececda399d6ccf6895503d92d1079d",
-      "asset_sha256": "654f948cbe71b8df1aabbe0fdae9a538a207d078da6d23701a02b81fdc9a68a2",
+      "source_sha256": "8cf84b5f0d481818977afa86540339568291fd8cfb806e770554098b680379d0",
+      "asset_sha256": "a80701d3feba1e04f4589769586b7075324c61282e8aa0f28c34412c5f7a3a47",
       "asset_path": "apps/storefront/public/products/crystal-bases.webp",
-      "width": 265,
-      "height": 265,
+      "width": 380,
+      "height": 277,
       "fetched_at": "2026-10-17",
-      "public_display": "owner_private_review"
+      "public_display": "owner_private_review",
+      "source_kind": "owner_business_brochure_extraction",
+      "previous_source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/s/q/square_base.jpg",
+      "source_brochure": {
+        "filename": "Sonoran Slush Brocure.pdf",
+        "native_path": "E:\\Business\\Sonoran Slush\\Sonoran Slush Brocure.pdf",
+        "extracted_image_index": 13,
+        "sha256": "a5f9081af1b19951ae6f88d84eeeacfcee18582628a73a6a7660164d50859a42"
+      }
     }
   }
 }

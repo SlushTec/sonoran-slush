@@ -3,6 +3,7 @@ export type ProductMedia = {
   src: string;
   alt: string;
   caption: string;
+  badge?: string;
   width: number;
   height: number;
   variants?: Record<

@@ -57,9 +57,10 @@ export function ProductVisual({
         <span>
           {label ||
             (media
-              ? media.caption.startsWith("Supplier")
-                ? "Supplier example"
-                : "Blank reference"
+              ? media.badge ||
+                (media.caption.startsWith("Supplier")
+                  ? "Supplier example"
+                  : "Blank reference")
               : "Studio photograph to follow")}
         </span>
         <span aria-hidden="true">↗</span>

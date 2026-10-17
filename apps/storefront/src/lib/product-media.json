@@ -1,38 +1,43 @@
 {
   "photo-crystal-rectangle-tall": {
     "src": "/products/photo-crystal-rectangle-tall.webp",
-    "alt": "Tall rectangle photo crystal — supplier engraving example",
-    "caption": "Supplier engraving example · your photo replaces the sample. Only the sizes listed here are offered.",
-    "width": 265,
-    "height": 265
+    "alt": "Tall rectangle photo crystal — crystal brochure example",
+    "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+    "width": 240,
+    "height": 342,
+    "badge": "Brochure example"
   },
   "photo-crystal-rectangle-wide": {
     "src": "/products/photo-crystal-rectangle-wide.webp",
-    "alt": "Wide rectangle photo crystal — supplier engraving example",
-    "caption": "Supplier engraving example · your photo replaces the sample. Only the sizes listed here are offered.",
-    "width": 265,
-    "height": 265
+    "alt": "Wide rectangle photo crystal — crystal brochure example",
+    "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+    "width": 595,
+    "height": 424,
+    "badge": "Brochure example"
   },
   "photo-crystal-heart": {
     "src": "/products/photo-crystal-heart.webp",
-    "alt": "Heart photo crystal — supplier engraving example",
-    "caption": "Supplier engraving example · your photo replaces the sample. Only the sizes listed here are offered.",
-    "width": 265,
-    "height": 265
+    "alt": "Heart photo crystal — crystal brochure example",
+    "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+    "width": 405,
+    "height": 381,
+    "badge": "Brochure example"
   },
   "photo-crystal-cut-corner-diamond": {
     "src": "/products/photo-crystal-cut-corner-diamond.webp",
-    "alt": "Cut-corner diamond photo crystal — supplier engraving example",
-    "caption": "Supplier engraving example · your photo replaces the sample. Only the sizes listed here are offered.",
-    "width": 265,
-    "height": 265
+    "alt": "Cut-corner diamond photo crystal — crystal brochure example",
+    "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+    "width": 728,
+    "height": 727,
+    "badge": "Brochure example"
   },
   "photo-crystal-prestige": {
     "src": "/products/photo-crystal-prestige.webp",
-    "alt": "Prestige iceberg photo crystal — supplier engraving example",
-    "caption": "Supplier engraving example · your photo replaces the sample. Only the sizes listed here are offered.",
-    "width": 265,
-    "height": 265
+    "alt": "Prestige iceberg photo crystal — crystal brochure example",
+    "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+    "width": 433,
+    "height": 533,
+    "badge": "Brochure example"
   },
   "photo-crystal-dog-bone": {
     "src": "/products/photo-crystal-dog-bone.webp",
@@ -43,10 +48,11 @@
   },
   "photo-crystal-candle": {
     "src": "/products/photo-crystal-candle.webp",
-    "alt": "Candle photo crystal — supplier engraving example",
-    "caption": "Supplier engraving example · your photo replaces the sample. Only the sizes listed here are offered.",
-    "width": 265,
-    "height": 265
+    "alt": "Candle photo crystal — crystal brochure example",
+    "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+    "width": 515,
+    "height": 811,
+    "badge": "Brochure example"
   },
   "photo-crystal-notched": {
     "src": "/products/photo-crystal-notched.webp",
@@ -57,31 +63,35 @@
   },
   "photo-crystal-circle-ornament": {
     "src": "/products/photo-crystal-circle-ornament.webp",
-    "alt": "Round crystal photo ornament — supplier engraving example",
-    "caption": "Supplier engraving example · your photo replaces the sample. Only the sizes listed here are offered.",
-    "width": 265,
-    "height": 265
+    "alt": "Round crystal photo ornament — crystal brochure example",
+    "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+    "width": 452,
+    "height": 424,
+    "badge": "Brochure example"
   },
   "photo-crystal-heart-keychain": {
     "src": "/products/photo-crystal-heart-keychain.webp",
-    "alt": "Heart crystal photo keychain — supplier engraving example",
-    "caption": "Supplier engraving example · your photo replaces the sample. Only the sizes listed here are offered.",
-    "width": 265,
-    "height": 265
+    "alt": "Heart crystal photo keychain — crystal brochure example",
+    "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+    "width": 398,
+    "height": 524,
+    "badge": "Brochure example"
   },
   "photo-crystal-rectangle-keychain": {
     "src": "/products/photo-crystal-rectangle-keychain.webp",
-    "alt": "Rectangle crystal photo keychain — supplier engraving example",
-    "caption": "Supplier engraving example · your photo replaces the sample. Only the sizes listed here are offered.",
-    "width": 265,
-    "height": 265
+    "alt": "Rectangle crystal photo keychain — crystal brochure example",
+    "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+    "width": 444,
+    "height": 620,
+    "badge": "Brochure example"
   },
   "photo-crystal-heart-necklace": {
     "src": "/products/photo-crystal-heart-necklace.webp",
-    "alt": "Heart crystal photo necklace — supplier engraving example",
-    "caption": "Supplier engraving example · your photo replaces the sample. Only the sizes listed here are offered.",
-    "width": 265,
-    "height": 265
+    "alt": "Heart crystal photo necklace — crystal brochure example",
+    "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+    "width": 589,
+    "height": 568,
+    "badge": "Brochure example"
   },
   "photo-crystal-rectangle-necklace": {
     "src": "/products/photo-crystal-rectangle-necklace.webp",
@@ -274,9 +284,10 @@
   },
   "crystal-bases": {
     "src": "/products/crystal-bases.webp",
-    "alt": "Crystal light & wood bases — blank or supplier reference photo",
-    "caption": "Supplier base example · compatibility is checked against your selected crystal.",
-    "width": 265,
-    "height": 265
+    "alt": "Crystal light & wood bases — crystal brochure example",
+    "caption": "Base example from our brochure · compatibility confirmed for your selected crystal.",
+    "width": 380,
+    "height": 277,
+    "badge": "Brochure example"
   }
 }

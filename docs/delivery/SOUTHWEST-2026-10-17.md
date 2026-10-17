@@ -6,7 +6,7 @@ Brian requested crystal products separated by shape, size options within each sh
 
 - 13 photo-crystal shape products; 41 catalog listings total. Each shape has its own size selector, a shape-change link, source-backed dimensions, and API validation. Larger unsupported sizes remain excluded.
 - The legacy crystal-collection bookmark opens a shape chooser. Recognized saved designs, bag items, and autosaved crystal drafts migrate to their shape routes without discarding personalization. Existing new-route drafts are preserved.
-- 40 self-hosted, optimized photo references with alt text, dimensions, and image/source hashes. Source examples are labeled and do not appear as studio-made customer work. The balsa-earring photo is held because the candidate material and painted finish cannot be verified.
+- 40 self-hosted, optimized photo references with alt text, dimensions, and image/source hashes: eleven from the recovered business brochure and twenty-nine from supplier pages. Source examples are labeled and do not appear as studio-made customer work. The balsa-earring photo is held because the candidate material and painted finish cannot be verified.
 - All 41 items have a source-register entry, with documented brands/products distinguished from newly found candidate suppliers. No wholesale prices or supplier stock counts enter the storefront.
 - Original coyote, roadrunner, saguaro, and landscape preserved. Logo lettering is redrawn in Rye; Bitter headings and Source Sans 3 body copy are self-hosted with OFL license files. Pine, canyon, and sandstone colors carry the identity through the site.
 - The prior ambiguous browser locator and gift-finder ARIA issue are corrected in source. Independent browser and peer qualification are still tracked separately.

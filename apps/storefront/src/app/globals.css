@@ -4375,3 +4375,7 @@ main:focus {
 .hero-editorial .photo-pending {
   color: var(--gold-light);
 }
+
+.tone-photo-crystals.has-product-photo {
+  background: #18231f;
+}
