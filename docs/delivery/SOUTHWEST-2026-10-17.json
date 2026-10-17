@@ -17,7 +17,7 @@
   "archive_files_unchanged": 67,
   "business_documents_unchanged": 41,
   "source_asset_hash_bindings": "40 passed",
-  "browser_qa": "GitHub run 39042089335 passed all 32 browser checks for application commit 0564813e3bb3bd5c880f48a52850947753206b22. Brochure-photo update qualification pending.",
+  "browser_qa": "32 browser checks passed on GitHub Actions, including accessibility routes and responsive overflow at 320/390/768/1440 widths.",
   "independent_peer_review": "pending",
   "audience": "owner_private",
   "production_commerce": "not connected; existing release gates unchanged",
@@ -30,5 +30,11 @@
   "internal_links_checked": 4402,
   "active_document_links_checked": 27,
   "brochure_photos": 11,
-  "supplier_photo_references": 29
+  "supplier_photo_references": 29,
+  "browser_tests_passed": 32,
+  "browser_ci_url": "https://github.com/SlushTec/sonoran-slush/actions/runs/39042611443",
+  "qualified_application_commit": "6a10cfdfe717bf8e36389bb319a30bf0a30cd9b3",
+  "container_ci": "passed",
+  "terraform_ci": "passed",
+  "publication_receipt": "docs/delivery/SOUTHWEST-PUBLICATION-2026-10-17.json"
 }
