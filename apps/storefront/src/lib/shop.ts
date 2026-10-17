@@ -1,4 +1,5 @@
 import { catalog, type Product } from "./catalog";
+import { crystalShapes } from "./crystals";
 
 export type Option = { label: string; values: string[] };
 export type ProductInfo = {
@@ -408,13 +409,40 @@ export const productInfo: Record<string, ProductInfo> = {
     ["Pet gifts", "Housewarming"],
   ),
 };
+for (const shape of crystalShapes) {
+  productInfo[shape.slug] = {
+    ...base(
+      shape.title,
+      shape.line,
+      shape.description,
+      "Crystal",
+      shape.shape === "Dog bone"
+        ? ["Pet gifts", "Remembrance", "Birthday"]
+        : ["Anniversary", "Remembrance", "Graduation", "Wedding", "Holiday"],
+      [
+        option("Size", ...shape.sizes.map((s) => s.value)),
+        ...(shape.orientations.length
+          ? [option("Orientation", ...shape.orientations)]
+          : []),
+      ],
+      [
+        ["Shape", shape.shape],
+        ["Process", shape.process + " subsurface photo engraving"],
+        ["Photo", "Your photograph; artwork reviewed before production"],
+        ["Size range", shape.sizes.map((s) => s.label).join("; ")],
+      ],
+    ),
+    personalization: "photo",
+    care: "Dust gently with a soft cloth. Avoid harsh cleaners, impacts, and extreme temperature changes.",
+  };
+}
 export function infoFor(p: Product) {
   return productInfo[p.slug];
 }
 export const featuredSlugs = [
   "makertwist-40oz-tumbler",
   "acacia-cutting-boards",
-  "photo-crystal-collection",
+  "photo-crystal-heart",
   "whiskey-decanter-4-glass-stones",
 ];
 export const occasions = [
@@ -458,20 +486,9 @@ export const fonts = [
   { name: "Handwritten", family: "cursive" },
 ];
 export function crystalSizes(shape: string = ""): string[] {
-  if (shape.startsWith("Rectangle "))
-    return ["Small", "Medium", "Large", "XLarge", "Mini Mantel (6 × 4 in)"];
-  if (shape === "Heart" || shape === "Cut corner diamond")
-    return ["Small", "Medium", "Large"];
-  const sizes: Record<string, string> = {
-    "Prestige Iceberg small": "Small only",
-    "Dog bone": "6 × 4 in",
-    Candle: "4 × 2.4 × 2.4 in",
-    "Small notched": "Size confirmed during review",
-    "Circle ornament": "Size confirmed during review",
-    "Heart keychain": "3.5 × 3.5 × 1.2 cm",
-    "Rectangle keychain": "3 × 2 × 1.5 cm",
-    "2D heart necklace": "3.5 × 3.5 × 0.8 cm",
-    "2D rectangle necklace": "3 × 4 cm",
-  };
-  return [sizes[shape] || "Size confirmed during review"];
+  return (
+    crystalShapes.find((s) => s.shape === shape)?.sizes.map((s) => s.value) || [
+      "Size confirmed during review",
+    ]
+  );
 }

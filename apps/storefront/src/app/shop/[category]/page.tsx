@@ -37,6 +37,16 @@ export default async function CategoryPage({
         <h1>{categoryLines[category]}</h1>
         <p>{c.description} Add the details that make it theirs.</p>
       </div>
+      {category === "photo-crystals" && (
+        <div className="crystal-collection-note">
+          <strong>First, choose the shape that feels right.</strong>
+          <span>
+            Then select its size and add your photograph. Necklaces and the
+            round photo ornament use 2D engraving; other photo shapes use 3D
+            engraving.
+          </span>
+        </div>
+      )}
       <CatalogSearch category={category} />
     </div>
   );

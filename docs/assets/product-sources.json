@@ -1,0 +1,947 @@
+{
+  "review_date": "2026-10-17",
+  "scope": "Owner-private review; original source and candidate distinctions retained. No pricing, stock, approved supplier relationship, or unrestricted image license is inferred.",
+  "products": {
+    "photo-crystal-rectangle-tall": {
+      "slug": "photo-crystal-rectangle-tall",
+      "name": "Tall rectangle photo crystal",
+      "supplier": "3D Crystal",
+      "source_url": "https://3dcrystal.com/3d-crystal-rectangle-tall",
+      "source_image_url": null,
+      "match": "documented_shape",
+      "note": "",
+      "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+      "rights": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "source_sha256": "845d8f6b5cd9d63d2395826383a95a8126e72b11e27bea6b92f6a547a17c1abf",
+      "asset_sha256": "461d2169961edc66e36f728458305f31872d2f749cff871a8061552dcc4ad606",
+      "asset_path": "apps/storefront/public/products/photo-crystal-rectangle-tall.webp",
+      "width": 240,
+      "height": 342,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review",
+      "source_kind": "owner_business_brochure_extraction",
+      "previous_source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/3/d/3d-crystal-rectangle-tall_05.jpg",
+      "source_brochure": {
+        "filename": "Sonoran Slush Brocure.pdf",
+        "native_path": "E:\\Business\\Sonoran Slush\\Sonoran Slush Brocure.pdf",
+        "extracted_image_index": 5,
+        "sha256": "a5f9081af1b19951ae6f88d84eeeacfcee18582628a73a6a7660164d50859a42"
+      }
+    },
+    "photo-crystal-rectangle-wide": {
+      "slug": "photo-crystal-rectangle-wide",
+      "name": "Wide rectangle photo crystal",
+      "supplier": "3D Crystal",
+      "source_url": "https://3dcrystal.com/3d-crystal-rectangle-wide",
+      "source_image_url": null,
+      "match": "documented_shape",
+      "note": "",
+      "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+      "rights": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "source_sha256": "3d6130df53cf2e3487f69ec636610e216b98739f984061e31684aa108595803a",
+      "asset_sha256": "fe61dcc11df4acc842f66c016d28b04bd9b584b830b84779d662ced29e0e8d10",
+      "asset_path": "apps/storefront/public/products/photo-crystal-rectangle-wide.webp",
+      "width": 595,
+      "height": 424,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review",
+      "source_kind": "owner_business_brochure_extraction",
+      "previous_source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/p/i/picsart_26-07-03_14-41-11-097.jpg",
+      "source_brochure": {
+        "filename": "Sonoran Slush Brocure.pdf",
+        "native_path": "E:\\Business\\Sonoran Slush\\Sonoran Slush Brocure.pdf",
+        "extracted_image_index": 4,
+        "sha256": "a5f9081af1b19951ae6f88d84eeeacfcee18582628a73a6a7660164d50859a42"
+      }
+    },
+    "photo-crystal-heart": {
+      "slug": "photo-crystal-heart",
+      "name": "Heart photo crystal",
+      "supplier": "3D Crystal",
+      "source_url": "https://3dcrystal.com/3d-crystal-heart",
+      "source_image_url": null,
+      "match": "documented_shape",
+      "note": "",
+      "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+      "rights": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "source_sha256": "698c28f1609533f46f4e7f61b179ab31c0800dc5231f00648f162cef838d12d3",
+      "asset_sha256": "007ad97d86834aa2371e149320a28860befef3e9db557a2ee110c457381f76d4",
+      "asset_path": "apps/storefront/public/products/photo-crystal-heart.webp",
+      "width": 405,
+      "height": 381,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review",
+      "source_kind": "owner_business_brochure_extraction",
+      "previous_source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/p/i/picsart_26-07-03_14-40-32-726.jpg",
+      "source_brochure": {
+        "filename": "Sonoran Slush Brocure.pdf",
+        "native_path": "E:\\Business\\Sonoran Slush\\Sonoran Slush Brocure.pdf",
+        "extracted_image_index": 3,
+        "sha256": "a5f9081af1b19951ae6f88d84eeeacfcee18582628a73a6a7660164d50859a42"
+      }
+    },
+    "photo-crystal-cut-corner-diamond": {
+      "slug": "photo-crystal-cut-corner-diamond",
+      "name": "Cut-corner diamond photo crystal",
+      "supplier": "3D Crystal",
+      "source_url": "https://3dcrystal.com/3d-crystal-cut-corner-diamond",
+      "source_image_url": null,
+      "match": "documented_shape",
+      "note": "",
+      "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+      "rights": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "source_sha256": "182683e6bc9c83064b59be9311a682f3651f6b331f979faae654387b474b9785",
+      "asset_sha256": "48d51e81810041ec5c79f2fa3445638879d7c829e1e82d4d9a4b960eeb2a11ee",
+      "asset_path": "apps/storefront/public/products/photo-crystal-cut-corner-diamond.webp",
+      "width": 728,
+      "height": 727,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review",
+      "source_kind": "owner_business_brochure_extraction",
+      "previous_source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/3/d/3d-crystal-cut-corner-diamond_03.jpg",
+      "source_brochure": {
+        "filename": "Sonoran Slush Brocure.pdf",
+        "native_path": "E:\\Business\\Sonoran Slush\\Sonoran Slush Brocure.pdf",
+        "extracted_image_index": 7,
+        "sha256": "a5f9081af1b19951ae6f88d84eeeacfcee18582628a73a6a7660164d50859a42"
+      }
+    },
+    "photo-crystal-prestige": {
+      "slug": "photo-crystal-prestige",
+      "name": "Prestige iceberg photo crystal",
+      "supplier": "3D Crystal",
+      "source_url": "https://3dcrystal.com/3d-crystal-prestige",
+      "source_image_url": null,
+      "match": "documented_shape",
+      "note": "",
+      "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+      "rights": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "source_sha256": "02d6612de3a179f0af028fd2dcc9f2643506e156757cc19608722aeec4ef2027",
+      "asset_sha256": "7ede6a845078336d1842645a81ade567d646cb36c7504cdc1a239e1c133a60e8",
+      "asset_path": "apps/storefront/public/products/photo-crystal-prestige.webp",
+      "width": 433,
+      "height": 533,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review",
+      "source_kind": "owner_business_brochure_extraction",
+      "previous_source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/p/r/prestige_041.jpg",
+      "source_brochure": {
+        "filename": "Sonoran Slush Brocure.pdf",
+        "native_path": "E:\\Business\\Sonoran Slush\\Sonoran Slush Brocure.pdf",
+        "extracted_image_index": 6,
+        "sha256": "a5f9081af1b19951ae6f88d84eeeacfcee18582628a73a6a7660164d50859a42"
+      }
+    },
+    "photo-crystal-dog-bone": {
+      "slug": "photo-crystal-dog-bone",
+      "name": "Dog bone photo crystal",
+      "supplier": "3D Crystal",
+      "source_url": "https://3dcrystal.com/3d-crystal-dog-bone-horizontal",
+      "source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/3/d/3d-crystal-dog-bone-horizontal_03.jpg",
+      "match": "documented_shape",
+      "note": "",
+      "caption": "Supplier engraving example · your photo replaces the sample. Only the sizes listed here are offered.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "source_sha256": "bd4b81af9f7ebd9dc2cff4d3e33ad7397ded3d506627b637378bbab8ee36793a",
+      "asset_sha256": "2a76ec4804cdb77cb3907015f73dcd222db5c8aa1716bc937eaf65f42ee0ab01",
+      "asset_path": "apps/storefront/public/products/photo-crystal-dog-bone.webp",
+      "width": 265,
+      "height": 265,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "photo-crystal-candle": {
+      "slug": "photo-crystal-candle",
+      "name": "Candle photo crystal",
+      "supplier": "3D Crystal",
+      "source_url": "https://3dcrystal.com/3d-crystal-candle",
+      "source_image_url": null,
+      "match": "documented_shape",
+      "note": "",
+      "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+      "rights": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "source_sha256": "327e9d45fb392851a7264b1992fc9ef7eb3096bbe9ccbd8eaf6f63a9af964cc1",
+      "asset_sha256": "f562a9a7bb101afb0bce51d657a691336f4e669fa5a039c79d9ff7b0c70cb7c4",
+      "asset_path": "apps/storefront/public/products/photo-crystal-candle.webp",
+      "width": 515,
+      "height": 811,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review",
+      "source_kind": "owner_business_brochure_extraction",
+      "previous_source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/c/a/candle_motherday_new.png",
+      "source_brochure": {
+        "filename": "Sonoran Slush Brocure.pdf",
+        "native_path": "E:\\Business\\Sonoran Slush\\Sonoran Slush Brocure.pdf",
+        "extracted_image_index": 8,
+        "sha256": "a5f9081af1b19951ae6f88d84eeeacfcee18582628a73a6a7660164d50859a42"
+      }
+    },
+    "photo-crystal-notched": {
+      "slug": "photo-crystal-notched",
+      "name": "Notched photo crystal",
+      "supplier": "3D Crystal",
+      "source_url": "https://3dcrystal.com/3d-notched-crystal-tall",
+      "source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/3/d/3d-notched-crystal-tall_03.jpg",
+      "match": "documented_shape",
+      "note": "",
+      "caption": "Supplier engraving example · your photo replaces the sample. Only the sizes listed here are offered.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "source_sha256": "1c408a999f2e2428c7d33b8610e4d2538054082febc29f3c3a0bc645127b7ba7",
+      "asset_sha256": "53f257f758e7a4f06bf647c5341b9b0e884d52102be42fc5e2e1456efbf6a4ef",
+      "asset_path": "apps/storefront/public/products/photo-crystal-notched.webp",
+      "width": 265,
+      "height": 265,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "photo-crystal-circle-ornament": {
+      "slug": "photo-crystal-circle-ornament",
+      "name": "Round crystal photo ornament",
+      "supplier": "3D Crystal",
+      "source_url": "https://3dcrystal.com/sun-catcher",
+      "source_image_url": null,
+      "match": "documented_shape",
+      "note": "",
+      "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+      "rights": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "source_sha256": "14d5fb1525addaa656d3017c1bf06dc19c7ffbb990b2d2dbac630da42c163307",
+      "asset_sha256": "d5e44f280601e10150ec58a58175d6ec5595be33a346e28f144ab312e945c737",
+      "asset_path": "apps/storefront/public/products/photo-crystal-circle-ornament.webp",
+      "width": 452,
+      "height": 424,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review",
+      "source_kind": "owner_business_brochure_extraction",
+      "previous_source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/2/d/2d-crystal-ornament_04.jpg",
+      "source_brochure": {
+        "filename": "Sonoran Slush Brocure.pdf",
+        "native_path": "E:\\Business\\Sonoran Slush\\Sonoran Slush Brocure.pdf",
+        "extracted_image_index": 11,
+        "sha256": "a5f9081af1b19951ae6f88d84eeeacfcee18582628a73a6a7660164d50859a42"
+      }
+    },
+    "photo-crystal-heart-keychain": {
+      "slug": "photo-crystal-heart-keychain",
+      "name": "Heart crystal photo keychain",
+      "supplier": "3D Crystal",
+      "source_url": "https://3dcrystal.com/3d-crystal-heart-keychains",
+      "source_image_url": null,
+      "match": "documented_shape",
+      "note": "",
+      "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+      "rights": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "source_sha256": "6e55b006e28dc0d2218a2fb30675e50e057cfb592ab518c3348bf92454f7fbe7",
+      "asset_sha256": "c4560d739085ae68bd712cccf8bdfa85f6060767cd1d214eb53f9774805ca725",
+      "asset_path": "apps/storefront/public/products/photo-crystal-heart-keychain.webp",
+      "width": 398,
+      "height": 524,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review",
+      "source_kind": "owner_business_brochure_extraction",
+      "previous_source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/3/d/3d-crystal-heart-keychains_04.jpg",
+      "source_brochure": {
+        "filename": "Sonoran Slush Brocure.pdf",
+        "native_path": "E:\\Business\\Sonoran Slush\\Sonoran Slush Brocure.pdf",
+        "extracted_image_index": 14,
+        "sha256": "a5f9081af1b19951ae6f88d84eeeacfcee18582628a73a6a7660164d50859a42"
+      }
+    },
+    "photo-crystal-rectangle-keychain": {
+      "slug": "photo-crystal-rectangle-keychain",
+      "name": "Rectangle crystal photo keychain",
+      "supplier": "3D Crystal",
+      "source_url": "https://3dcrystal.com/3d-crystal-rectangle-keychains",
+      "source_image_url": null,
+      "match": "documented_shape",
+      "note": "",
+      "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+      "rights": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "source_sha256": "2d97421fc11d514840f9db60a95eed0f59f25c0d22889e8cca3ab57ffa772283",
+      "asset_sha256": "ff61df1157a29584684985edc645154dd632d010da255fbe0674c3c1d0f67e1e",
+      "asset_path": "apps/storefront/public/products/photo-crystal-rectangle-keychain.webp",
+      "width": 444,
+      "height": 620,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review",
+      "source_kind": "owner_business_brochure_extraction",
+      "previous_source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/3/d/3d-crystal-rectangle-keychains_04.jpg",
+      "source_brochure": {
+        "filename": "Sonoran Slush Brocure.pdf",
+        "native_path": "E:\\Business\\Sonoran Slush\\Sonoran Slush Brocure.pdf",
+        "extracted_image_index": 9,
+        "sha256": "a5f9081af1b19951ae6f88d84eeeacfcee18582628a73a6a7660164d50859a42"
+      }
+    },
+    "photo-crystal-heart-necklace": {
+      "slug": "photo-crystal-heart-necklace",
+      "name": "Heart crystal photo necklace",
+      "supplier": "3D Crystal",
+      "source_url": "https://3dcrystal.com/2d-crystal-heart-necklaces",
+      "source_image_url": null,
+      "match": "documented_shape",
+      "note": "",
+      "caption": "Example from our crystal brochure · your photo replaces the sample. Only the listed sizes are offered.",
+      "rights": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "source_sha256": "12b3c304b5fbb7090a651d4201044c0707db19f317d3345e7bf09f0e202ea484",
+      "asset_sha256": "aeb16a7cd3479d90a098c796ae5a7695bce2e5b8acdeb6a9897edb6251446db0",
+      "asset_path": "apps/storefront/public/products/photo-crystal-heart-necklace.webp",
+      "width": 589,
+      "height": 568,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review",
+      "source_kind": "owner_business_brochure_extraction",
+      "previous_source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/2/d/2d-crystal-heart-necklaces_03.jpg",
+      "source_brochure": {
+        "filename": "Sonoran Slush Brocure.pdf",
+        "native_path": "E:\\Business\\Sonoran Slush\\Sonoran Slush Brocure.pdf",
+        "extracted_image_index": 10,
+        "sha256": "a5f9081af1b19951ae6f88d84eeeacfcee18582628a73a6a7660164d50859a42"
+      }
+    },
+    "photo-crystal-rectangle-necklace": {
+      "slug": "photo-crystal-rectangle-necklace",
+      "name": "Rectangle crystal photo necklace",
+      "supplier": "3D Crystal",
+      "source_url": "https://3dcrystal.com/2d-crystal-rectangle-necklaces",
+      "source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/2/d/2d-crystal-rectangle-necklaces_04.jpg",
+      "match": "documented_shape",
+      "note": "",
+      "caption": "Supplier engraving example · your photo replaces the sample. Only the sizes listed here are offered.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "source_sha256": "4ae4f0c8f2701cceae7e30ed5f51139cb618c1f4d40863d8cc0891cb979c1aba",
+      "asset_sha256": "538b4b736226b019a1d74e8ff8a56926f6c050c9924aec95aa0daf701fc698d3",
+      "asset_path": "apps/storefront/public/products/photo-crystal-rectangle-necklace.webp",
+      "width": 265,
+      "height": 265,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "makertwist-40oz-tumbler": {
+      "slug": "makertwist-40oz-tumbler",
+      "name": "MakerTwist 40 oz tumbler",
+      "supplier": "MakerFlo",
+      "source_url": "https://makerflo.com/products/40oz-tumbler-with-handle",
+      "source_image_url": "https://cdn.shopify.com/s/files/1/0246/5411/8978/files/40oz-tumbler-with-handle-powder-coated-laser-ready.jpg?v=1779141433",
+      "match": "documented_product",
+      "note": "MakerFlo provides product-image downloads in its reseller resources. Use and current stock still need release review.",
+      "caption": "Supplier photo · blank shown before personalization.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/products/MAKERTWIST-40OZ-TUMBLER.md"
+      ],
+      "source_sha256": "cef2570b6c01814b26e7f700afb736b6ea522e7029a5e27977c696e1876688ab",
+      "asset_sha256": "bea6af3ab965abe5b43287c99d15667d29ff4005ec4a9ebb7f33740f1f691e8e",
+      "asset_path": "apps/storefront/public/products/makertwist-40oz-tumbler.webp",
+      "width": 1100,
+      "height": 1100,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "makerflo-40oz-electroplated": {
+      "slug": "makerflo-40oz-electroplated",
+      "name": "Electroplated 40 oz tumbler",
+      "supplier": "MakerFlo",
+      "source_url": "https://makerflo.com/products/40oz-electroplated-tumbler",
+      "source_image_url": "https://cdn.shopify.com/s/files/1/0246/5411/8978/files/40oz-Electroplated-Tumbler-in-gold-rainbow.png?v=1776979092",
+      "match": "documented_product",
+      "note": "MakerFlo provides product-image downloads in its reseller resources. Use and current stock still need release review.",
+      "caption": "Supplier photo · blank shown before personalization.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/products/MAKERFLO-40OZ-ELECTROPLATED.md"
+      ],
+      "source_sha256": "07645d81cef363e5adf1e6652c82820646f3efd84de51fe3cdc14f31c4b0479e",
+      "asset_sha256": "155a046c838619e1ed8894456728d2a7e1d1f410591b5566c936b1507d12ec28",
+      "asset_path": "apps/storefront/public/products/makerflo-40oz-electroplated.webp",
+      "width": 1100,
+      "height": 1100,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "laserette-journal": {
+      "slug": "laserette-journal",
+      "name": "Personalized journal",
+      "supplier": "MakerFlo",
+      "source_url": "https://makerflo.com/products/laserette-notebook-journal",
+      "source_image_url": "https://cdn.shopify.com/s/files/1/0246/5411/8978/files/Laserette-journal-notebok-engravable-leatherette_1.jpg?v=1773179529",
+      "match": "documented_product",
+      "note": "MakerFlo provides product-image downloads in its reseller resources. Use and current stock still need release review.",
+      "caption": "Supplier photo · blank shown before personalization.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/products/LASERETTE-JOURNAL.md"
+      ],
+      "source_sha256": "f3e9e5c9ea8179b6dcc6c1d0003d8e709990849e9b2a357a435fba09a694f8d0",
+      "asset_sha256": "318ad2ee39e2908036a1168f15b4a83d80f1e252d6abef6ce502e80ccefbb097",
+      "asset_path": "apps/storefront/public/products/laserette-journal.webp",
+      "width": 1100,
+      "height": 1100,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "makerflo-32oz-water-bottle": {
+      "slug": "makerflo-32oz-water-bottle",
+      "name": "32 oz water bottle",
+      "supplier": "MakerFlo",
+      "source_url": "https://makerflo.com/products/32oz-hydro-water-bottle-powder-coated",
+      "source_image_url": "https://cdn.shopify.com/s/files/1/0246/5411/8978/files/32oz-Insulated-Water-Bottles-Powder-Coated-Stainless-Steel-Sport-Lid-1.png?v=1775587062",
+      "match": "documented_product",
+      "note": "",
+      "caption": "Supplier photo · blank shown before personalization.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/products/MAKERFLO-32OZ-WATER-BOTTLE.md"
+      ],
+      "source_sha256": "555eec137f059096011419ad4a8cd72cebf820f0cfa2b39e232f21774151f22b",
+      "asset_sha256": "cae387fd92080ed402eb9065cdeaa0d7afd958125806a6eec766fd99829d2459",
+      "asset_path": "apps/storefront/public/products/makerflo-32oz-water-bottle.webp",
+      "width": 1100,
+      "height": 1100,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "libbey-1639-mixing-glass": {
+      "slug": "libbey-1639-mixing-glass",
+      "name": "Libbey mixing glass",
+      "supplier": "Libbey",
+      "source_url": "https://libbeyfoodservice.com/product/libbey/restaurant-basics-heat-treated-mixing-glass/1639ht",
+      "source_image_url": "https://images.salsify.com/image/upload/s--Fs2HBpO2--/if_w_gt_2048,w_2048,c_fit/3598b4075dd9352161583a301d1990315b9479fa.jpg",
+      "match": "documented_product",
+      "note": "1639HT is the current manufacturer listing; the retained source uses 1639.",
+      "caption": "Supplier photo · blank shown before personalization.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/products/LIBBEY-1639-MIXING-GLASS.md"
+      ],
+      "source_sha256": "a095116488d27bc8bfe2c7bdcd44d96ec9c14c96b7e51e5042af7dfcee8aef2e",
+      "asset_sha256": "1bd31aaade45626fb2438c39e9054d353e294b6a24cedcae789c7ed20c4d7cad",
+      "asset_path": "apps/storefront/public/products/libbey-1639-mixing-glass.webp",
+      "width": 1100,
+      "height": 1100,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "libbey-2339-dof": {
+      "slug": "libbey-2339-dof",
+      "name": "Libbey rocks glass",
+      "supplier": "Libbey",
+      "source_url": "https://libbeyfoodservice.com/product/libbey/lexington-double-old-fashioned/2339",
+      "source_image_url": "https://images.salsify.com/image/upload/s--2CW0OAAE--/if_w_gt_2048,w_2048,c_fit/71d7edf78c966fcabd3ecc971bede4c202fa4c64.jpg",
+      "match": "documented_product",
+      "note": "",
+      "caption": "Supplier photo · blank shown before personalization.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/products/LIBBEY-2339-DOF.md"
+      ],
+      "source_sha256": "cbab8d800ce85fcdab7620cbf5352cc97b30b9375968a601ea8095e78c7a4f9c",
+      "asset_sha256": "700a15ef5f0326dfcf63405dd91a5a8b008510dc0b4cfcea4231ae14ba0bec1b",
+      "asset_path": "apps/storefront/public/products/libbey-2339-dof.webp",
+      "width": 1100,
+      "height": 1100,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "acacia-cutting-boards": {
+      "slug": "acacia-cutting-boards",
+      "name": "Acacia cutting boards & sets",
+      "supplier": "GlikCeil / WoodArtSupply",
+      "source_url": "https://woodartsupply.com/collections/kitchen-tools/products/glikceil-12-pcs-thick-acacia-wood-cutting-boards-for-kitchen-reversible-wooden-chopping-board-set-double-sided-charcuterie-boards-for-meat-cheese-meal-14-x-11-inches-10-x-8-inches-8-x-5-5-inches",
+      "source_image_url": "https://woodartsupply.com/cdn/shop/files/81nQ_1bkLpL.jpg?v=1730353816&width=600",
+      "match": "documented_brand",
+      "note": "Brand matches retained notes; original purchase URL is not recovered. Photo shows bulk blanks; selling units remain individual/quoted sets.",
+      "caption": "Reference blank · final style confirmed during review.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/products/ACACIA-CUTTING-BOARDS.md"
+      ],
+      "source_sha256": "fd9427d17c7eca1ba421ee020088e00d51b31dd7b38952558b64ea9e6bc03957",
+      "asset_sha256": "9d5455cdc69b4009ef641f39a676a173505c15759af2dcc830ee70dace757ff7",
+      "asset_path": "apps/storefront/public/products/acacia-cutting-boards.webp",
+      "width": 600,
+      "height": 600,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "salt-rimmer-acacia": {
+      "slug": "salt-rimmer-acacia",
+      "name": "Acacia salt rimmer",
+      "supplier": "Ziliny / marketplace listing",
+      "source_url": "https://www.ebay.com/itm/137750552150",
+      "source_image_url": "https://i.ebayimg.com/images/g/g4kAAeSwelRqrOwt/s-l500.jpg",
+      "match": "documented_brand",
+      "note": "Ziliny brand is named in retained notes. Marketplace images and diameter vary by listing; exact 5.9-inch blank still needs confirmation.",
+      "caption": "Reference blank · final style confirmed during review.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/products/SALT-RIMMER-ACACIA.md"
+      ],
+      "source_sha256": "e52f4368853cc91cd68edc49808929c15608b7fd8ec3cf50eddf94306f5a4b1d",
+      "asset_sha256": "7a7c0462c59e6b9b08b312b4723aa37998ccb4b5e72c3f932e91e4d8745386a7",
+      "asset_path": "apps/storefront/public/products/salt-rimmer-acacia.webp",
+      "width": 500,
+      "height": 500,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "whiskey-decanter-26oz-set": {
+      "slug": "whiskey-decanter-26oz-set",
+      "name": "Whiskey decanter set",
+      "supplier": "HUAHANGNA / Wuhan Xinhuahang",
+      "source_url": "https://www.xhhglass.com/index.php?c=show&id=25",
+      "source_image_url": "https://www.xhhglass.com/uploadfile/202301/96e19d6154466fe.jpg",
+      "match": "documented_brand",
+      "note": "Supplier matches named brand. Supplier listing is 700 ml/25 oz rather than historical ~26 oz; exact capacity and set contents await blank verification.",
+      "caption": "Supplier set example · glass count, capacity, and packaging confirmed with your quote.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/products/WHISKEY-DECANTER-26OZ-SET.md"
+      ],
+      "source_sha256": "6326af301dc24d3982ac74e69913e30d423d10dc8b3b55821ac23f6835bf2c18",
+      "asset_sha256": "958f90688d674cf7c5283f5e44ca6ace1c848c60a5e19ae9ba8c6b0835ef9908",
+      "asset_path": "apps/storefront/public/products/whiskey-decanter-26oz-set.webp",
+      "width": 800,
+      "height": 800,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "whiskey-decanter-4-glass-stones": {
+      "slug": "whiskey-decanter-4-glass-stones",
+      "name": "Decanter, four glasses & stones",
+      "supplier": "HUAHANGNA / Wuhan Xinhuahang",
+      "source_url": "https://www.xhhglass.com/index.php?c=show&id=25",
+      "source_image_url": "https://www.xhhglass.com/uploadfile/202301/96e19d6154466fe.jpg",
+      "match": "representative_blank",
+      "note": "Supplier gallery photo shows four glasses with stones in the wooden case. Original purchase supplier is not recovered; this remains a reference set.",
+      "caption": "Supplier set example · final glass count and accessories confirmed with your quote.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/products/WHISKEY-DECANTER-4-GLASS-STONES.md"
+      ],
+      "source_sha256": "6326af301dc24d3982ac74e69913e30d423d10dc8b3b55821ac23f6835bf2c18",
+      "asset_sha256": "958f90688d674cf7c5283f5e44ca6ace1c848c60a5e19ae9ba8c6b0835ef9908",
+      "asset_path": "apps/storefront/public/products/whiskey-decanter-4-glass-stones.webp",
+      "width": 800,
+      "height": 800,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "cocktail-smoker-kit": {
+      "slug": "cocktail-smoker-kit",
+      "name": "Cocktail smoker kit",
+      "supplier": "Zyxwoodencraft (candidate)",
+      "source_url": "https://www.zyxwoodencraft.com/wooden-cocktail-smoker/cocktail-smoker-kit-with-torch",
+      "source_image_url": "https://www.zyxwoodencraft.com/icms/upload/d05d41a068a111ee8b3d373ceaac3f31/pic/产品管理-产品展示图片/a1bc3bb668d311ee88c1514de5b5344e/Directory/Cocktail Smoker Kit With Torch.webp",
+      "match": "representative_blank",
+      "note": "No original supplier is named in source. Candidate kit for visual review only.",
+      "caption": "Reference blank · final style confirmed during review.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/products/COCKTAIL-SMOKER-KIT.md"
+      ],
+      "source_sha256": "ed3c18796317e89b0cb66e2db77a81d050904a569470ad176ae2670de1615357",
+      "asset_sha256": "ab795144f724c78f402ffbd5d00d6bb8c4f59a96406fd41158657bb4bfd3efad",
+      "asset_path": "apps/storefront/public/products/cocktail-smoker-kit.webp",
+      "width": 600,
+      "height": 600,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "crystal-wine-stopper": {
+      "slug": "crystal-wine-stopper",
+      "name": "Surface-engraved wine stopper",
+      "supplier": "e-CorporateGifts (candidate)",
+      "source_url": "https://www.e-corporategifts.com/Crystal-Rosetta-Wine-Stopper.html",
+      "source_image_url": "https://www.e-corporategifts.com/media/5641995New.jpg",
+      "match": "representative_blank",
+      "note": "New matching blank source, not a recovered original purchase link.",
+      "caption": "Reference blank · final style confirmed during review.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/products/CRYSTAL-WINE-STOPPER.md"
+      ],
+      "source_sha256": "dff37950fe51c666f6f53919c4ce04ef260110bb49e632a45e8282bd6dd8ba36",
+      "asset_sha256": "c604a2df04b5bd16ddf1c4be580a70a1e2d7bfb581f4a4f1e01b8d38ec165220",
+      "asset_path": "apps/storefront/public/products/crystal-wine-stopper.webp",
+      "width": 960,
+      "height": 960,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "wood-bottle-opener-keychain": {
+      "slug": "wood-bottle-opener-keychain",
+      "name": "Wood bottle-opener keychain",
+      "supplier": "4CustomPromo (candidate)",
+      "source_url": "https://www.4custompromo.com/custom-wooden-bottle-opener-keychain.html",
+      "source_image_url": "https://www.4custompromo.com/media/catalog/product/cache/9c858a98dac03d13497c8f13196c5f8f/c/u/custom_wooden_bottle_opener_keychain.jpg",
+      "match": "representative_blank",
+      "note": "New matching blank source, not a recovered original purchase link.",
+      "caption": "Supplier engraving example · your design replaces the sample; final blank confirmed during review.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/products/WOOD-BOTTLE-OPENER-KEYCHAIN.md"
+      ],
+      "source_sha256": "2a4eef3a431336fe182e35cd8b2b3585de80a1e5c01a9dc9ef6942f3779be08b",
+      "asset_sha256": "d69d75de2c61ea20220259a2ab6233b5541e97c66ced0ecea89b40cefb221fb2",
+      "asset_path": "apps/storefront/public/products/wood-bottle-opener-keychain.webp",
+      "width": 265,
+      "height": 265,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "wood-keychain-round": {
+      "slug": "wood-keychain-round",
+      "name": "Round wood keychain",
+      "supplier": "XSTRON (candidate)",
+      "source_url": "https://www.xstron.com/wood-key-chain-blank-laser-engraving-material/",
+      "source_image_url": "https://www.xstron.com/wp-content/uploads/wood_key_chain_ring_blank_engraving_material.jpg",
+      "match": "representative_blank",
+      "note": "New matching blank source, not a recovered original purchase link.",
+      "caption": "Reference blank · final style confirmed during review.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/products/WOOD-KEYCHAIN-ROUND.md"
+      ],
+      "source_sha256": "f498d905d79298f40a9983bc85d817714aef1a15e7d3ba129b634d55d8cd6051",
+      "asset_sha256": "d25e17e8b969e7c9845538d37c04712d75dcd774ad249d924d228ed055f6a8bc",
+      "asset_path": "apps/storefront/public/products/wood-keychain-round.webp",
+      "width": 1059,
+      "height": 1059,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "shot-glass-2oz-wood-box": {
+      "slug": "shot-glass-2oz-wood-box",
+      "name": "Boxed shot glass set",
+      "supplier": "Wuhan Xinhuahang / Made-in-China (candidate)",
+      "source_url": "https://glassware.en.made-in-china.com/product/kGYpeqMvEyWI/China-Wholesale-Personalised-Shot-Glass-Set-with-Wooden-Box.html",
+      "source_image_url": "https://image.made-in-china.com/2f0j00IzrBOwqhEWkg/Wholesale-Personalised-Shot-Glass-Set-with-Wooden-Box.jpg",
+      "match": "representative_blank",
+      "note": "New matching blank source, not a recovered original purchase link.",
+      "caption": "Reference blank · final style confirmed during review.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/products/SHOT-GLASS-2OZ-WOOD-BOX.md"
+      ],
+      "source_sha256": "6eab62749d6eba57e1067f03e224069d319ceca35c5b09140a49aa2d3f7da513",
+      "asset_sha256": "cfd152df6746520369d49126e49ba833d8811fc4d7bfb4f7d9dd271e8c9b9b36",
+      "asset_path": "apps/storefront/public/products/shot-glass-2oz-wood-box.webp",
+      "width": 800,
+      "height": 800,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "wood-keychain-rectangle": {
+      "slug": "wood-keychain-rectangle",
+      "name": "Rectangle wood keychain",
+      "supplier": "LaserPecker (candidate)",
+      "source_url": "https://us.laserpecker.net/products/blank-rectangle-wood-keychain",
+      "source_image_url": "https://us.laserpecker.net/cdn/shop/files/laserpecker-materials-rectangular-wooden-keychain.png?v=1750927182&width=2048",
+      "match": "representative_blank",
+      "note": "Matching material/type found; original supplier is not documented.",
+      "caption": "Reference blank · final style confirmed during review.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/products/WOOD-KEYCHAIN-RECTANGLE.md"
+      ],
+      "source_sha256": "71971cfde99be85c85cc9e95a523f650b7c1e937716b17e28e41dac3e110e213",
+      "asset_sha256": "22c4dc1de628101c612a81871f1635f4a0a4ba1250326ae2da1c5c0425c7449a",
+      "asset_path": "apps/storefront/public/products/wood-keychain-rectangle.webp",
+      "width": 1100,
+      "height": 1100,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "aluminum-rfid-money-clip": {
+      "slug": "aluminum-rfid-money-clip",
+      "name": "RFID money clip",
+      "supplier": "Lock Connection (candidate)",
+      "source_url": "https://lockconnection.net/the-notch-all-aluminum-rfid-blocking-wallets-blank/",
+      "source_image_url": "https://cdn11.bigcommerce.com/s-fm98cwwaq4/images/stencil/1280x1280/products/399/3893/Light_Gray_FB__48252.1728653073.png?c=2",
+      "match": "representative_blank",
+      "note": "Matching material/type found; original supplier is not documented.",
+      "caption": "Reference blank · final style confirmed during review.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/products/ALUMINUM-RFID-MONEY-CLIP.md"
+      ],
+      "source_sha256": "d26999d15c003a5f0f54b39476ba56c20fc0d3236c101fe5c504dd6acbea50c1",
+      "asset_sha256": "49c07e09215d5c9ee6f17902fa446b90b935e3eac4c701e6f54a811ca6387fbe",
+      "asset_path": "apps/storefront/public/products/aluminum-rfid-money-clip.webp",
+      "width": 900,
+      "height": 900,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "pet-bowls": {
+      "slug": "pet-bowls",
+      "name": "Engraved pet bowls",
+      "supplier": "FMB Laser Designs (candidate)",
+      "source_url": "https://fmblaserdesigns.com/product/blank-32-oz-insulated-stainless-steel-pet-bowl/",
+      "source_image_url": "https://fmblaserdesigns.com/wp-content/uploads/2026/01/7ba4084821f65c1fb86e0bffe0e95208-1.png",
+      "match": "representative_blank",
+      "note": "Matching material/type found; original supplier is not documented.",
+      "caption": "Reference blank · final style confirmed during review.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/FAQ.md"
+      ],
+      "source_sha256": "50337a7d6e7c96b3967489fb09e32e461c9225f43ec0ea840f1029c2612fac28",
+      "asset_sha256": "6a96213a218633393f101ca7d9b67f65921fcac8d7d30236cc9463d027b90f1d",
+      "asset_path": "apps/storefront/public/products/pet-bowls.webp",
+      "width": 800,
+      "height": 800,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "stainless-pendants": {
+      "slug": "stainless-pendants",
+      "name": "Stainless steel pendants",
+      "supplier": "Metaza (candidate)",
+      "source_url": "https://metaza.com/en-us/products/premium-long-rectangle-pendant-st-steel-10pcs",
+      "source_image_url": "https://metaza.com/cdn/shop/products/R0828-SS-MCC_1200x1200.png?v=1660321096",
+      "match": "representative_blank",
+      "note": "Matching material/type found; original supplier is not documented.",
+      "caption": "Reference blank · final style confirmed during review.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/FAQ.md"
+      ],
+      "source_sha256": "7609f62cea287defb8ee1f3af130638b0fa83c97485ec3333c68de20c8540336",
+      "asset_sha256": "40e4431286d3b4cac18e2ab11677f4fed7dec1f6db15f54668c8c76df5bd5671",
+      "asset_path": "apps/storefront/public/products/stainless-pendants.webp",
+      "width": 1100,
+      "height": 1100,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "crystal-round-ornament-60-80": {
+      "slug": "crystal-round-ornament-60-80",
+      "name": "Surface-engraved round ornament",
+      "supplier": "LaserBeast Lab (candidate)",
+      "source_url": "https://www.laserbeastlab.com/products/blank-crystal-ornament",
+      "source_image_url": "https://www.laserbeastlab.com/cdn/shop/files/AF2C74ED-FB2E-404A-BC71-0F548BABEF3D_1200x1200.jpg?v=1697217186",
+      "match": "representative_blank",
+      "note": "Matching material/type found; original supplier is not documented.",
+      "caption": "Supplier engraving example · your design replaces the sample; final blank confirmed during review.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/products/CRYSTAL-ROUND-ORNAMENT-60-80.md"
+      ],
+      "source_sha256": "92625b1be879283472aa833e1234126a4f0c90bf7c51c4d164ed3cabcfde0296",
+      "asset_sha256": "a1a4be89bd108311632231ae08514c52def1437314cfaad7f0fd914c5f5a6ade",
+      "asset_path": "apps/storefront/public/products/crystal-round-ornament-60-80.webp",
+      "width": 825,
+      "height": 1100,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "shot-glass-2oz-square": {
+      "slug": "shot-glass-2oz-square",
+      "name": "Square shot glasses",
+      "supplier": "Metro Textile (candidate)",
+      "source_url": "https://www.metro-textile.com/productdetail.aspx?id=927",
+      "source_image_url": "https://www.metro-textile.com/ProductImages/zoom_MTGW19188.jpg",
+      "match": "representative_blank",
+      "note": "Square 2 oz glass reference; confirm the actual blank before production.",
+      "caption": "Reference blank · final style confirmed during review.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/products/SHOT-GLASS-2OZ-SQUARE.md"
+      ],
+      "source_sha256": "23b9504b0f965677fcd5ebe6d3bba270140d7757222cf42c403130e15839fa1e",
+      "asset_sha256": "03067e029d5b2a80ba0a6f0467cb133739d34ab1ced039e5b77937bdd2dbe7e5",
+      "asset_path": "apps/storefront/public/products/shot-glass-2oz-square.webp",
+      "width": 900,
+      "height": 846,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "credit-card-bottle-opener": {
+      "slug": "credit-card-bottle-opener",
+      "name": "Card bottle opener",
+      "supplier": "Stealth Steel (candidate)",
+      "source_url": "https://www.stealthsteel.com/products/customized-bottle-opener",
+      "source_image_url": "https://www.stealthsteel.com/cdn/shop/products/20181025_075555_1200x1200.jpg?v=1601479518",
+      "match": "representative_blank",
+      "note": "Matching stainless card opener type; original supplier is not documented.",
+      "caption": "Supplier engraving example · your design replaces the sample; final blank confirmed during review.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/products/CREDIT-CARD-BOTTLE-OPENER.md"
+      ],
+      "source_sha256": "905c135c9fc54f941bb2ba223196912fb5bc4c748a4768d428ea24d9a4d69a8c",
+      "asset_sha256": "2162db54818049b9ac51acfa0a4f5ce84a537d0b21469a676c796e5e2aa588d9",
+      "asset_path": "apps/storefront/public/products/credit-card-bottle-opener.webp",
+      "width": 1100,
+      "height": 825,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "crystal-heart-ornament": {
+      "slug": "crystal-heart-ornament",
+      "name": "Surface-engraved heart ornament",
+      "supplier": "Customeeze (candidate)",
+      "source_url": "https://custom-eeze.com/accessories/christmas-blank-h",
+      "source_image_url": "https://custom-eeze.com/catalog/accessories/christmas-blank-h/gallery/5hnqxpyysmrzpxmeaxwzpvlc28z0j-cropped.png",
+      "match": "representative_blank",
+      "note": "Blank heart photo, not the 2D subsurface ornament. Supplier dimension differs slightly from historical approximate notes.",
+      "caption": "Reference blank · your surface engraving is added during production.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/products/CRYSTAL-HEART-ORNAMENT.md"
+      ],
+      "source_sha256": "6b090a3737e5e03946deba4d140811a29babb1c982fdc575dbbe385ce494cdde",
+      "asset_sha256": "37df6c100322f1bd59ab91ab1b80a67a90b49f271428e0525337a4feefd1ec1a",
+      "asset_path": "apps/storefront/public/products/crystal-heart-ornament.webp",
+      "width": 928,
+      "height": 928,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "pet-tags": {
+      "slug": "pet-tags",
+      "name": "Personalized pet tags",
+      "supplier": "Ball Chain Mfg (candidate)",
+      "source_url": "https://www.ballchain.com/blank-pet-id-tags-various-colors-bone-shaped/",
+      "source_image_url": "https://cdn11.bigcommerce.com/s-xszi2drqh5/products/685/images/1205/Anodized-Aluminmum-Pet-ID-Dog-Tags__09682.1550508359.500.750.jpg?c=2",
+      "match": "representative_blank",
+      "note": "Matching blank style found. No original purchasing supplier recovered.",
+      "caption": "Reference blank · final style confirmed during review.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/FAQ.md"
+      ],
+      "source_sha256": "d9e06a1e189c71a27814c3c2386f6fc93a36461a0acd01f71aa2e7b860e71ff3",
+      "asset_sha256": "74af002001fec47e7cd621965d5484ab393b96e7d093490b3851db25780527ca",
+      "asset_path": "apps/storefront/public/products/pet-tags.webp",
+      "width": 500,
+      "height": 500,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "steel-flat-bottle-opener": {
+      "slug": "steel-flat-bottle-opener",
+      "name": "Steel bottle opener",
+      "supplier": "Marketplace sample (candidate)",
+      "source_url": "https://www.nellisauction.com/p/60-Pieces-Stainless-Steel-Flat-Bottle-Opener-with-Keychain-3-5-x/64509641",
+      "source_image_url": "https://images-na.ssl-images-amazon.com/images/I/812aApxb1pL.jpg",
+      "match": "representative_blank",
+      "note": "Matching blank style found. No original purchasing supplier recovered.",
+      "caption": "Reference blank · final style confirmed during review.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/products/STEEL-FLAT-BOTTLE-OPENER.md"
+      ],
+      "source_sha256": "268a6dba845792f1b27e437858bb53b0c9ff97044807abc7dc9a5b39f02546b7",
+      "asset_sha256": "3fce1442b4c2e3cabe9aee724eac597d3809e1f4f3f059feb824a91a16d60a69",
+      "asset_path": "apps/storefront/public/products/steel-flat-bottle-opener.webp",
+      "width": 1100,
+      "height": 1100,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "bamboo-cutting-board": {
+      "slug": "bamboo-cutting-board",
+      "name": "Bamboo cutting board",
+      "supplier": "Suncha (candidate; original Hyuetrsa-style link not found)",
+      "source_url": "https://www.cnsuncha.com/suncha-engraved-bamboo-cutting-boards-for-mom-gifts-product/",
+      "source_image_url": "https://www.cnsuncha.com/upload/image/products/118.jpg",
+      "match": "representative_blank",
+      "note": "Source describes 11 × 8.6 × 0.4 in bamboo board with handle. Candidate is not the documented supplier brand.",
+      "caption": "Supplier engraving example · your design replaces the sample; final blank confirmed during review.",
+      "rights": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+      "source_paths": [
+        "docs/products/BAMBOO-CUTTING-BOARD.md"
+      ],
+      "source_sha256": "acd116ba5b676cb5e4377a8a5946db44b3672beeee938234a9e93244704faaf5",
+      "asset_sha256": "d8e92d66551c95bd6d6d5880b0829099c984057d92cb501f3c2e79bb62a63243",
+      "asset_path": "apps/storefront/public/products/bamboo-cutting-board.webp",
+      "width": 800,
+      "height": 800,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review"
+    },
+    "balsa-earrings": {
+      "slug": "balsa-earrings",
+      "name": "Hand-painted balsa earrings",
+      "supplier": "Original supplier not recovered",
+      "source_url": "https://alteregobeadingsupplies.com/products/copy-of-3pcs-geometric-shapes-wooden-blanks-choose-size-and-quantity-bulk-with-or-without-holes-unfinished-wood-laser-cutout-circle-round-dangle-earring-jewelry-blanks-shape-5",
+      "source_image_url": "https://alteregobeadingsupplies.com/cdn/shop/files/image_79ccc050-90a6-4a9c-b5b6-cc61401f2a8b_1200x1200.png?v=1689008968",
+      "match": "held_material_mismatch",
+      "note": "Candidate is an unfinished wooden earring blank. Balsa species and the studio hand-painted finish are unverified, so this photo is held rather than displayed.",
+      "rights": "Not displayed",
+      "source_paths": [
+        "docs/FAQ.md"
+      ]
+    },
+    "crystal-bases": {
+      "slug": "crystal-bases",
+      "name": "Crystal light & wood bases",
+      "supplier": "3D Crystal",
+      "source_url": "https://3dcrystal.com/light-bases/index/index",
+      "source_image_url": null,
+      "match": "documented_shape",
+      "note": "",
+      "caption": "Base example from our brochure · compatibility confirmed for your selected crystal.",
+      "rights": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
+      "source_paths": [
+        "docs/PRICING-3D-CRYSTAL.md"
+      ],
+      "source_sha256": "8cf84b5f0d481818977afa86540339568291fd8cfb806e770554098b680379d0",
+      "asset_sha256": "a80701d3feba1e04f4589769586b7075324c61282e8aa0f28c34412c5f7a3a47",
+      "asset_path": "apps/storefront/public/products/crystal-bases.webp",
+      "width": 380,
+      "height": 277,
+      "fetched_at": "2026-10-17",
+      "public_display": "owner_private_review",
+      "source_kind": "owner_business_brochure_extraction",
+      "previous_source_image_url": "https://3dcrystal.com/media/catalog/product/cache/74b6f6c03ba82924338b3fbf587c2009/s/q/square_base.jpg",
+      "source_brochure": {
+        "filename": "Sonoran Slush Brocure.pdf",
+        "native_path": "E:\\Business\\Sonoran Slush\\Sonoran Slush Brocure.pdf",
+        "extracted_image_index": 13,
+        "sha256": "a5f9081af1b19951ae6f88d84eeeacfcee18582628a73a6a7660164d50859a42"
+      }
+    }
+  }
+}

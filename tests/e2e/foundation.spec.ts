@@ -31,9 +31,7 @@ for (const path of routes)
     const response = await page.goto(path);
     expect(response?.status()).toBe(200);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-    await expect(
-      page.getByText("Private storefront review", { exact: false }),
-    ).toBeVisible();
+    await expect(page.locator(".review-note")).toBeVisible();
     const result = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
       .analyze();
@@ -65,7 +63,9 @@ test("search, no matches, and recovery", async ({ page }) => {
   ).toBeVisible();
   await page.getByRole("button", { name: "Clear filters" }).click();
   await expect(
-    page.getByText("29 thoughtful gifts", { exact: false }),
+    page.getByText(catalog.products.length + " thoughtful gifts", {
+      exact: false,
+    }),
   ).toBeVisible();
 });
 test("mobile navigation opens, closes with Escape, and follows a route", async ({
@@ -131,7 +131,12 @@ for (const width of [320, 390, 768, 1440])
   });
 test("production readiness remains closed", async ({ page, request }) => {
   await page.goto("/products/photo-crystal-collection");
-  await expect(page.getByLabel("Crystal shape")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Find the shape of your memory." }),
+  ).toBeVisible();
+  await page.goto("/products/photo-crystal-heart");
+  await expect(page.getByLabel("Size", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Crystal shape")).toHaveCount(0);
   expect((await request.get("/api/ready")).status()).toBe(503);
   expect(await (await request.get("/robots.txt")).text()).toContain(
     "Disallow: /",

@@ -27,6 +27,7 @@ from services.commerce.app.domain.prerequisites import ProductionPrerequisites
 router = APIRouter()
 ROOT = Path(__file__).resolve().parents[3]
 PRODUCTS = {p["slug"]: p for p in json.loads((ROOT / "packages/contracts/catalog.reference.json").read_text())["products"]}
+CRYSTAL_SHAPES = json.loads((ROOT / "packages/contracts/crystal-shapes.json").read_text())["shapes"]
 NOW = lambda: datetime.now(timezone.utc).isoformat()
 
 
@@ -151,29 +152,29 @@ class Item(StrictModel):
     @field_validator("product_slug")
     @classmethod
     def known_product(cls, value):
-        if value not in PRODUCTS:
+        if value not in PRODUCTS and value != "photo-crystal-collection":
             raise ValueError("Select a product from the collection.")
         return value
 
     @field_validator("options")
     @classmethod
     def supported_crystal_sizes(cls, value, info):
-        if info.data.get("product_slug") != "photo-crystal-collection":
+        slug = info.data.get("product_slug")
+        shape = next((s for s in CRYSTAL_SHAPES if s["slug"] == slug), None)
+        if slug == "photo-crystal-collection":
+            shape = next((s for s in CRYSTAL_SHAPES if s["shape"] == value.get("Crystal shape")), None)
+            if shape is None:
+                raise ValueError("Choose a supported crystal shape and size.")
+        elif shape is None:
             return value
-        shape = value.get("Crystal shape", "")
-        supported = {
-          "Rectangle tall": {"Small", "Medium", "Large", "XLarge", "Mini Mantel (6 × 4 in)"},
-          "Rectangle wide": {"Small", "Medium", "Large", "XLarge", "Mini Mantel (6 × 4 in)"},
-          "Heart": {"Small", "Medium", "Large"}, "Cut corner diamond": {"Small", "Medium", "Large"},
-          "Prestige Iceberg small": {"Small only"}, "Dog bone": {"6 × 4 in"},
-          "Candle": {"4 × 2.4 × 2.4 in"}, "Small notched": {"Size confirmed during review"},
-          "Circle ornament": {"Size confirmed during review"}, "Heart keychain": {"3.5 × 3.5 × 1.2 cm"},
-          "Rectangle keychain": {"3 × 2 × 1.5 cm"}, "2D heart necklace": {"3.5 × 3.5 × 0.8 cm"},
-          "2D rectangle necklace": {"3 × 4 cm"},
-        }
-        if shape not in supported or value.get("Size") not in supported[shape]:
-            raise ValueError("Choose a supported crystal shape and size.")
-        return value
+        if value.get("Crystal shape", shape["shape"]) != shape["shape"]:
+            raise ValueError("The selected shape must match this crystal product.")
+        if value.get("Size") not in {s["value"] for s in shape["sizes"]}:
+            raise ValueError("Choose a supported size for this crystal shape.")
+        if shape["orientations"] and value.get("Orientation", "Horizontal") not in shape["orientations"]:
+            raise ValueError("Choose a supported crystal orientation.")
+        return {**value, "Crystal shape": shape["shape"]}
+
 
 
 class Inquiry(StrictModel):

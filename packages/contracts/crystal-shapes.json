@@ -1,0 +1,292 @@
+{
+  "source_paths": [
+    "docs/CRYSTAL-SIZE-KEEP-LIST.md",
+    "docs/CRYSTAL-SELECTION-GUIDE.md"
+  ],
+  "shapes": [
+    {
+      "slug": "photo-crystal-rectangle-tall",
+      "shape": "Rectangle tall",
+      "title": "Tall rectangle photo crystal",
+      "line": "A portrait with a place of its own.",
+      "description": "A tall optical crystal for a favorite portrait, a graduation photograph, or a quiet reminder of someone special.",
+      "process": "3D",
+      "supplier_url": "https://3dcrystal.com/3d-crystal-rectangle-tall",
+      "sizes": [
+        {
+          "value": "Small",
+          "dimensions": "2.5 × 1.5 × 1.5 in",
+          "label": "Small · 2.5 × 1.5 × 1.5 in"
+        },
+        {
+          "value": "Medium",
+          "dimensions": "3 × 2 × 2 in",
+          "label": "Medium · 3 × 2 × 2 in"
+        },
+        {
+          "value": "Large",
+          "dimensions": "3.5 × 2.5 × 2.5 in",
+          "label": "Large · 3.5 × 2.5 × 2.5 in"
+        },
+        {
+          "value": "XLarge",
+          "dimensions": "4.8 × 3.2 × 2.4 in",
+          "label": "XLarge · 4.8 × 3.2 × 2.4 in"
+        },
+        {
+          "value": "Mini Mantel (6 × 4 in)",
+          "dimensions": "6 × 4 × 2.5 in",
+          "label": "Mini Mantel (6 × 4 in) · 6 × 4 × 2.5 in"
+        }
+      ],
+      "orientations": []
+    },
+    {
+      "slug": "photo-crystal-rectangle-wide",
+      "shape": "Rectangle wide",
+      "title": "Wide rectangle photo crystal",
+      "line": "Room for everyone in the memory.",
+      "description": "A landscape crystal for family photographs, side-by-side portraits, and the moments that need a little more room.",
+      "process": "3D",
+      "supplier_url": "https://3dcrystal.com/3d-crystal-rectangle-wide",
+      "sizes": [
+        {
+          "value": "Small",
+          "dimensions": "2.5 × 1.5 × 1.5 in",
+          "label": "Small · 2.5 × 1.5 × 1.5 in"
+        },
+        {
+          "value": "Medium",
+          "dimensions": "3 × 2 × 2 in",
+          "label": "Medium · 3 × 2 × 2 in"
+        },
+        {
+          "value": "Large",
+          "dimensions": "3.5 × 2.5 × 2.5 in",
+          "label": "Large · 3.5 × 2.5 × 2.5 in"
+        },
+        {
+          "value": "XLarge",
+          "dimensions": "4.8 × 3.2 × 2.4 in",
+          "label": "XLarge · 4.8 × 3.2 × 2.4 in"
+        },
+        {
+          "value": "Mini Mantel (6 × 4 in)",
+          "dimensions": "6 × 4 × 2.5 in",
+          "label": "Mini Mantel (6 × 4 in) · 6 × 4 × 2.5 in"
+        }
+      ],
+      "orientations": []
+    },
+    {
+      "slug": "photo-crystal-heart",
+      "shape": "Heart",
+      "title": "Heart photo crystal",
+      "line": "A little closer to the heart.",
+      "description": "A heart-shaped photo keepsake for anniversaries, weddings, and the people whose place in your life is permanent.",
+      "process": "3D",
+      "supplier_url": "https://3dcrystal.com/3d-crystal-heart",
+      "sizes": [
+        {
+          "value": "Small",
+          "dimensions": "3.2 × 2.8 × 1.6 in",
+          "label": "Small · 3.2 × 2.8 × 1.6 in"
+        },
+        {
+          "value": "Medium",
+          "dimensions": "4 × 3.5 × 2.4 in",
+          "label": "Medium · 4 × 3.5 × 2.4 in"
+        },
+        {
+          "value": "Large",
+          "dimensions": "5 × 4.3 × 2.4 in",
+          "label": "Large · 5 × 4.3 × 2.4 in"
+        }
+      ],
+      "orientations": []
+    },
+    {
+      "slug": "photo-crystal-cut-corner-diamond",
+      "shape": "Cut corner diamond",
+      "title": "Cut-corner diamond photo crystal",
+      "line": "A memory with a different angle.",
+      "description": "Faceted, cut-corner crystal for a personal photograph or a milestone worth displaying.",
+      "process": "3D",
+      "supplier_url": "https://3dcrystal.com/3d-crystal-cut-corner-diamond",
+      "sizes": [
+        {
+          "value": "Small",
+          "dimensions": "2 × 2 × 2 in",
+          "label": "Small · 2 × 2 × 2 in"
+        },
+        {
+          "value": "Medium",
+          "dimensions": "2.4 × 2.4 × 2.4 in",
+          "label": "Medium · 2.4 × 2.4 × 2.4 in"
+        },
+        {
+          "value": "Large",
+          "dimensions": "3 × 3 × 3 in",
+          "label": "Large · 3 × 3 × 3 in"
+        }
+      ],
+      "orientations": []
+    },
+    {
+      "slug": "photo-crystal-prestige",
+      "shape": "Prestige Iceberg small",
+      "title": "Prestige iceberg photo crystal",
+      "line": "For the milestones that stand tall.",
+      "description": "An iceberg-shaped keepsake with a faceted outline for recognition, graduation, and meaningful portraits. Offered in our supported small size.",
+      "process": "3D",
+      "supplier_url": "https://3dcrystal.com/3d-crystal-prestige",
+      "sizes": [
+        {
+          "value": "Small only",
+          "dimensions": "5 × 4.3 × 2.4 in",
+          "label": "Small only · 5 × 4.3 × 2.4 in"
+        }
+      ],
+      "orientations": []
+    },
+    {
+      "slug": "photo-crystal-dog-bone",
+      "shape": "Dog bone",
+      "title": "Dog bone photo crystal",
+      "line": "For the one who was always family.",
+      "description": "A bone-shaped crystal for a beloved companion. Choose a horizontal or vertical layout for your pet photograph.",
+      "process": "3D",
+      "supplier_url": "https://3dcrystal.com/3d-crystal-dog-bone-horizontal",
+      "sizes": [
+        {
+          "value": "6 × 4 in",
+          "dimensions": "6 × 4 in",
+          "label": "6 × 4 in"
+        }
+      ],
+      "orientations": [
+        "Horizontal",
+        "Vertical"
+      ]
+    },
+    {
+      "slug": "photo-crystal-candle",
+      "shape": "Candle",
+      "title": "Candle photo crystal",
+      "line": "Keep a memory in the light.",
+      "description": "A candle-style crystal keepsake for remembrance and the small moments you want to hold close.",
+      "process": "3D",
+      "supplier_url": "https://3dcrystal.com/3d-crystal-candle",
+      "sizes": [
+        {
+          "value": "4 × 2.4 × 2.4 in",
+          "dimensions": "4 × 2.4 × 2.4 in",
+          "label": "4 × 2.4 × 2.4 in"
+        }
+      ],
+      "orientations": []
+    },
+    {
+      "slug": "photo-crystal-notched",
+      "shape": "Small notched",
+      "title": "Notched photo crystal",
+      "line": "A distinctive edge. A personal story.",
+      "description": "A notched crystal with a sculptural outline for portraits and personal milestones. The studio confirms the supported small blank dimensions during review.",
+      "process": "3D",
+      "supplier_url": "https://3dcrystal.com/3d-notched-crystal-tall",
+      "sizes": [
+        {
+          "value": "Size confirmed during review",
+          "dimensions": "Supported small size; dimensions confirmed during review",
+          "label": "Size confirmed during review"
+        }
+      ],
+      "orientations": []
+    },
+    {
+      "slug": "photo-crystal-circle-ornament",
+      "shape": "Circle ornament",
+      "title": "Round crystal photo ornament",
+      "line": "A memory for every season.",
+      "description": "A circular hanging crystal with your photo engraved inside. A personal ornament for the holidays or a keepsake to catch the light year-round.",
+      "process": "2D",
+      "supplier_url": "https://3dcrystal.com/sun-catcher",
+      "sizes": [
+        {
+          "value": "Size confirmed during review",
+          "dimensions": "Dimensions confirmed during review",
+          "label": "Size confirmed during review"
+        }
+      ],
+      "orientations": []
+    },
+    {
+      "slug": "photo-crystal-heart-keychain",
+      "shape": "Heart keychain",
+      "title": "Heart crystal photo keychain",
+      "line": "Their memory, wherever you go.",
+      "description": "A compact heart-shaped crystal photo keepsake on a keyring. A personal little gift made for everyday carry.",
+      "process": "3D",
+      "supplier_url": "https://3dcrystal.com/3d-crystal-heart-keychains",
+      "sizes": [
+        {
+          "value": "3.5 × 3.5 × 1.2 cm",
+          "dimensions": "3.5 × 3.5 × 1.2 cm",
+          "label": "3.5 × 3.5 × 1.2 cm"
+        }
+      ],
+      "orientations": []
+    },
+    {
+      "slug": "photo-crystal-rectangle-keychain",
+      "shape": "Rectangle keychain",
+      "title": "Rectangle crystal photo keychain",
+      "line": "A little piece of what matters.",
+      "description": "A rectangular crystal photo keepsake on a keyring, with room for a favorite face and a meaningful memory.",
+      "process": "3D",
+      "supplier_url": "https://3dcrystal.com/3d-crystal-rectangle-keychains",
+      "sizes": [
+        {
+          "value": "3 × 2 × 1.5 cm",
+          "dimensions": "3 × 2 × 1.5 cm",
+          "label": "3 × 2 × 1.5 cm"
+        }
+      ],
+      "orientations": []
+    },
+    {
+      "slug": "photo-crystal-heart-necklace",
+      "shape": "2D heart necklace",
+      "title": "Heart crystal photo necklace",
+      "line": "Keep them close.",
+      "description": "A heart-shaped crystal pendant with a two-dimensional photo engraved inside. A wearable memory for someone special.",
+      "process": "2D",
+      "supplier_url": "https://3dcrystal.com/2d-crystal-heart-necklaces",
+      "sizes": [
+        {
+          "value": "3.5 × 3.5 × 0.8 cm",
+          "dimensions": "3.5 × 3.5 × 0.8 cm",
+          "label": "3.5 × 3.5 × 0.8 cm"
+        }
+      ],
+      "orientations": []
+    },
+    {
+      "slug": "photo-crystal-rectangle-necklace",
+      "shape": "2D rectangle necklace",
+      "title": "Rectangle crystal photo necklace",
+      "line": "A memory to wear close.",
+      "description": "A rectangular crystal pendant with a two-dimensional photo engraved inside. Small, personal, and close to the heart.",
+      "process": "2D",
+      "supplier_url": "https://3dcrystal.com/2d-crystal-rectangle-necklaces",
+      "sizes": [
+        {
+          "value": "3 × 4 cm",
+          "dimensions": "3 × 4 cm",
+          "label": "3 × 4 cm"
+        }
+      ],
+      "orientations": []
+    }
+  ]
+}

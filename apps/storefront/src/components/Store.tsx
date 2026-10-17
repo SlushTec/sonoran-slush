@@ -9,6 +9,7 @@ import {
 } from "react";
 import { readLocal, writeLocal, newId } from "@/lib/client";
 import { catalog } from "@/lib/catalog";
+import { migrateCrystalDesign } from "@/lib/crystals";
 export type Design = {
   id: string;
   slug: string;
@@ -42,7 +43,19 @@ type StoreState = {
 const Context = createContext<StoreState | null>(null);
 export function parseDesign(value: unknown): Design | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
-  const d = value as Record<string, unknown>;
+  const raw = value as Record<string, unknown>;
+  const d =
+    typeof raw.slug === "string" &&
+    raw.options &&
+    typeof raw.options === "object" &&
+    !Array.isArray(raw.options)
+      ? migrateCrystalDesign(
+          raw as Record<string, unknown> & {
+            slug: string;
+            options: Record<string, string>;
+          },
+        )
+      : raw;
   if (
     typeof d.id !== "string" ||
     !d.id ||
@@ -102,6 +115,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             .filter((d): d is Design => d !== null)
             .slice(0, 100)
         : [];
+    // Preserve the previous collection's autosaved draft at its new shape route.
+    // An existing draft at the new route takes precedence.
+    const oldCrystal = parseDesign(
+      readLocal("config:photo-crystal-collection", null),
+    );
+    if (
+      oldCrystal &&
+      oldCrystal.slug !== "photo-crystal-collection" &&
+      !readLocal("config:" + oldCrystal.slug, null)
+    ) {
+      writeLocal("config:" + oldCrystal.slug, oldCrystal);
+    }
     setDesigns(valid(readLocal("designs", [])));
     setCart(valid(readLocal("cart", [])));
     const f = readLocal<unknown>("favorites", []);
