@@ -318,8 +318,152 @@
       "purchasable": false
     },
     {
-      "slug": "photo-crystal-collection",
-      "name": "3D photo crystal collection",
+      "slug": "photo-crystal-rectangle-tall",
+      "name": "Tall rectangle photo crystal",
+      "category": "photo-crystals",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "photo-crystal-rectangle-wide",
+      "name": "Wide rectangle photo crystal",
+      "category": "photo-crystals",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "photo-crystal-heart",
+      "name": "Heart photo crystal",
+      "category": "photo-crystals",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "photo-crystal-cut-corner-diamond",
+      "name": "Cut-corner diamond photo crystal",
+      "category": "photo-crystals",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "photo-crystal-prestige",
+      "name": "Prestige iceberg photo crystal",
+      "category": "photo-crystals",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "photo-crystal-dog-bone",
+      "name": "Dog bone photo crystal",
+      "category": "photo-crystals",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "photo-crystal-candle",
+      "name": "Candle photo crystal",
+      "category": "photo-crystals",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "photo-crystal-notched",
+      "name": "Notched photo crystal",
+      "category": "photo-crystals",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "photo-crystal-circle-ornament",
+      "name": "Round crystal photo ornament",
+      "category": "photo-crystals",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "photo-crystal-heart-keychain",
+      "name": "Heart crystal photo keychain",
+      "category": "photo-crystals",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "photo-crystal-rectangle-keychain",
+      "name": "Rectangle crystal photo keychain",
+      "category": "photo-crystals",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "photo-crystal-heart-necklace",
+      "name": "Heart crystal photo necklace",
+      "category": "photo-crystals",
+      "source_paths": [
+        "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+      ],
+      "status": "reference_only",
+      "price_minor": null,
+      "currency": "USD",
+      "purchasable": false
+    },
+    {
+      "slug": "photo-crystal-rectangle-necklace",
+      "name": "Rectangle crystal photo necklace",
       "category": "photo-crystals",
       "source_paths": [
         "docs/CRYSTAL-SIZE-KEEP-LIST.md"

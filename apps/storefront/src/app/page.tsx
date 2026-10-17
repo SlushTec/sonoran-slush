@@ -41,20 +41,23 @@ export default function Home() {
           </div>
           <div
             className="hero-editorial"
-            aria-label="Product imagery reserved for a later update"
+            aria-label="Sonoran Slush desert emblem"
           >
             <div className="editorial-top">
               <span>THE PERSONAL TOUCH</span>
               <span>EST. IN TUCSON, AZ</span>
             </div>
-            <div className="editorial-type">
-              One of
-              <br />
-              <em>their</em>
-              <br />
-              kind
-              <span className="editorial-star" aria-hidden="true">
-                ✦
+            <div className="editorial-type southwest-editorial">
+              <img
+                src="/brand/desert-mark-light.svg"
+                alt="A roadrunner, coyote, and saguaro in the Sonoran Desert"
+                width="430"
+                height="317"
+              />
+              <span>
+                Rooted in the desert.
+                <br />
+                <em>Made for your story.</em>
               </span>
             </div>
             <div className="editorial-bottom">
@@ -63,9 +66,7 @@ export default function Home() {
                 <br />
                 OUR CRAFT.
               </span>
-              <span className="photo-pending">
-                Collection photography to come
-              </span>
+              <span className="photo-pending">A little Sonoran spirit</span>
             </div>
           </div>
         </div>

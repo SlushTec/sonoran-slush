@@ -48,13 +48,13 @@ test('expired or corrupted local drafts do not break shopping',()=>{
 
 test('search, filters and recovery find actual collection products',async()=>{
  wrap(React.createElement(CatalogSearch));
- assert.ok(await screen.findByText('29 thoughtful gifts'));
+ assert.ok(await screen.findByText(catalog.products.length+' thoughtful gifts'));
  fireEvent.change(screen.getByRole('searchbox'),{target:{value:'decanter'}});
  assert.ok(await screen.findByText('2 thoughtful gifts'));
  fireEvent.change(screen.getByLabelText('Material'),{target:{value:'Wood'}});
  assert.ok(await screen.findByText('No gifts found, just yet.'));
  fireEvent.click(screen.getByRole('button',{name:'Clear filters'}));
- assert.ok(await screen.findByText('29 thoughtful gifts'));
+ assert.ok(await screen.findByText(catalog.products.length+' thoughtful gifts'));
 });
 
 test('favorites toggle and survive a new visit',async()=>{
@@ -92,15 +92,29 @@ test('a blank required design is kept out of the bag',async()=>{
  assert.equal(readLocal('cart',[]).length,0);
 });
 
-test('crystal shapes constrain size and reset an incompatible selection',async()=>{
- wrap(React.createElement(Customizer,{product:product('photo-crystal-collection')}));
- const shape=await screen.findByLabelText('Crystal shape');
- fireEvent.change(shape,{target:{value:'Heart'}});
- fireEvent.change(screen.getByLabelText('Supported size'),{target:{value:'Large'}});
- fireEvent.change(shape,{target:{value:'Prestige Iceberg small'}});
- assert.equal(screen.getByLabelText('Supported size').value,'Small only');
- assert.equal(screen.queryByRole('option',{name:'Large Mantel'}),null);
- assert.equal(screen.queryByRole('option',{name:'Prestige Iceberg medium'}),null);
+test('each crystal shape has its own listing and only its supported size choices',async()=>{
+ const r=wrap(React.createElement(Customizer,{product:product('photo-crystal-heart')}));
+ const size=await screen.findByLabelText('Size');
+ assert.equal(screen.queryByLabelText('Crystal shape'),null);
+ assert.deepEqual([...size.options].map(o=>o.value),['Small','Medium','Large']);
+ assert.match(size.options[0].textContent,/3.2 × 2.8/);
+ fireEvent.change(size,{target:{value:'Large'}});
+ await waitFor(()=>assert.equal(readLocal('config:photo-crystal-heart',null).options.Size,'Large'));
+ r.unmount();wrap(React.createElement(Customizer,{product:product('photo-crystal-prestige')}));
+ assert.equal((await screen.findByLabelText('Size')).value,'Small only');
+ assert.equal(screen.queryByRole('option',{name:/Large Mantel/}),null);
+});
+
+test('old saved crystal designs migrate to the shape listing without losing personalization',async()=>{
+ const {parseDesign,emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');
+ const old={...emptyDesign('photo-crystal-collection'),text:'Always with us',options:{'Crystal shape':'Heart',Size:'Large'},notes:'Keep this exact inscription'};
+ const migrated=parseDesign(old);
+ assert.equal(migrated.slug,'photo-crystal-heart');
+ assert.equal(migrated.id,old.id);assert.equal(migrated.text,old.text);assert.deepEqual(migrated.options,old.options);
+ writeLocal('cart',[old]);writeLocal('config:photo-crystal-collection',old);wrap(React.createElement(Bag));
+ assert.ok(await screen.findByText('“Always with us”'));
+ assert.equal(readLocal('cart',[])[0].slug,'photo-crystal-heart');
+ assert.equal(readLocal('config:photo-crystal-heart',null).text,'Always with us');
 });
 
 test('missing service produces a recoverable inquiry error and preserves the form',async()=>{
@@ -133,7 +147,7 @@ test('gift finder returns grounded products and permits editing',async()=>{
  fireEvent.click(screen.getByRole('button',{name:'Next little detail'}));
  fireEvent.click(screen.getByRole('button',{name:'A memory to keep close'}));
  fireEvent.click(screen.getByRole('button',{name:'Find their gifts'}));
- assert.ok(await screen.findByText('Your photo, held in crystal'));
+ assert.ok(await screen.findByText('Dog bone photo crystal'));
  assert.ok(screen.getByText('A few gifts that feel like them.'));
  fireEvent.click(screen.getByRole('button',{name:'Change your answers'}));
  assert.ok(await screen.findByRole('button',{name:'A pet person'}));
@@ -166,7 +180,7 @@ test('clearing saved work also clears inquiry and configuration drafts',async()=
 
 test('core shopping controls have no returned semantic accessibility violations',async()=>{
  wrap(React.createElement('main',null,React.createElement('h1',null,'Shop gifts'),React.createElement(CatalogSearch)));
- await screen.findByText('29 thoughtful gifts');
+ await screen.findByText(catalog.products.length+' thoughtful gifts');
  const result=await axe.run(document.body,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa']},rules:{'color-contrast':{enabled:false}}});
  assert.deepEqual(result.violations.map(v=>({id:v.id,nodes:v.nodes.length})),[]);
 });
@@ -184,4 +198,12 @@ test('personalization tabs support arrow-key navigation',async()=>{
  fireEvent.keyDown(tab,{key:'ArrowRight'});
  assert.equal(screen.getByRole('tab',{name:/Make it personal/}).getAttribute('aria-selected'),'true');
  assert.equal(document.activeElement.id,'config-tab-1');
+});
+
+
+test('gift finder progress has a valid accessible group role',async()=>{
+ wrap(React.createElement('main',null,React.createElement('h1',null,'Gift finder'),React.createElement(GiftFinder)));
+ await screen.findByRole('group',{name:'Step 1 of 3'});
+ const result=await axe.run(document.body,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa']},rules:{'color-contrast':{enabled:false}}});
+ assert.deepEqual(result.violations.map(v=>({id:v.id,nodes:v.nodes.length})),[]);
 });

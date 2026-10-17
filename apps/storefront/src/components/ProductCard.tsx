@@ -4,28 +4,64 @@ import type { Product } from "@/lib/catalog";
 import { categoryShort, infoFor } from "@/lib/shop";
 import { useStore } from "./Store";
 import Icon from "./Icon";
+import { mediaFor } from "@/lib/media";
 export function ProductVisual({
   category,
+  product,
+  variant,
   large = false,
   label,
   children,
 }: {
   category: string;
+  product?: Product;
+  variant?: string;
   large?: boolean;
   label?: string;
   children?: React.ReactNode;
 }) {
+  const media = product ? mediaFor(product.slug) : undefined;
+  const photo =
+    variant && media?.variants?.[variant] ? media.variants[variant] : media;
   return (
     <div
-      className={"product-visual tone-" + category + (large ? " large" : "")}
+      className={
+        "product-visual tone-" +
+        category +
+        (photo ? " has-product-photo" : "") +
+        (large ? " large" : "")
+      }
     >
-      <span className="visual-corner" />
-      <span className="visual-monogram" aria-hidden="true">
-        s<span>s</span>
-      </span>
+      {photo ? (
+        <img
+          className="supplier-product-photo"
+          src={photo.src}
+          alt={photo.alt}
+          width={photo.width}
+          height={photo.height}
+          loading={large ? "eager" : "lazy"}
+          decoding="async"
+        />
+      ) : (
+        <img
+          className="visual-desert-mark"
+          src="/brand/desert-mark.svg"
+          alt=""
+          width="180"
+          height="133"
+          loading="lazy"
+        />
+      )}
       {children}
       <div className="visual-caption">
-        <span>{label || "Product photography to come"}</span>
+        <span>
+          {label ||
+            (media
+              ? media.caption.startsWith("Supplier")
+                ? "Supplier example"
+                : "Blank reference"
+              : "Studio photograph to follow")}
+        </span>
         <span aria-hidden="true">↗</span>
       </div>
     </div>
@@ -42,7 +78,7 @@ export default function ProductCard({ product }: { product: Product }) {
           href={"/products/" + product.slug}
           aria-label={"Explore " + info.title}
         >
-          <ProductVisual category={product.category} />
+          <ProductVisual category={product.category} product={product} />
         </Link>
         <button
           className={"favorite-button" + (saved ? " selected" : "")}
