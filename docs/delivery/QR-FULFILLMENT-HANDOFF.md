@@ -83,3 +83,57 @@ deprecation warning. `.venv/bin/python scripts/verify_archive.py` — 67 archive
 files and 41 unchanged business files verified. `git diff --cached --check` — passed. Browser/e2e, frontend typecheck,
 frontend build/static-export checks, live services and production stages are not
 run by this isolated Python-only lane. Fixtures are synthetic and never approvals.
+
+## Coordinator-observed supplier size matrix — 2026-11-06
+
+Source: the exact live QR page linked above, inspected read-only by the
+coordinator through its visible selection UI, not hidden state or network
+inspection. These are reported observations, not independently reproduced here,
+owner qualifications, local catalog additions, or confirmed mapping records.
+The UI showed 18 shape/orientation choices and 30 size choices. Dimensions below
+preserve the reported inch/cm values without conversion or correction. No
+supplier amounts are included.
+
+| Supplier choice | Size | Inches shown | Centimeters shown |
+| --- | --- | --- | --- |
+| Rectangle Tall; Rectangle Wide (each) | Small | 2.5 × 1.5 × 1.5 | 6 × 4 × 4 |
+| Rectangle Tall; Rectangle Wide (each) | Medium | 3 × 2 × 2 | 8 × 5 × 5 |
+| Rectangle Tall; Rectangle Wide (each) | Large | 3.5 × 2.5 × 2.5 | 9 × 6 × 6 |
+| Rectangle Tall; Rectangle Wide (each) | Extra Large | 4.8 × 3.2 × 2.4 | 12 × 8 × 6 |
+| Rectangle Tall; Rectangle Wide (each) | Mini Mantel | 6 × 4 × 2.5 | 15 × 10 × 6 |
+| Heart | Small | 3.2 × 2.8 × 1.6 | 8 × 7 × 4 |
+| Heart | Medium | 4 × 3.5 × 2.4 | 10 × 9 × 5 |
+| Heart | Large | 5 × 4.3 × 2.4 | 13 × 11 × 5 |
+| Prestige | Small | 5 × 4.3 × 2.4 | 13 × 11 × 6 |
+| Cut Corner Diamond | Small | 2 × 2 × 2 | 5 × 5 × 5 |
+| Cut Corner Diamond | Medium | 2.4 × 2.4 × 2.4 | 6 × 6 × 6 |
+| Cut Corner Diamond | Large | 3 × 3 × 3 | 8 × 8 × 8 |
+| Vertical Keychain; Horizontal Keychain (each) | Single size observed | 1.2 × 0.8 × 0.6 | 3 × 2 × 1.5 |
+| Heart Keychains | Single size observed | Not reported | 3.5 × 3.5 × 1.2 |
+| Heart Necklace | Single size observed | 1.4 × 1.4 × 0.3 | 3.5 × 3.5 × 0.8 |
+| Ornament | Single size observed | 3 × 3 | 8 × 8 |
+| Rectangle Necklace | Single size observed | 1.2 × 1.6 | 3 × 4 |
+| Candle | Single size observed | 4 × 2.4 × 2.4 | 10 × 6 × 6 |
+| Notched Tall | Small | 6 × 4 | 15 × 10 |
+| Notched Wide | Small | 6 × 5 | 15 × 10 |
+| Dog Bone Vertical; Dog Bone Horizontal (each) | Single size observed | 6 × 4 | 15 × 10 |
+| Square Keychain | One Size | No dimensions shown | No dimensions shown |
+| Circle Keychain | One Size | No dimensions shown | No dimensions shown |
+
+Ambiguities and boundaries:
+
+- Notched Wide's inch/cm dimensions conflict. Other displayed conversions are
+  approximate or inconsistent; do not silently normalize or choose a unit as
+  authoritative. Missing dimensions remain unknown.
+- The coordinator reports that the existing source has no rectangle-keychain
+  orientation field and no notched orientation field. Neither supplier choice
+  can be inferred from existing data. Exact orientation decisions need owner
+  confirmation and a future reviewed contract change where required.
+- The current catalog includes Candle and Dog Bone. Square/Circle Keychains are
+  additional supplier shapes, not authorized local catalog expansions. Observed
+  supplier sizes likewise do not authorize new local sizes.
+- Selection observations do not establish supplier production identifiers,
+  complete downstream options, compatibility or availability. The photo-upload
+  gate remains the stopping point; no add-ons or downstream fields are guessed.
+- The confirmed mapping registry remains empty. Each production choice still
+  needs explicit owner qualification, including the no-curved Jet Mini rule.
