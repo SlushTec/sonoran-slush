@@ -174,7 +174,7 @@ The 13 crystal slugs and all request values/orientations remain unchanged. 3D su
 
 ## Remaining decisions
 
-Exact blanks/purchases for brand-only and candidate records; balsa species/finish and photo; disputed supplier measurements; studio package contents; stock, pricing and public image rights remain unresolved. Independent review and production acceptance have not occurred. No source push, merge, deployment, Linear mutation, live-service change or other worker launch.
+Exact blanks/purchases for brand-only and candidate records; balsa species/finish and photo; disputed supplier measurements; studio package contents; stock, pricing and public image rights remain unresolved. Parent independently reviewed the initial patch with no blocking implementation/source-handling defect; final updated bytes still need review. Production acceptance has not occurred. No source push, merge, deployment, Linear mutation, live-service change or other worker launch.
 
 ## Verification
 

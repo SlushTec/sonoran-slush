@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     template: "%s | Sonoran Slush",
   },
   description:
-    "Personalized gifts, custom laser engraving, Photo crystals, and live event experiences. A small creative studio in Tucson, Arizona.",
+    "Personalized gifts, custom laser engraving, photo crystals, and live event experiences. A small creative studio in Tucson, Arizona.",
   robots: { index: false, follow: false },
 };
 export default function RootLayout({
