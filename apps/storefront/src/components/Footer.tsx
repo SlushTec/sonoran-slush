@@ -21,7 +21,7 @@ export default function Footer() {
         <div>
           <h2>Find your gift</h2>
           <Link href="/shop">All gifts</Link>
-          <Link href="/shop/photo-crystals">3D photo crystals</Link>
+          <Link href="/shop/photo-crystals">Photo crystals</Link>
           <Link href="/shop/drinkware">Drinkware</Link>
           <Link href="/shop/kitchen">Kitchen & entertaining</Link>
           <Link href="/gift-finder">Help me choose</Link>

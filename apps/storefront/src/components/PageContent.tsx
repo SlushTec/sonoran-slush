@@ -318,7 +318,7 @@ export function Information({ path }: { path: string }) {
 const faqs = [
   [
     "What can I personalize?",
-    "Explore drinkware, glassware and bar gifts, boards and kitchen pieces, small gifts, jewelry and pet items, ornaments, and 3D photo crystals. Each product page shows the relevant design requests.",
+    "Explore drinkware, glassware and bar gifts, boards and kitchen pieces, small gifts, jewelry and pet items, ornaments, and Photo crystals. Each product page shows the relevant design requests.",
   ],
   [
     "How is a photo crystal different from an ornament?",

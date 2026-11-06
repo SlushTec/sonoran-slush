@@ -207,3 +207,53 @@ test('gift finder progress has a valid accessible group role',async()=>{
  const result=await axe.run(document.body,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa']},rules:{'color-contrast':{enabled:false}}});
  assert.deepEqual(result.violations.map(v=>({id:v.id,nodes:v.nodes.length})),[]);
 });
+
+test('supplier review covers every listing without exposing private provenance',()=>{
+ const refs=require('../../apps/storefront/src/lib/product-references.json');
+ assert.deepEqual(Object.keys(refs).sort(),catalog.products.map(p=>p.slug).sort());
+ for(const ref of Object.values(refs)) {
+  assert.deepEqual(Object.keys(ref).sort(),['note','status','url']);
+  assert.equal(new URL(ref.url).protocol,'https:');
+ }
+ assert.equal(Object.values(refs).filter(x=>x.status.startsWith('Candidate')).length,17);
+ assert.equal(Object.values(refs).filter(x=>x.status.startsWith('Held')).length,1);
+ const serialized=JSON.stringify(refs);assert.doesNotMatch(serialized,/native_path|source_paths|wholesale_cost|E:\\\\/);
+});
+
+test('care follows the actual product and candidate claims stay qualified',()=>{
+ const {infoFor}=require('../../apps/storefront/src/lib/shop.ts');
+ for(const p of catalog.products) {
+  const info=infoFor(p);
+  if(info.care.includes('side for cutting')) assert.ok(['acacia-cutting-boards','bamboo-cutting-board'].includes(p.slug));
+ }
+ assert.match(infoFor(product('laserette-journal')).care,/microfiber/);
+ assert.doesNotMatch(infoFor(product('laserette-journal')).care,/wash/);
+ assert.match(infoFor(product('laserette-journal')).description,/refillable/);
+ assert.match(infoFor(product('crystal-bases')).care,/Disconnect/);
+ assert.equal(infoFor(product('balsa-earrings')).material,'Unverified');
+ assert.match(infoFor(product('balsa-earrings')).description,/unfinished basswood/);
+ assert.match(JSON.stringify(infoFor(product('whiskey-decanter-26oz-set')).details),/capacity unverified/);
+ assert.doesNotMatch(JSON.stringify(infoFor(product('whiskey-decanter-26oz-set')).details),/Lead-free/);
+});
+
+test('product page shows candidate reference and no cutting advice on keychains',()=>{
+ wrap(React.createElement(Customizer,{product:product('wood-keychain-round')}));
+ assert.ok(screen.getByRole('complementary',{name:'Supplier reference'}));
+ assert.ok(screen.getByText('Candidate reference — exact blank unverified'));
+ assert.equal(screen.getByRole('link',{name:'Supplier reference page'}).href,'https://www.xstron.com/wood-key-chain-blank-laser-engraving-material/');
+ assert.doesNotMatch(document.body.textContent,/side for cutting/);
+});
+
+test('crystal reference dimensions preserve old selections and distinguish engraving processes',()=>{
+ const {infoFor}=require('../../apps/storefront/src/lib/shop.ts');
+ const {shapes}=require('../../packages/contracts/crystal-shapes.json');
+ assert.equal(shapes.length,13);
+ assert.equal(catalog.categories.find(c=>c.slug==='photo-crystals').name,'Photo crystals');
+ for(const slug of ['photo-crystal-notched','photo-crystal-circle-ornament']) {
+  const shape=shapes.find(s=>s.slug===slug);
+  assert.deepEqual(shape.sizes.map(s=>s.value),['Size confirmed during review']);
+  assert.match(shape.sizes[0].dimensions,/Supplier/);
+ }
+ for(const shape of shapes) assert.ok(infoFor(product(shape.slug)).details.some(([k,v])=>k==='Process' && v===shape.process+' subsurface photo engraving'));
+ assert.match(infoFor(product('crystal-heart-ornament')).description,/surface engraved/);
+});

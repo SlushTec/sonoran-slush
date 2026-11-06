@@ -30,7 +30,7 @@ const base = (
   options,
   details,
   personalization: "text",
-  care: "Use a soft cloth and wash by hand. Keep the engraved surface away from abrasive cleaners.",
+  care: "Wipe gently with a soft cloth. Final care instructions depend on the confirmed blank and finish; avoid abrasive cleaners.",
 });
 const option = (label: string, ...values: string[]): Option => ({
   label,
@@ -101,7 +101,11 @@ export const productInfo: Record<string, ProductInfo> = {
     [placement, glassSet],
     [
       ["Capacity", "16 oz"],
-      ["Glass", "Libbey 1639"],
+      [
+        "Supplier reference",
+        "Libbey 1639HT; actual blank variant confirmed during review",
+      ],
+      ["Reference dimensions", "5.88 in high × 3.5 in diameter"],
       ["Process", "Surface engraving"],
     ],
   ),
@@ -115,6 +119,7 @@ export const productInfo: Record<string, ProductInfo> = {
     [
       ["Capacity", "12½ oz"],
       ["Glass", "Libbey 2339 Lexington"],
+      ["Dimensions", "4 in high × 3.25 in diameter"],
       ["Process", "Surface engraving"],
     ],
   ),
@@ -129,7 +134,10 @@ export const productInfo: Record<string, ProductInfo> = {
       option("Finish request", "Frosted engraving", "Color fill request"),
     ],
     [
-      ["Capacity", "Approximately 2.2 oz"],
+      [
+        "Capacity",
+        "Historical reference: approximately 2.2 oz; exact blank unverified",
+      ],
       ["Process", "Surface engraving"],
       ["Color fill", "Additional curing time; reviewed separately"],
     ],
@@ -155,15 +163,18 @@ export const productInfo: Record<string, ProductInfo> = {
     ["Anniversary", "Retirement", "Birthday", "Wedding"],
     [option("Engraving request", "Decanter", "Decanter + glasses")],
     [
-      ["Decanter", "Approximately 26 oz"],
-      ["Material", "Lead-free glass"],
+      [
+        "Decanter",
+        "Historical reference: approximately 26 oz; capacity unverified",
+      ],
+      ["Material", "Glass; composition awaits exact blank verification"],
       ["Set contents", "Confirmed with your quote"],
     ],
   ),
   "whiskey-decanter-4-glass-stones": base(
     "The complete whiskey set",
     "The full pour. The full gift.",
-    "A decanter, four tumblers, eight chilling stones, and a wood box. Personal details turn the complete set into their own little tradition.",
+    "A proposed gift configuration with a decanter, four tumblers, eight chilling stones, and a wood box. The exact blank and included pieces need confirmation before a quote.",
     "Glass",
     ["Birthday", "Anniversary", "Retirement", "Housewarming"],
     [
@@ -175,7 +186,10 @@ export const productInfo: Record<string, ProductInfo> = {
       ),
     ],
     [
-      ["Includes", "Decanter, 4 tumblers, 8 stones"],
+      [
+        "Requested configuration",
+        "Decanter, 4 tumblers, 8 stones; contents to be confirmed",
+      ],
       ["Packaging", "Wood gift box"],
     ],
   ),
@@ -194,7 +208,10 @@ export const productInfo: Record<string, ProductInfo> = {
       ),
     ],
     [
-      ["Kit", "Smoker top, torch, wood chips, wood box"],
+      [
+        "Requested kit",
+        "Smoker top, torch, wood chips, wood box; contents to be confirmed",
+      ],
       ["Process", "Surface engraving on wood"],
     ],
   ),
@@ -232,7 +249,10 @@ export const productInfo: Record<string, ProductInfo> = {
     [],
     [
       ["Material", "Bamboo"],
-      ["Dimensions", "Approximately 11 × 8.6 in"],
+      [
+        "Reference dimensions",
+        "Approximately 11 × 8.6 in; exact blank unverified",
+      ],
       ["Care", "Hand wash; do not soak"],
     ],
   ),
@@ -245,7 +265,7 @@ export const productInfo: Record<string, ProductInfo> = {
     [option("Engraving request", "Top ring", "Lid", "Top ring + lid")],
     [
       ["Material", "Acacia wood"],
-      ["Diameter", "Approximately 5.9 in"],
+      ["Reference diameter", "Approximately 5.9 in; exact blank unverified"],
       ["Includes", "One rimmer and matching lid"],
     ],
   ),
@@ -258,7 +278,10 @@ export const productInfo: Record<string, ProductInfo> = {
     [option("Placement", "Front cover", "Front + back cover")],
     [
       ["Material", "Engravable leatherette"],
-      ["Size", "Approximately 8.75 × 5.5 in"],
+      [
+        "Approximate size",
+        "8.75 in tall × about 5.5 in wide; supplier width varies between sections",
+      ],
       ["Cover", "Removable and refillable"],
     ],
   ),
@@ -360,7 +383,10 @@ export const productInfo: Record<string, ProductInfo> = {
         ),
       ],
       [
-        ["Process", "Subsurface engraving; necklaces use 2D engraving"],
+        [
+          "Process",
+          "Subsurface engraving; necklaces and circle ornament use 2D engraving",
+        ],
         ["Photo", "Human artwork review before production"],
         ["Sizes", "Only supported shapes and sizes are offered"],
       ],
@@ -381,10 +407,10 @@ export const productInfo: Record<string, ProductInfo> = {
     personalization: "none",
   },
   "balsa-earrings": base(
-    "The hand-painted earrings",
+    "The earrings concept",
     "A little color. A little character.",
-    "Hand-painted balsa wood earrings for a personal gift with a light touch. Tell us about the look you have in mind.",
-    "Wood",
+    "An earring concept awaiting confirmation of the wood species and painted finish. The reference supplier shows unfinished basswood, which does not verify the intended balsa product. Photography is held.",
+    "Unverified",
     ["Birthday", "Thank you"],
   ),
   "stainless-pendants": base(
@@ -409,6 +435,64 @@ export const productInfo: Record<string, ProductInfo> = {
     ["Pet gifts", "Housewarming"],
   ),
 };
+// Care follows the product type, not the broad material filter.
+for (const slug of [
+  "makertwist-40oz-tumbler",
+  "makerflo-32oz-water-bottle",
+  "makerflo-40oz-electroplated",
+]) {
+  productInfo[slug].care =
+    "Hand wash only. Avoid abrasive cleaners on the coated and engraved surfaces.";
+}
+for (const slug of ["acacia-cutting-boards", "bamboo-cutting-board"]) {
+  productInfo[slug].care =
+    "Hand wash and dry promptly. Do not soak or put in the dishwasher. Use the unengraved side for cutting.";
+}
+for (const slug of [
+  "wood-bottle-opener-keychain",
+  "wood-keychain-rectangle",
+  "wood-keychain-round",
+]) {
+  productInfo[slug].care =
+    "Wipe gently with a soft cloth and keep dry. Do not soak wood or its fittings.";
+}
+productInfo["laserette-journal"].care =
+  "Clean the cover with a microfiber cloth. Keep the paper dry.";
+productInfo["salt-rimmer-acacia"].care =
+  "Hand wash and dry promptly. Do not soak or put in the dishwasher.";
+productInfo["cocktail-smoker-kit"].care =
+  "Care and safe-use instructions depend on the confirmed kit. Follow the supplied manufacturer instructions for the smoker and torch; do not immerse the kit.";
+productInfo["crystal-bases"].care =
+  "Dust with a dry soft cloth. Disconnect powered bases before cleaning and follow the selected base manufacturer's instructions; do not immerse.";
+productInfo["balsa-earrings"].care =
+  "Material and finish are unverified. Care instructions will follow confirmation of the actual piece.";
+productInfo["makerflo-32oz-water-bottle"].details.push([
+  "Dimensions",
+  "10.06 in high × 3.40 in diameter",
+]);
+productInfo["makertwist-40oz-tumbler"].details.push(
+  ["Body dimensions", "10 in high × 3.95 in diameter"],
+  [
+    "Accessories",
+    "Handle and package contents confirmed with the selected blank",
+  ],
+);
+productInfo["makerflo-40oz-electroplated"].details.push(
+  ["Body dimensions", "10 in high × 3.95 in diameter"],
+  ["Handle", "Supplier sells separately; studio package to be confirmed"],
+);
+productInfo["aluminum-rfid-money-clip"].details.push([
+  "Performance",
+  "RFID blocking is unverified for the actual studio blank",
+]);
+productInfo["stainless-pendants"].details.push([
+  "Fittings",
+  "Chain and fittings are not guaranteed; confirm with the selected blank",
+]);
+productInfo["crystal-heart-ornament"].details.push([
+  "Process",
+  "Surface engraving",
+]);
 for (const shape of crystalShapes) {
   productInfo[shape.slug] = {
     ...base(
@@ -466,7 +550,7 @@ export const categoryShort: Record<string, string> = {
   "small-gifts": "Little keepsakes",
   "jewelry-pets": "Jewelry & pets",
   ornaments: "Ornaments",
-  "photo-crystals": "3D photo crystals",
+  "photo-crystals": "Photo crystals",
 };
 export const categoryLines: Record<string, string> = {
   drinkware: "Their everyday, made personal.",
