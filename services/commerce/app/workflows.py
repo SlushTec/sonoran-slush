@@ -409,7 +409,7 @@ class ProofRequest(StrictModel):
 def revise_proof(body: ProofRequest):
     with database() as db:
         order = load(db, body.order_id)
-        if order["kind"] != "order" or order["status"] in {"in_production", "shipped", "cancelled"}:
+        if order["kind"] != "order" or order["status"] in {"in_production", "shipped", "cancelled"} or order.get("reservation_status") == "expired":
             raise HTTPException(409, "This order cannot receive a proof revision.")
         old = load(db, order["current_proof_id"]) if order.get("current_proof_id") else None
         if (old["version"] if old else 0) != body.expected_proof_version:
@@ -436,8 +436,8 @@ def proof_decision(record_id: str, body: Decision, authorization: str | None, de
         order = load(db, doc["order_id"])
         if order.get("current_proof_id") != doc["id"] or order.get("current_proof_version") != doc["version"]:
             raise HTTPException(409, "This is not the order's current proof.")
-        if order["status"] in {"in_production", "shipped", "cancelled"}:
-            raise HTTPException(409, "The piece has already been released for production. Contact the studio.")
+        if order["status"] in {"in_production", "shipped", "cancelled"} or order.get("reservation_status") == "expired":
+            raise HTTPException(409, "This order cannot accept a proof decision. Contact the studio.")
         if decision == "approve":
             if doc["status"] == "approved":
                 return doc

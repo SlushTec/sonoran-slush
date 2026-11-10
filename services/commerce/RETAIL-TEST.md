@@ -22,9 +22,11 @@ All bodies reject unknown fields. Money and quantities are strict integers (bool
 | POST `/v1/cart` | `{request_id: UUID, items: Item[]}` returns `{id, status, access_token}`. Same identity/content replays; changed content under the same identity conflicts. |
 | GET `/v1/cart/{id}` | Cart-specific bearer. Returns version/status, items, priced lines, total_minor, currency, test_mode, pricing_scope, timestamps and optional order_id. A line has item, offer_version, unit_price_minor, line_total_minor, stock_id and stock_units. |
 | POST `/v1/cart/{id}/orders` | Cart bearer plus `{version: 1}`. Atomically verifies frozen offers and reserves every shared blank; returns order receipt with its own bearer token. Retry returns the same order even after offer changes; insufficient stock reserves nothing. Changed offers require a new cart/request identity and user review. |
-| GET `/v1/orders/{id}` | Existing order-specific bearer route. Retail orders add cart_id, lines, test_mode/retail_test, pricing_scope and reservation_status (`active`, `consumed`, `released`). |
+| GET `/v1/orders/{id}` | Existing order-specific bearer route. Retail orders add cart_id, lines, test_mode/retail_test, pricing_scope and reservation_status (`active`, `consumed`, `released`, `expired`). |
 | POST `/v1/orders/{id}/cancel-test` | Order bearer plus `{version}`. Only unpaid local retail orders without provider sessions can cancel. Repeated cancellation is harmless; releases exactly once. |
 | POST `/v1/admin/retail-test/orders/{id}/payments` | Staff bearer; `{event_id: UUID, version: 1, amount_minor: 1234, currency: "USD", outcome: "paid"}` or outcome `failed`. Explicit local simulation, no provider call/charge. Failure leaves unpaid; duplicate identity/content replays; altered identity payload conflicts. |
+| POST `/v1/admin/retail-test/orders/{id}/hold-deadline` | Staff bearer plus `{version, test_hold_expires_at}`. Explicit timezone-aware ISO string, future on first assignment, immutable thereafter; same instant replays. Test fixture only, no default duration. |
+| POST `/v1/admin/retail-test/orders/{id}/expire` | Staff bearer plus `{version}`. At/after the explicit deadline, atomically releases a complete, demonstrably unpaid synthetic hold. No caller-supplied clock; paid/ambiguous/provider-linked holds conflict without release. |
 | POST `/v1/admin/retail-test/orders/{id}/capacity` | Staff bearer plus `{version, confirmed: true/false}` persists the local capacity decision before release. Repeated identical decision is harmless. |
 
 Existing proof creation/revision and customer approve/change paths remain. Revision invalidates prior approval. Existing staff release route retains its request shape (`version`, `inventory_reserved`, `capacity_confirmed`) for compatibility, but the booleans no longer supply authority: release reads persisted reservation and capacity state. Reservation units are consumed once in the release transaction. Existing dispatch route supports retry without duplicate dispatch.
@@ -71,7 +73,7 @@ No Square network request occurred during tests. Transport is mocked; sandbox ac
 
 SQLite file-backed transactions (`BEGIN IMMEDIATE`, 15-second lock wait) serialize reservations, cancellation, payment updates and release. Stock/offer and payment-binding tables are additive. WAL initialization retries only SQLite BUSY-family failures within a 15-second deadline, restores the normal lock timeout after success, and closes connections if WAL or schema initialization fails. File permissions and access-secret fingerprint protection remain. This is a single-host local adapter, not DynamoDB or a production concurrency/backup qualification.
 
-Reservations have no automatic expiry: unpaid tests require explicit cancellation, paid holds require staff reconciliation. No refund/restock API, external notification, image upload, live payment, legal/tax/shipping policy, production stock approval or live launch is included. General options are carried as request text under a synthetic base price; production option/variant surcharge rules are not approved by this slice.
+Reservations have no background expiry scheduler or default duration. Synthetic holds can opt into the explicit test-deadline workflow below; existing records without a deadline retain their previous behavior. Paid or ambiguous holds require manual reconciliation and are never automatically released. No refund/restock API, external notification, image upload, live payment, legal/tax/shipping policy, production stock approval or live launch is included. General options are carried as request text under a synthetic base price; production option/variant surcharge rules are not approved by this slice.
 
 ## Validation receipt
 
@@ -80,3 +82,62 @@ Historical candidate `245f503e` author-run results (2026-11-06): **47 focused te
 Follow-up to independent review (2026-11-06): corrected documented sandbox buyer URL validation, explicitly refused redirects, and added durable refund reconciliation holds. New offline tests cover documented responses, strict URL rejection, 301/302/303/307/308 redirects to same/other hosts with a real urllib opener and in-memory transport, signed partial/full refund events before/after payment, duplicate/out-of-order refunds, malformed refunds and stored legacy URL rejection. No provider services or actual credentials were used. Final author-run validation: **92 focused tests passed; 127 full Python tests passed**, with only the existing Starlette/httpx deprecation warning. OpenAPI generation check, all 30 active-document links, archive verification (67 archived + 41 retained files) and `git diff --check` passed. Frontend/browser and actual Square integration were not run for this backend-only follow-up.
 
 Minimum integration: review the additive OpenAPI plus this document; opt frontend development into synthetic mode explicitly; keep reference catalog non-purchasable; serialize photo briefs only with local-media labeling; handle 409 by reloading/reviewing; keep Square setup and legacy inventory migration as separate gated work. No full production-ready claim.
+
+
+## Synthetic reservation expiry (RPG-124 / SS-047)
+
+This bounded local/test slice does not approve production hold timing, duration, inventory or late-payment policy.
+Staff may assign one `test_hold_expires_at` only to an active, fully reserved, demonstrably unpaid synthetic order.
+The value is normalized to UTC, must be later than the transaction's current time on first assignment, and cannot
+be shortened or extended. An identical normalized deadline replays without changing state. No deadline is inferred
+for old orders. Missing deadlines, stale versions, naive/numeric dates, unauthorized access and unexpected fields fail closed.
+
+Expiry is explicit, per order, via the staff endpoint. A valid simulated paid event also checks the deadline in its
+own transaction, so missing an expiry invocation cannot turn an overdue payment into fulfillment authority.
+The injectable clock is a callable sampled after `BEGIN IMMEDIATE`, not a client field or a timestamp captured
+before waiting for the write lock. At the exact deadline the unpaid hold is expired; before it the hold remains active.
+No scheduler, poller or production default is installed.
+
+- Expiry compares every active persisted component/quantity with the frozen order lines before changing anything.
+  It leaves `on_hand` unchanged, moves those reservation rows from `active` to `released`, and records
+  `reservation_status=expired`, `status=reservation_expired`, `inventory_reserved=false` and `reservation_expired_at`.
+  Existing SQLite table constraints are unchanged; the order document distinguishes expiry from cancellation.
+- The order, exact reservation rows and late-payment event/recovery record commit or roll back together.
+  Repeated expiry/cancellation is harmless; checkout retries return the original order and do not reacquire stock.
+  Another buyer may reserve the freed components, but a late event never takes them back.
+- Only the exact `unpaid` state without provider metadata or existing Square session/payment bindings is eligible.
+  Paid, pending, unknown and reconciliation states retain stock. An ambiguous provider-linked record must be manually
+  reconciled, even if its document says unpaid. Local simulation cannot resolve that ambiguity.
+- A valid simulated paid event at/after expiry sets `payment_status=reconciliation_required`,
+  `status=payment_reconciliation_required` and `payment_recovery_reason=reservation_expired`.
+  The response is `received=true`, `applied=false`, `recovery_required=true`, `test_mode=true`.
+  Here `applied` means ordinary paid authorization, not merely receiving the event. The recovery hold is durable and
+  sticky across same-event retries, new paid events, failed events and restart; changed content under an event ID conflicts.
+  This slice has no recovery-resolution, refund, restock or production-release shortcut.
+- Paid-before-deadline holds remain reserved afterward. A cancellation that wins before expiry remains cancelled,
+  and its later payment simulation is still rejected. Expired orders cannot gain proof revisions/decisions or capacity
+  changes; persisted payment, proof, stock and capacity checks continue to independently gate release.
+
+No destructive database migration is required: deadlines and recovery reasons are additive order-document fields;
+old records have no deadline unless explicitly assigned one. All existing WAL initialization and transaction behavior is reused.
+Rollback: disable synthetic retail writes, retain the test database and recovery evidence, then revert the reviewed feature
+commit through the normal reviewed process. Older code does not enforce the new deadlines; do not resume it against these
+holds while assuming expiry/recovery support. No production data or provider state is changed by this slice.
+
+Validation commands use the unchanged locked Python dependencies. On Windows set `PYTHONUTF8=1` for each test process;
+the default legacy code-page invocation does not pass the repository's UTF-8 document-link checks. The shared reviewed
+harness prefix adds compact IDs to the six existing SVG resource-limit cases to avoid Windows' environment-variable length
+limit without changing payloads or assertions. Aggregate baseline on that prefix: 312 passed, 94 subtests passed, one existing
+Starlette/httpx deprecation warning. This is not evidence of completed COM-02 or SS-047 acceptance or production qualification.
+
+
+Author validation on the frozen expiry candidate (2026-11-10, with `PYTHONUTF8=1`):
+`python -m pytest -q tests/unit/test_reservation_expiry.py` passed **49 tests**;
+`python -m pytest -q` passed **361 tests and 94 subtests**, with only the existing Starlette/httpx warning.
+Coverage includes exact deadline boundaries, strict input/auth/stage gates, immutable replay, multi-component release,
+unknown/paid/provider-bound holds (including incomplete metadata), cancellation/payment/buyer races, a clock advanced
+while waiting for the database lock, full transaction rollback, independent-process restart and cross-process contention.
+`python -m scripts.export_contracts --check`, `python scripts/verify_archive.py` (67 archived / 41 retained),
+`python scripts/check_links.py` (31 links) and `git diff --check` pass. Infrastructure and CI workflows are unchanged.
+Independent review and exact-head CI remain pending at author freeze. No frontend/browser checks, real provider calls,
+production stock qualification, deployment or activation were performed by this backend-only candidate.

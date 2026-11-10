@@ -1,5 +1,7 @@
 """Opt-in local/test retail slice. Synthetic offers never approve production prices."""
 from collections import Counter
+from collections.abc import Callable
+from datetime import datetime, timezone
 from hashlib import sha256
 import json
 import os
@@ -7,7 +9,7 @@ from typing import Annotated, Literal
 from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, Header, HTTPException
-from pydantic import Field, StrictInt, StrictBool
+from pydantic import AwareDatetime, Field, StrictInt, StrictBool, field_validator
 from services.commerce.app.workflows import (
     Item, StrictModel, NOW, database, enabled, event, load, private, receipt, save, staff,
 )
@@ -194,6 +196,112 @@ def consume_reservation(db, doc):
     doc["reservation_status"] = "consumed"
 
 
+def reservation_clock() -> Callable[[], datetime]:
+    # Inject the clock, not a precomputed instant: read it after BEGIN IMMEDIATE.
+    # A request cannot supply time, and no default hold duration is selected.
+    return lambda: datetime.now(timezone.utc)
+
+
+Clock = Annotated[Callable[[], datetime], Depends(reservation_clock)]
+
+
+def current_test_order(doc, version):
+    if doc.get("kind") != "order" or doc.get("retail_test") is not True or doc.get("test_mode") is not True or doc["version"] != version:
+        raise HTTPException(409, "A current synthetic retail test order is required.")
+
+
+def provider_linked(db, doc):
+    # Synthetic orders never carry provider fields, even empty/unknown ones.
+    if "checkout_session_id" in doc or "payment_provider" in doc:
+        return True
+    # Existing databases may have a provider binding even if document metadata
+    # needs reconciliation. Such ambiguity must never free a stock hold.
+    for table in ("square_sessions", "square_payments"):
+        exists = db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (table,)).fetchone()
+        if exists and db.execute(f"SELECT 1 FROM {table} WHERE order_id=?", (doc["id"],)).fetchone():
+            return True
+    return False
+
+
+def eligible_unpaid_hold(db, doc):
+    if (doc.get("retail_test") is not True or doc.get("test_mode") is not True
+            or doc.get("payment_status") != "unpaid" or provider_linked(db, doc)
+            or doc.get("status") != "awaiting_payment"
+            or doc.get("reservation_status") != "active" or not has_reservation(db, doc)):
+        raise HTTPException(409, "Only a complete, demonstrably unpaid synthetic hold without provider linkage is eligible; reconcile other holds manually.")
+
+
+def deadline_reached(doc, now):
+    value = doc.get("test_hold_expires_at")
+    if value is None:
+        return False
+    try:
+        deadline = datetime.fromisoformat(value)
+        if deadline.tzinfo is None or deadline.utcoffset() is None:
+            raise ValueError("Naive persisted deadline")
+    except (TypeError, ValueError):
+        raise HTTPException(409, "The persisted test deadline requires reconciliation.")
+    return now >= deadline
+
+
+def expire_reservation(db, doc, now):
+    """Caller owns the transaction; release exact components and record one reason."""
+    eligible_unpaid_hold(db, doc)
+    if not deadline_reached(doc, now):
+        raise HTTPException(409, "An explicit elapsed test hold deadline is required.")
+    db.execute("UPDATE retail_reservations SET state='released' WHERE order_id=? AND state='active'", (doc["id"],))
+    doc.update(status="reservation_expired", reservation_status="expired", inventory_reserved=False,
+               reservation_expired_at=now.astimezone(timezone.utc).isoformat(),
+               next_step="Synthetic hold expired. A later simulated payment requires manual recovery; production is not authorized.")
+    doc.setdefault("timeline", []).append({"label": "Synthetic hold expired and exact reservation released", "at": doc["reservation_expired_at"]})
+    save(db, doc)
+
+
+class TestHoldDeadline(Version):
+    test_hold_expires_at: AwareDatetime
+
+    @field_validator("test_hold_expires_at", mode="before")
+    @classmethod
+    def explicit_datetime(cls, value):
+        # Pydantic also accepts numeric epoch values; this test-only contract does
+        # not. Require an ISO date/time string with an explicit timezone.
+        if not isinstance(value, str) or "T" not in value:
+            raise ValueError("Supply an explicit timezone-aware ISO test deadline.")
+        return value
+
+
+@router.post("/v1/admin/retail-test/orders/{record_id}/hold-deadline", dependencies=[Depends(retail_enabled), Depends(staff)], tags=["local test retail"])
+def set_hold_deadline(record_id: str, body: TestHoldDeadline, clock: Clock):
+    with database() as db:
+        schema(db)
+        doc = load(db, record_id)
+        current_test_order(doc, body.version)
+        deadline = body.test_hold_expires_at.astimezone(timezone.utc).isoformat()
+        if doc.get("test_hold_expires_at") is not None:
+            if doc["test_hold_expires_at"] != deadline:
+                raise HTTPException(409, "A test hold deadline is immutable; it cannot be extended or replaced.")
+            return doc
+        eligible_unpaid_hold(db, doc)
+        if body.test_hold_expires_at <= clock():
+            raise HTTPException(409, "A new test hold deadline must be in the future.")
+        doc["test_hold_expires_at"] = deadline
+        event(doc, "Explicit synthetic hold deadline assigned")
+        save(db, doc)
+        return doc
+
+
+@router.post("/v1/admin/retail-test/orders/{record_id}/expire", dependencies=[Depends(retail_enabled), Depends(staff)], tags=["local test retail"])
+def expire_test_hold(record_id: str, body: Version, clock: Clock):
+    with database() as db:
+        schema(db)
+        doc = load(db, record_id)
+        current_test_order(doc, body.version)
+        if doc.get("reservation_status") == "expired" or doc.get("status") == "cancelled":
+            return doc
+        expire_reservation(db, doc, clock())
+        return doc
+
+
 @router.post("/v1/orders/{record_id}/cancel-test", dependencies=[Depends(retail_enabled)], tags=["local test retail"])
 def cancel(record_id: str, body: Version, authorization: Annotated[str | None, Header()] = None):
     with database() as db:
@@ -201,9 +309,9 @@ def cancel(record_id: str, body: Version, authorization: Annotated[str | None, H
         doc = private(db, record_id, authorization, {"order"})
         if not doc.get("retail_test") or doc["version"] != body.version:
             raise HTTPException(409, "A current local retail test order is required.")
-        if doc["status"] == "cancelled":
+        if doc["status"] == "cancelled" or doc.get("reservation_status") == "expired":
             return doc
-        if doc["payment_status"] != "unpaid" or doc.get("checkout_session_id") or doc["reservation_status"] != "active":
+        if doc["payment_status"] != "unpaid" or provider_linked(db, doc) or doc["reservation_status"] != "active":
             raise HTTPException(409, "Only unpaid, unsubmitted test orders can be cancelled.")
         db.execute("UPDATE retail_reservations SET state='released' WHERE order_id=? AND state='active'", (doc["id"],))
         doc.update(status="cancelled", reservation_status="released", inventory_reserved=False, next_step="Test order cancelled; stock released. Create a new cart to start again.")
@@ -221,7 +329,7 @@ class TestPayment(StrictModel):
 
 
 @router.post("/v1/admin/retail-test/orders/{record_id}/payments", dependencies=[Depends(retail_enabled), Depends(staff)], tags=["local test retail"])
-def reconcile_test_payment(record_id: str, body: TestPayment):
+def reconcile_test_payment(record_id: str, body: TestPayment, clock: Clock):
     with database() as db:
         schema(db)
         doc = load(db, record_id)
@@ -231,18 +339,32 @@ def reconcile_test_payment(record_id: str, body: TestPayment):
         if old:
             if old[0] != digest:
                 raise HTTPException(409, "Payment event identity reused with different contents.")
-            return {"received": True, "applied": False, "test_mode": True}
+            return {"received": True, "applied": False, "test_mode": True, "recovery_required": doc.get("payment_status") == "reconciliation_required"}
         if not doc.get("retail_test") or doc["version"] != body.version or doc["total_minor"] != body.amount_minor or doc["status"] == "cancelled":
             raise HTTPException(409, "Payment simulation does not match a current local retail test order.")
-        applied = body.outcome == "paid" and doc["payment_status"] == "unpaid"
-        if applied:
-            if not has_reservation(db, doc):
-                raise HTTPException(409, "Payment simulation requires a persisted reservation.")
-            doc.update(payment_status="paid", status="awaiting_production_checks" if doc["proof_status"] == "approved" else "awaiting_approval", next_step="Local payment simulated; exact proof and capacity checks remain required.")
-            event(doc, "Local test payment simulated (no processor or charge)")
+        if provider_linked(db, doc) or doc["payment_status"] not in {"unpaid", "paid", "reconciliation_required"}:
+            raise HTTPException(409, "Ambiguous or provider-linked payment requires manual reconciliation, not local simulation.")
+        applied = False
+        if body.outcome == "paid" and doc["payment_status"] == "unpaid":
+            now = clock()
+            if doc.get("reservation_status") != "expired" and deadline_reached(doc, now):
+                # The payment path enforces the deadline even if no expiry sweep
+                # has run. The release and recovery record share this transaction.
+                expire_reservation(db, doc, now)
+            if doc.get("reservation_status") == "expired":
+                doc.update(payment_status="reconciliation_required", status="payment_reconciliation_required",
+                           payment_recovery_reason="reservation_expired",
+                           next_step="Late synthetic payment recorded for manual recovery. No stock is reacquired and production is not authorized.")
+                event(doc, "Late local test payment held for recovery (no processor or charge)")
+            else:
+                if not has_reservation(db, doc):
+                    raise HTTPException(409, "Payment simulation requires a persisted reservation.")
+                applied = True
+                doc.update(payment_status="paid", status="awaiting_production_checks" if doc["proof_status"] == "approved" else "awaiting_approval", next_step="Local payment simulated; exact proof and capacity checks remain required.")
+                event(doc, "Local test payment simulated (no processor or charge)")
             save(db, doc)
         db.execute("INSERT INTO payment_events VALUES(?,?,?)", (key, digest, record_id))
-        return {"received": True, "applied": applied, "test_mode": True}
+        return {"received": True, "applied": applied, "test_mode": True, "recovery_required": doc["payment_status"] == "reconciliation_required"}
 
 
 class Capacity(Version):
@@ -253,7 +375,7 @@ class Capacity(Version):
 def capacity(record_id: str, body: Capacity):
     with database() as db:
         doc = load(db, record_id)
-        if not doc.get("retail_test") or doc["version"] != body.version or doc["status"] in {"in_production", "shipped", "cancelled"}:
+        if not doc.get("retail_test") or doc["version"] != body.version or doc["status"] in {"in_production", "shipped", "cancelled"} or doc.get("reservation_status") == "expired":
             raise HTTPException(409, "An unreleased current test order is required.")
         if doc["capacity_confirmed"] == body.confirmed:
             return doc
