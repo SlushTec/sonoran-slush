@@ -1,0 +1,7 @@
+# Not active. Bootstrap a versioned, encrypted private state bucket and review IAM before using.
+# Add a backend "s3" block only with the reviewed AWS implementation.
+bucket       = "REPLACE_WITH_APPROVED_STATE_BUCKET"
+key          = "sonoran-slush/production/terraform.tfstate"
+region       = "us-east-1"
+encrypt      = true
+use_lockfile = true

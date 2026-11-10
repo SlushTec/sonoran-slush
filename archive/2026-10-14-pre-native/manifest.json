@@ -1,0 +1,477 @@
+{
+  "schema_version": 1,
+  "base_commit": "8238fd378ca54dcfd654aa1c099b4f21416f2826",
+  "archived_on": "2026-10-14",
+  "reason": "Owner-directed AWS-native ecommerce reset; preserve all pre-reset content.",
+  "files": [
+    {
+      "original_path": "README.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/README.md",
+      "sha256": "9142ed7fe0e3077e493141247cb3bcc3f9c9451b1811a0e68ab5337aafcf11fa",
+      "bytes": 2368,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "docs/COMPANY-OVERVIEW.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/COMPANY-OVERVIEW.md",
+      "sha256": "3c09ebf3ee16527c67b7e894990033fbd31855c54148bff478f18c33539ec7a5",
+      "bytes": 2011,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/CRYSTAL-SELECTION-GUIDE.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/CRYSTAL-SELECTION-GUIDE.md",
+      "sha256": "b68582cd0a435fd9ee9a85f7fc9e79669ace87437594cd24dfb8dedb010fcc52",
+      "bytes": 4646,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/CRYSTAL-SIZE-KEEP-LIST.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/CRYSTAL-SIZE-KEEP-LIST.md",
+      "sha256": "a9aeb827506fd0bda1f02cb5776ce87a3e946f004adbe0e34c43dd90a865e8fe",
+      "bytes": 2843,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/DISCOUNT-POLICY.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/DISCOUNT-POLICY.md",
+      "sha256": "e1f7e132a95f5bfd5a4960f92575ed914b928345f5d5972eb40e15eea8ceeda3",
+      "bytes": 5049,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/EMAIL-AUTOMATIONS.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/EMAIL-AUTOMATIONS.md",
+      "sha256": "6549680dafad54657e7eeba27b62e54c205a9d7dd6e2ad51f9874f0a31907a00",
+      "bytes": 6362,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "docs/EVENTS.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/EVENTS.md",
+      "sha256": "3cd88aa8404c9e822249e4726ed93032514fde24a5262a2fa245402104825fb2",
+      "bytes": 6339,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/FAQ.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/FAQ.md",
+      "sha256": "6066e7f454f1f9c73510cba0ff553fbbffc0ff4ab74a92ac324ba36a1df551a4",
+      "bytes": 5808,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/FUTURE-MERCH.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/FUTURE-MERCH.md",
+      "sha256": "82d3286e3486f1f63d65737a178da25800cf071c0d9a268fe42c23372611731e",
+      "bytes": 942,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/GLASSWARE-COLOR-FILL.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/GLASSWARE-COLOR-FILL.md",
+      "sha256": "aef5679caa00adf2c56ba99d20f8cd981f6bc6adf2ae487588aac1af343ef8b7",
+      "bytes": 2771,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/GLASSWARE-PRICING.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/GLASSWARE-PRICING.md",
+      "sha256": "a8879b467138016254373ad7c478727a9843cc2000275e95e46525ce770f9450",
+      "bytes": 4215,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/IDME-INTEGRATION.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/IDME-INTEGRATION.md",
+      "sha256": "5360f0ba44e656a922a2f1a7f895653070d4b1c0159234f6939998c04cfec867",
+      "bytes": 1064,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "docs/JET-MINI-CAPABILITIES.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/JET-MINI-CAPABILITIES.md",
+      "sha256": "0ea7cfd60c7be4dec2a4bf95d427a32b2f2ae9c02b4053311449b044f3c243fc",
+      "bytes": 3537,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/MARKETING-ASSETS.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/MARKETING-ASSETS.md",
+      "sha256": "fbbbcc051be4d05c3164db4d69b3eca37bc4913c86a473a3477f5e5c5dd17061",
+      "bytes": 1618,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/ON-SITE-EVENTS.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/ON-SITE-EVENTS.md",
+      "sha256": "26c9f01df81f48730946cdee31d79bc4354bb1767d8feeb0ccf7fdf7dafe329b",
+      "bytes": 3728,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/OWNERS_PERSONALITY.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/OWNERS_PERSONALITY.md",
+      "sha256": "624920bbd9ad53909084e93bced9d4c50b8d9dbeef1272aad26fff5b88fe5d49",
+      "bytes": 2720,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/PHOTO-CONVERSION-GUIDE.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/PHOTO-CONVERSION-GUIDE.md",
+      "sha256": "e8082c80115d728d84e609c3c6d54f76d02d941cf1faf87b60d13314c5042b51",
+      "bytes": 3961,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/PREVIEW-ARCHITECTURE.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/PREVIEW-ARCHITECTURE.md",
+      "sha256": "8e935ae92411d810bdaec6d9b334361b35bc2d960d1b3512fac44f72827d108c",
+      "bytes": 5982,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "docs/PRICING-3D-CRYSTAL.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/PRICING-3D-CRYSTAL.md",
+      "sha256": "9dd60ed0fe0e41035cb5c1e65c8aa503f8b6f58d91b21d0c20baee913a7e8893",
+      "bytes": 4501,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/PRICING-MODEL.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/PRICING-MODEL.md",
+      "sha256": "4ca2ac64dcc934d6cd5858e7a342133fa73729f6c55b3d744ff35b5d530e34d8",
+      "bytes": 7926,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/PRODUCT-PAGE-SCAFFOLDING.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/PRODUCT-PAGE-SCAFFOLDING.md",
+      "sha256": "a8dcc11075469985e6012eeed5ea3fae7fcc7651b4f80552f0859a90611efa98",
+      "bytes": 12151,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/TAX-DISCLAIMER.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/TAX-DISCLAIMER.md",
+      "sha256": "1150884fb04ea36f398b169163da9f45ddc17dd2d0ffe7c5e2c646bee1af17bb",
+      "bytes": 1579,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/WEBSITE-PLAN.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/WEBSITE-PLAN.md",
+      "sha256": "54ba94728c89bf53ad7be2e227fd02a4a0b2a421dd337990e2f05d4008a04e26",
+      "bytes": 1363,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "docs/daily_hs/2026-08-11-SONORAN-SLUSH.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/daily_hs/2026-08-11-SONORAN-SLUSH.md",
+      "sha256": "556bf6f2147cbe61d5014c4636f5b0f4b2949965609ed6fa27d7c270b8976e52",
+      "bytes": 4325,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "docs/daily_hs/README.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/daily_hs/README.md",
+      "sha256": "0884cae1f4ae1619cd4bbf2966813d74394f67dcad58df8206ccd658d1f523df",
+      "bytes": 425,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "docs/init/AGENDA.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/init/AGENDA.md",
+      "sha256": "c0930ae40ffa17d29e73dbf859b2eb1c5433a34132958665be2b5a3b12380121",
+      "bytes": 350,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "docs/init/CHECKPOINT.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/init/CHECKPOINT.md",
+      "sha256": "2595b7079606d1b6b26c57e3d26138e06a7ac59f400342f71f991baaa925c0bb",
+      "bytes": 313,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "docs/init/COMPLIANCE.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/init/COMPLIANCE.md",
+      "sha256": "4220145086da9450ec05b04925b08c5fc1df2e14891c03817bda286ada5be794",
+      "bytes": 308,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "docs/init/HANDSHAKE.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/init/HANDSHAKE.md",
+      "sha256": "4d83345a29e54370dba37f90f966b83d78eb8c9256e41dfef6de6ce5bf1deb7e",
+      "bytes": 1486,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "docs/init/PROFILE.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/init/PROFILE.md",
+      "sha256": "591e8042afb7ee18b46bca317930909970d649cd3aa6186e4d487fb155b16e32",
+      "bytes": 1530,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "docs/init/README.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/init/README.md",
+      "sha256": "bb44cf9be66e4afef526adc8f904f0f59683ced04afe4d59495493d2e5eedd6d",
+      "bytes": 774,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "docs/init/SEAT-LENSES.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/init/SEAT-LENSES.md",
+      "sha256": "3cc5afa7077e706b1fdf6c20963ee83cd2a2321086bea8971665a64b86dcd98d",
+      "bytes": 7975,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "docs/init/SOP.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/init/SOP.md",
+      "sha256": "ffaf24660aa929be752249aadee3c59fc039fa93333bbaafeaabb9a9a490979a",
+      "bytes": 3904,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "docs/init/TEAM.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/init/TEAM.md",
+      "sha256": "b2ead726fa5f9cbd67274c13063c3eb5dbfe3688d6ea88957f38b2e397a5ce00",
+      "bytes": 1460,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "docs/init/USEFUL-WASTE-TRACKER.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/init/USEFUL-WASTE-TRACKER.md",
+      "sha256": "d8e087c3bdc6c50fd4be74f17f3abdbb4c3f8b7b295317e4b039bd98c734db03",
+      "bytes": 1070,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "docs/init/WEEKLY-RITUAL.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/init/WEEKLY-RITUAL.md",
+      "sha256": "39d413399546e949706a392d9b369b495bc5c92565c4f306ecbc5f695a2a6c14",
+      "bytes": 999,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "docs/products/ACACIA-CUTTING-BOARDS.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/products/ACACIA-CUTTING-BOARDS.md",
+      "sha256": "00542d79bf603c29c07aa8c30b8e3bb9b1fe8569e38efefc992a6fe95244e6bc",
+      "bytes": 1458,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/products/ALUMINUM-RFID-MONEY-CLIP.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/products/ALUMINUM-RFID-MONEY-CLIP.md",
+      "sha256": "9f92e0e495596c80497e05a5159a1038098e8a8872131e994ec8659eb2fefc87",
+      "bytes": 1428,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/products/BAMBOO-CUTTING-BOARD.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/products/BAMBOO-CUTTING-BOARD.md",
+      "sha256": "343b2e49c1520be53a24f20a081147ef38346d0da5b0483e051fa299044c3682",
+      "bytes": 1249,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/products/COCKTAIL-SMOKER-KIT.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/products/COCKTAIL-SMOKER-KIT.md",
+      "sha256": "84e115d5a61b3e190df3a8e7946b8e0e5b0ef08e126d87ecaea69dd864c7059a",
+      "bytes": 1460,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/products/CREDIT-CARD-BOTTLE-OPENER.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/products/CREDIT-CARD-BOTTLE-OPENER.md",
+      "sha256": "68ae5bb16df9686c6883495cc97367ccac1dfe71ea5408bd606818c11da29498",
+      "bytes": 1262,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/products/CRYSTAL-HEART-ORNAMENT.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/products/CRYSTAL-HEART-ORNAMENT.md",
+      "sha256": "096932b20d6cd4c31cbda293aa0f1e9770e43097c844496c01a18abfd36533d0",
+      "bytes": 1650,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/products/CRYSTAL-ROUND-ORNAMENT-60-80.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/products/CRYSTAL-ROUND-ORNAMENT-60-80.md",
+      "sha256": "bcb83a6c72d9344668f2a3714e0e40d3e12021100071bf26edce63562ea27955",
+      "bytes": 1685,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/products/CRYSTAL-WINE-STOPPER.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/products/CRYSTAL-WINE-STOPPER.md",
+      "sha256": "1091016d70c3eec0a0a88f5222a4aacaf3de82dcab6f957312fcc8a12cc9e14e",
+      "bytes": 1412,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/products/LASERETTE-JOURNAL.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/products/LASERETTE-JOURNAL.md",
+      "sha256": "b8a0d20e078fd18ba7b6dbe7253b7d7311b77cfa8c9062ad3ee89fa931a5d9a2",
+      "bytes": 1491,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/products/LIBBEY-1639-MIXING-GLASS.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/products/LIBBEY-1639-MIXING-GLASS.md",
+      "sha256": "63662d168d3d33b92e8db5e6d847815719c92d3325ddb52d6381b22a3cdc1274",
+      "bytes": 2861,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/products/LIBBEY-2339-DOF.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/products/LIBBEY-2339-DOF.md",
+      "sha256": "31d1e0413026917f0d0e179322663c77d6f5f782592fad1391b5e29618fec7f4",
+      "bytes": 2385,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/products/MAKERFLO-32OZ-WATER-BOTTLE.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/products/MAKERFLO-32OZ-WATER-BOTTLE.md",
+      "sha256": "a978df900f9fa24912e00012f4d7a9f082ce5fcb5bb45fa632a0e0b3e37f516f",
+      "bytes": 1395,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/products/MAKERFLO-40OZ-ELECTROPLATED.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/products/MAKERFLO-40OZ-ELECTROPLATED.md",
+      "sha256": "fea1263e7e7e3f328e80869a6d626dadace04dec252c9141969451af6ef4e8dd",
+      "bytes": 1654,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/products/MAKERTWIST-40OZ-TUMBLER.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/products/MAKERTWIST-40OZ-TUMBLER.md",
+      "sha256": "ede0dd3b0d397b9c555bbb09a8d798de70d0954e9aee0ffd9c4fae3c4c829a5c",
+      "bytes": 1493,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/products/SALT-RIMMER-ACACIA.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/products/SALT-RIMMER-ACACIA.md",
+      "sha256": "246d1f999b3974dc5fe67849795de402309a5f36f7967b64f16908f2fdc9d54b",
+      "bytes": 3277,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/products/SHOT-GLASS-2OZ-SQUARE.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/products/SHOT-GLASS-2OZ-SQUARE.md",
+      "sha256": "8b99e7619def1d8e1be2e697138813d94c2d4b23c0b8c75dc32b9c52cee13f7f",
+      "bytes": 2822,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/products/SHOT-GLASS-2OZ-WOOD-BOX.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/products/SHOT-GLASS-2OZ-WOOD-BOX.md",
+      "sha256": "314d9b99c5c61283556f3b102c9739d247ed59514059da9cd3b388affd289d4e",
+      "bytes": 1425,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/products/STEEL-FLAT-BOTTLE-OPENER.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/products/STEEL-FLAT-BOTTLE-OPENER.md",
+      "sha256": "092637fe90f16e6ed4ed548b0e7ab85a5c5a4e58be240536af7477041f903fbc",
+      "bytes": 1193,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/products/WHISKEY-DECANTER-26OZ-SET.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/products/WHISKEY-DECANTER-26OZ-SET.md",
+      "sha256": "72f3f84cb8f03183580222f3c8ecd98ae9b8dddbb984b0e0e0fad643c36ac285",
+      "bytes": 1516,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/products/WHISKEY-DECANTER-4-GLASS-STONES.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/products/WHISKEY-DECANTER-4-GLASS-STONES.md",
+      "sha256": "5242fe78967eb6a8dacec144d76f087237dce4b98ac523b85bdfd3ba8cdde32e",
+      "bytes": 1402,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/products/WOOD-BOTTLE-OPENER-KEYCHAIN.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/products/WOOD-BOTTLE-OPENER-KEYCHAIN.md",
+      "sha256": "7cb39b31efc16ca39fbbafc11bcf8bf8f7fc09caf05d5f57d7783e2e7d046de5",
+      "bytes": 1073,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/products/WOOD-KEYCHAIN-RECTANGLE.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/products/WOOD-KEYCHAIN-RECTANGLE.md",
+      "sha256": "4a71d7dd599abe73c1ec1bcfd16711c6fb4fe4f97eba52112bbf2fa0b398c478",
+      "bytes": 1058,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "docs/products/WOOD-KEYCHAIN-ROUND.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/docs/products/WOOD-KEYCHAIN-ROUND.md",
+      "sha256": "e7a90c6a4a0a2d020d23a223260fdfef5be0811e47c66dab91c27e2900983e40",
+      "bytes": 1099,
+      "retained_active_unchanged": true
+    },
+    {
+      "original_path": "site/README.md",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/site/README.md",
+      "sha256": "9632e686c4060813957aec18904cbd614fa0f53db13ca45ef6c012cda6b795ef",
+      "bytes": 660,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "site/crystals.html",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/site/crystals.html",
+      "sha256": "fad5ae09e9451bbf1002215e4b9cbd30b6acf55cd8a107d52e39270dcdf5e628",
+      "bytes": 4182,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "site/css/styles.css",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/site/css/styles.css",
+      "sha256": "2317a561818a7683f284ab3c7a8edc628313fa586da407d520b2a07407ff5800",
+      "bytes": 9378,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "site/events.html",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/site/events.html",
+      "sha256": "de4a93151cbfef2ef6aba83e9b4b11913178e06786995a7e133d6f465e918ed0",
+      "bytes": 3961,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "site/index.html",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/site/index.html",
+      "sha256": "5b29ff907916ddf7ae606fb64ee851bbe57768467fe8248a10e0fa5d8f89d88b",
+      "bytes": 5818,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "site/js/main.js",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/site/js/main.js",
+      "sha256": "387474af8652d12d96c9b3e7c5a213ad1020e65bead69d232b72765704a14078",
+      "bytes": 534,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "site/photo-guide.html",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/site/photo-guide.html",
+      "sha256": "4d2f15b20c7e30696ba881111a885d4e40e9b7cbd2b206360ec09760d323b918",
+      "bytes": 3902,
+      "retained_active_unchanged": false
+    },
+    {
+      "original_path": "site/shop.html",
+      "archive_path": "archive/2026-10-14-pre-native/snapshot/site/shop.html",
+      "sha256": "a920c352cb2551da2e79047f66d3dead68d3d16a87ba3c3442b77e7f0bdc30d8",
+      "bytes": 3647,
+      "retained_active_unchanged": false
+    }
+  ]
+}
