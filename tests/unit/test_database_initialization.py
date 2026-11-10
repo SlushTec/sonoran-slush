@@ -12,7 +12,7 @@ from services.commerce.app import workflows
 def database_path(tmp_path, monkeypatch):
     path = tmp_path / "commerce.sqlite3"
     monkeypatch.setenv("SONORAN_REQUESTS_ENABLED", "true")
-    monkeypatch.setenv("SONORAN_STAGE", "local")
+    monkeypatch.setenv("SONORAN_STAGE", "scaffold")
     monkeypatch.setenv("SONORAN_ACCESS_SECRET", "initialization-test-only-" + "x" * 40)
     monkeypatch.setenv("SONORAN_DB_PATH", str(path))
     return path
