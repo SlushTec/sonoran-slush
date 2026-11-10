@@ -94,3 +94,34 @@ It is being reconciled with the verified public main above without replacing eit
 The exact combined source still requires composition review, publication approval and fresh exact-head CI before merge.
 Full COM-02/SS-047 acceptance and production hold/recovery policy remain open. The finite cutoff and all release/source
 holds recorded above remain unchanged. Test/review receipts are technical evidence, not production authorization.
+
+
+### Conditional reserve admitted: 2026-11-10
+
+Both primary slices were independently reviewed and integrated before the 00:30Z reserve gate,
+with more than 150 minutes remaining before the fixed 03:00Z cutoff. SVG PR #8 and expiry
+[PR #9](https://github.com/SlushTec/sonoran-slush/pull/9) are merged. PR #9's reviewed head
+`3dea037e94646a4559a8847587e56e55a3ed52f3` and current public main
+`8b24aa1129881a64e33b5b87bfa8a52c948e4cfa` share tree `5f7f4c281ac1ba1ffed7ceafed2554a0d5583bd1`.
+[Expiry exact-head CI](https://github.com/SlushTec/sonoran-slush/actions/runs/42909646339) and
+[post-merge main CI](https://github.com/SlushTec/sonoran-slush/actions/runs/42912273975) passed all four
+existing jobs, as did the SVG checks linked above. These are bounded source closures, not full feature acceptance.
+
+The existing [RPG-138 / OPS-04](https://linear.app/rpg-chat/issue/RPG-138/ops-04-qualify-recovery-and-operational-visibility)
+now admits only an SS-070 test-only, disconnected SQLite backup/isolated-restore drill. It creates its own
+synthetic database and byte fixtures; checks committed WAL recovery, current order/proof/reference lineage,
+stock/deadline/reconciliation state and existing request/payment-event replay; and rejects corrupt, incomplete
+or unsafe restore inputs without overwriting existing targets. Hashes prove integrity, not source authority.
+No existing customer database or asset folder is admitted, and external actions stay disabled before and after restore.
+
+Job/outbox recovery, real private-asset or historical proof-file recovery, production schema/behavior-version
+qualification, cloud persistence, financial/supplier reconnection, production RPO/RTO, cost and retention are
+**NOT ASSESSED**. No queue, asset service, migration, endpoint, dependency or workflow is added. The harness format
+is not an application schema version; synthetic metadata/bytes are not private-asset recovery. SS-064, SS-068,
+SS-069, full SS-070 and OPS-04 remain open, with their original owner decisions and acceptance unchanged.
+
+Two roles cover this reserve: a producer, who is the sole coordinated serial publisher, and an independent reviewer.
+The reviewer first checks this checkpoint before feature edits, then reviews the frozen implementation and exact checks.
+Publication and readiness/merge require separate exact-target confirmation; earlier PR approvals do not transfer.
+At most two store lanes remain active. Stop new implementation by **2026-11-11T02:20:00Z** and complete safe preservation,
+verification and reporting by **2026-11-11T03:00:00Z**; no automatic extension. All existing source and activation holds apply.
