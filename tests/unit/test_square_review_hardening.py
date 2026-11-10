@@ -139,3 +139,22 @@ def test_out_of_order_refund_totals_cannot_reduce_durable_hold(connected,monkeyp
         doc=load(db,o['id'])
         assert doc['refunded_minor']==12345
         assert doc['payment_status']=='reconciliation_required'
+
+
+def test_non_ascii_webhook_signature_returns_400_without_mutation(connected, monkeypatch):
+    o = order(connected)
+    session(connected, o, monkeypatch)
+    payload = payment_event(o['id'], event_id='non-ascii-signature')
+    with database() as db:
+        before = list(db.iterdump())
+    response = connected.post(
+        '/v1/webhooks/payments',
+        content=json.dumps(payload).encode(),
+        headers={b'x-square-hmacsha256-signature': b'\xff'},
+    )
+    assert response.status_code == 400, response.text
+    with database() as db:
+        assert list(db.iterdump()) == before
+        assert load(db, o['id'])['payment_status'] == 'unpaid'
+    # Rejecting the malformed header must not consume the event identity.
+    assert send_event(connected, payload).json()['applied'] is True

@@ -94,7 +94,7 @@ def schema(db):
 
 def verify_signature(raw: bytes, signature: str, secret: str, notification_url: str) -> dict:
     expected = base64.b64encode(hmac.new(secret.encode(), notification_url.encode()+raw, sha256).digest()).decode()
-    if not hmac.compare_digest(expected, signature):
+    if not signature.isascii() or not hmac.compare_digest(expected, signature):
         raise HTTPException(400, "The Square event signature could not be verified.")
     try:
         payload = json.loads(raw)
