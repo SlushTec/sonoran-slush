@@ -138,7 +138,7 @@ def test_xml_and_viewport_failures(source, code):
     (svg(attrs=b' '.join(b'a%d="x"' % n for n in range(17))), "XML_COMPLEXITY_LIMIT"),
     (svg(attrs=b'fill="' + b'a' * MAX_ATTRIBUTE_CHARS + b'"'), "ATTRIBUTE_TOO_LARGE"),
     (svg(b'<title>' + b'a' * (MAX_TEXT_CHARS + 1) + b'</title>'), "TEXT_TOO_LARGE"),
-])
+], ids=["bytes", "depth", "elements", "attributes", "attribute-chars", "text-chars"])
 def test_resource_limits(source, code):
     report = validate_svg(source)
     assert code in codes(report)
