@@ -4,7 +4,9 @@
 
 This is Brian's independent production-targeted ecommerce build. Four work agents are planned ownership lanes,
 not simulated people, running sessions, or a class team. No grading checklist or invented deadline governs delivery.
-Current architecture: `docs/architecture/README.md`. Current backlog: `docs/delivery/backlog.json`.
+Current architecture: `docs/architecture/README.md`. Current delivery board: Linear project `P-RPG-4`,
+bound in `docs/delivery/backlog.json`. That file preserves the original requirements; current run checkpoints
+and coordination are in `docs/delivery/WORKSTREAMS.md`.
 
 1. Preserve `archive/2026-10-14-pre-native/**` and all business sources marked unchanged in its manifest.
 2. Use one feature branch per lane and peer review. AGENT-04 owns serial integration; coordinate shared contract changes with AGENT-02.

@@ -36,7 +36,7 @@ def test_supported_synthetic_shapes_are_held_and_deterministic_without_mutation(
     assert report.report_sha256 == sha256(report.canonical_bytes()).hexdigest()
     assert report.report_sha256 != report.original_sha256
     assert report.schema_version == "sonoran.svg-intake/1"
-    assert report.validator_version == "1.0.0"
+    assert report.validator_version == "1.1.0"
     assert validate_svg(original) == report
     assert validate_svg(original).canonical_bytes() == report.canonical_bytes()
     assert original == before
@@ -68,7 +68,7 @@ def test_supported_synthetic_shapes_are_held_and_deterministic_without_mutation(
     (b'<style>@import "https://invalid.example/"</style>', "UNSUPPORTED_ELEMENT"),
     (b'<use href="#shape"/>', "UNSUPPORTED_ELEMENT"),
     (b'<defs/>', "UNSUPPORTED_ELEMENT"),
-    (b'<path d="M0 0L1 1"/>', "UNSUPPORTED_ELEMENT"),
+    (b'<path d="M0 0C1 1 2 2 3 3"/>', "UNSUPPORTED_PATH_SYNTAX"),
     (b'<image href="data:image/png;base64,AAAA"/>', "EMBEDDED_RASTER_DECLARED"),
     (b'<image href="https://invalid.example/a.png"/>', "IMAGE_REFERENCE_UNSUPPORTED"),
     (b'<image/>', "IMAGE_REFERENCE_UNSUPPORTED"),
@@ -138,7 +138,7 @@ def test_xml_and_viewport_failures(source, code):
     (svg(attrs=b' '.join(b'a%d="x"' % n for n in range(17))), "XML_COMPLEXITY_LIMIT"),
     (svg(attrs=b'fill="' + b'a' * MAX_ATTRIBUTE_CHARS + b'"'), "ATTRIBUTE_TOO_LARGE"),
     (svg(b'<title>' + b'a' * (MAX_TEXT_CHARS + 1) + b'</title>'), "TEXT_TOO_LARGE"),
-])
+], ids=["bytes", "depth", "elements", "attributes", "attribute-chars", "text-chars"])
 def test_resource_limits(source, code):
     report = validate_svg(source)
     assert code in codes(report)

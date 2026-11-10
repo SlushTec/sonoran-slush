@@ -4,6 +4,17 @@
   "agents_activated": false,
   "deadline": null,
   "scope": "Independent full-production target; scaffold does not complete these tasks.",
+  "canonical_board": {
+    "system": "Linear",
+    "project_identifier": "P-RPG-4",
+    "project_id": "8a85eb4b-f504-45ed-9c5b-62a6ce58c800",
+    "project_url": "https://linear.app/rpg-chat/project/sonoran-slush-store-e8838e0da62f",
+    "team_name": "Slushtec",
+    "team_key": "RPG",
+    "team_id": "311903e6-3ec7-4e24-bdcb-23e03630f25e",
+    "authority": "Linear is the current delivery board. This file preserves the original 24 requirement records; planned statuses and empty evidence are historical scaffold values, not current acceptance.",
+    "checkpoint": "WORKSTREAMS.md#finite-run-checkpoint-2026-11-10"
+  },
   "items": [
     {
       "id": "UX-01",

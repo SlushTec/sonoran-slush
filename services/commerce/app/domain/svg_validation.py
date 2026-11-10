@@ -7,13 +7,16 @@ import re
 from xml.parsers import expat
 
 SCHEMA_VERSION = "sonoran.svg-intake/1"
-VALIDATOR_VERSION = "1.0.0"
+VALIDATOR_VERSION = "1.1.0"
 MAX_BYTES = 131072
 MAX_ELEMENTS = 1024
 MAX_DEPTH = 32
 MAX_ATTRIBUTES = 16
 MAX_ATTRIBUTE_CHARS = 4096
 MAX_TEXT_CHARS = 4096
+MAX_PATH_TOKENS = 512  # Commands, numbers and commas; whitespace is not a token.
+MAX_PATH_SEGMENTS = 128  # Explicit L segments; one optional closing Z is separate.
+PATH_TOKEN = re.compile(r"[MLZ]|[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)|,")
 SVG_NS = "http://www.w3.org/2000/svg"
 NUMBER = r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?"
 SEPARATOR = r"(?:\s*,\s*|\s+)"
@@ -99,11 +102,79 @@ def _numbers(value, count):
     return tuple(_number(v) for v in re.split(SEPARATOR, value.strip(" \t\r\n")))
 
 
+def _path(value):
+    """Observe one bounded explicit M/L[/Z] sequence, not general SVG geometry."""
+    tokens = []
+    offset = 0
+    while offset < len(value):
+        if value[offset] in " \t\r\n":
+            offset += 1
+            continue
+        match = PATH_TOKEN.match(value, offset)
+        if match is None:
+            raise _Stop("UNSUPPORTED_PATH_SYNTAX")
+        tokens.append((match[0], offset, match.end()))
+        if len(tokens) > MAX_PATH_TOKENS:
+            raise _Stop("PATH_COMPLEXITY_LIMIT")
+        offset = match.end()
+
+    cursor = 0
+
+    def number():
+        nonlocal cursor
+        if cursor >= len(tokens) or tokens[cursor][0] in {"M", "L", "Z", ","}:
+            raise _Stop("INVALID_PATH_DATA")
+        result = _number(tokens[cursor][0])
+        cursor += 1
+        return result
+
+    def point():
+        nonlocal cursor
+        x = number()
+        end = tokens[cursor - 1][2]
+        if cursor < len(tokens) and tokens[cursor][0] == ",":
+            cursor += 1
+        elif cursor >= len(tokens) or tokens[cursor][1] == end:
+            # Adjacent signed/decimal numbers (e.g. 1-2 or 1.2.3) are excluded.
+            raise _Stop("INVALID_PATH_DATA")
+        return x, number()
+
+    if not tokens or tokens[0][0] != "M":
+        raise _Stop("INVALID_PATH_DATA")
+    cursor = 1
+    vertices = [point()]
+    closed = False
+    while cursor < len(tokens):
+        command = tokens[cursor][0]
+        cursor += 1
+        if command == "Z":
+            if cursor != len(tokens):
+                raise _Stop("INVALID_PATH_DATA")
+            closed = True
+        elif command == "L":
+            if len(vertices) - 1 >= MAX_PATH_SEGMENTS:
+                raise _Stop("PATH_COMPLEXITY_LIMIT")
+            vertex = point()
+            if vertex == vertices[-1]:
+                raise _Stop("DEGENERATE_GEOMETRY")
+            vertices.append(vertex)
+        else:
+            raise _Stop("INVALID_PATH_DATA")
+    if len(vertices) < 2:
+        raise _Stop("DEGENERATE_GEOMETRY")
+    if closed and vertices[-1] == vertices[0]:
+        raise _Stop("DEGENERATE_GEOMETRY")
+    xs, ys = zip(*vertices)
+    # Ordered vertices + explicit closure only. Do not simplify, reverse, rotate,
+    # infer topology, or equate an explicit closing L with terminal Z.
+    return (tuple(vertices), closed), (min(xs), min(ys), max(xs), max(ys))
+
+
 def validate_svg(original: bytes) -> Report:
     """Inspect exact immutable UTF-8 bytes. Never fetch, upload, render or normalize.
 
-    Strict basic-shape subset only. A nonrejected report is still held for owner
-    review and physical qualification. Unknown machine/material inputs are not
+    Strict basic-shape and explicit straight-line-path subset only. A nonrejected
+    report remains held for owner review and physical qualification. Unknown inputs are not
     accepted as self-asserted approvals. No filesystem or network API is used.
     """
     if type(original) is not bytes:
@@ -178,9 +249,9 @@ def validate_svg(original: bytes) -> Report:
             stop("IMAGE_REFERENCE_UNSUPPORTED")
         if tag in {"script", "foreignObject", "animate", "animateMotion", "animateTransform", "set", "audio", "video"}:
             stop("ACTIVE_CONTENT_FORBIDDEN")
-        if tag not in {"svg", "g", "title", "desc", *GEOMETRY}:
+        if tag not in {"svg", "g", "title", "desc", "path", *GEOMETRY}:
             stop("UNSUPPORTED_ELEMENT")
-        if stack and (tag == "svg" or stack[-1] in {"title", "desc", *GEOMETRY}):
+        if stack and (tag == "svg" or stack[-1] in {"title", "desc", "path", *GEOMETRY}):
             stop("UNSUPPORTED_NESTING")
         for key, value in attrs.items():
             local = key.rsplit("}", 1)[-1]
@@ -193,6 +264,8 @@ def validate_svg(original: bytes) -> Report:
             if local in {"style", "class", "transform"} or "url(" in value.lower():
                 stop("CSS_OR_TRANSFORM_UNSUPPORTED")
         allowed = {"width", "height", "viewBox"} if tag == "svg" else set(GEOMETRY.get(tag, ()))
+        if tag == "path":
+            allowed.add("d")
         if tag not in {"title", "desc"}:
             allowed |= PAINT
         if set(attrs) - allowed:
@@ -215,24 +288,29 @@ def validate_svg(original: bytes) -> Report:
             view_box = _numbers(attrs["viewBox"], 4)
             if view_box[2] <= 0 or view_box[3] <= 0:
                 stop("INVALID_VIEWBOX")
-        elif tag in GEOMETRY:
-            fields = GEOMETRY[tag]
-            required = {"rect": {"width", "height"}, "circle": {"r"}, "ellipse": {"rx", "ry"}, "line": set()}[tag]
-            if required - attrs.keys():
-                stop("MISSING_GEOMETRY")
-            values = tuple(_number(attrs.get(k, "0")) for k in fields)
-            v = dict(zip(fields, values))
-            if any(v[k] <= 0 for k in required):
-                stop("DEGENERATE_GEOMETRY")
-            if tag == "rect":
-                bounds = (v["x"], v["y"], v["x"] + v["width"], v["y"] + v["height"])
-            elif tag in {"circle", "ellipse"}:
-                rx, ry = (v["r"], v["r"]) if tag == "circle" else (v["rx"], v["ry"])
-                bounds = (v["cx"] - rx, v["cy"] - ry, v["cx"] + rx, v["cy"] + ry)
+        elif tag in GEOMETRY or tag == "path":
+            if tag == "path":
+                if "d" not in attrs:
+                    stop("MISSING_GEOMETRY")
+                values, bounds = _path(attrs["d"])
             else:
-                bounds = (min(v["x1"], v["x2"]), min(v["y1"], v["y2"]), max(v["x1"], v["x2"]), max(v["y1"], v["y2"]))
-                if v["x1"] == v["x2"] and v["y1"] == v["y2"]:
+                fields = GEOMETRY[tag]
+                required = {"rect": {"width", "height"}, "circle": {"r"}, "ellipse": {"rx", "ry"}, "line": set()}[tag]
+                if required - attrs.keys():
+                    stop("MISSING_GEOMETRY")
+                values = tuple(_number(attrs.get(k, "0")) for k in fields)
+                v = dict(zip(fields, values))
+                if any(v[k] <= 0 for k in required):
                     stop("DEGENERATE_GEOMETRY")
+                if tag == "rect":
+                    bounds = (v["x"], v["y"], v["x"] + v["width"], v["y"] + v["height"])
+                elif tag in {"circle", "ellipse"}:
+                    rx, ry = (v["r"], v["r"]) if tag == "circle" else (v["rx"], v["ry"])
+                    bounds = (v["cx"] - rx, v["cy"] - ry, v["cx"] + rx, v["cy"] + ry)
+                else:
+                    bounds = (min(v["x1"], v["x2"]), min(v["y1"], v["y2"]), max(v["x1"], v["x2"]), max(v["y1"], v["y2"]))
+                    if v["x1"] == v["x2"] and v["y1"] == v["y2"]:
+                        stop("DEGENERATE_GEOMETRY")
             x, y, width, height = view_box
             if bounds[0] < x or bounds[1] < y or bounds[2] > x + width or bounds[3] > y + height:
                 stop("GEOMETRY_OUTSIDE_VIEWBOX")
