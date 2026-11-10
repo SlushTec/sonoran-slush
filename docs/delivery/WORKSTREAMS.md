@@ -27,3 +27,47 @@ M3: optional AI and polished discovery/recovery/notifications.
 M4: security/accessibility/performance/restore acceptance and live launch approval.
 
 See `backlog.json`; future tasks start planned, not completed. Agent activation is a separate owner action.
+
+## Finite run checkpoint: 2026-11-10
+
+The canonical delivery board is [Sonoran Slush Store, P-RPG-4](https://linear.app/rpg-chat/project/sonoran-slush-store-e8838e0da62f)
+under Slushtec (RPG). The stable project/team binding is recorded in [backlog.json](backlog.json).
+That file preserves all 24 original requirements, acceptance text, owner lanes and scaffold statuses;
+Linear owns current status, dependencies, decisions and acceptance evidence. This checkpoint is not another board.
+
+### Admitted source and bounded scope
+
+Source: `SlushTec/sonoran-slush` public main `4c8e40f175a7a273e682db09cc278cde03b3276a`,
+tree `afbd7103e29d4b8545a0da1d19e8e9d5f4e926d2`. No held source or uncertain derivative is admitted.
+The owner-authorized run ends at **20:00 America/Phoenix on 2026-11-10**
+(**2026-11-11T03:00:00Z**), with no automatic extension. Stop new implementation by 02:20Z;
+reserve remaining time for review, exact-head verification, cleanup and the final receipt.
+This finite grant does not change the historical `agents_activated: false` scaffold value into standing authorization.
+
+- Lane A: [RPG-124 / COM-02](https://linear.app/rpg-chat/issue/RPG-124/com-02-qualify-durable-cart-and-stock),
+  SS-047 synthetic reservation expiry and late-payment recovery. Deterministic injected time and explicit
+  test-only deadlines; exact atomic release once; cancellation/buyer/payment/restart races; paid or
+  unknown-payment holds never silently release. No production hold duration or recovery policy is selected.
+- Lane B: [RPG-132 / AI-04](https://linear.app/rpg-chat/issue/RPG-132), disconnected restricted SVG paths,
+  with bounded static validation and adversarial coverage only. No live artwork processing or production approval.
+
+At most two active store lanes, each with its own clean branch/worktree. Lane B independently reviews this
+scaffold-only checkpoint before feature admission. Producers freeze exact commits and trees by shared minute 120;
+then each reviews the other's frozen candidate. Lane A owns any later serial composition/integration, only after
+both candidates qualify and the coordinator confirms the publication/integration step. Never share uncommitted
+work or compose concurrently. Any code change after review requires re-review within the remaining grant or deferral.
+
+### Gates and open acceptance
+
+Scaffold repair and candidate preparation are not acceptance. Full COM-02, SS-047 and AI-04 remain open;
+Linear retains criterion-level gaps and owner decisions. Candidate test/review receipts must state the exact source,
+changed paths, checks actually run, failures, remaining gaps and rollback. No future check is recorded as passed.
+The existing SQLite/WAL, money/replay/stock invariants, proof/payment/capacity independence, legacy quote-release
+hold, synthetic-only gates and public non-purchasable catalog must remain intact.
+
+No production deploy or activation, live provider/payment/photo/model/supplier/manufacturing action, customer data,
+new credentials/accounts, paid services or AWS resources is authorized. Production inventory, duration, prices,
+provider configuration and release policy remain owner decisions. Guided-design `3e57cfb45ece04241342bcf0cc41d74325f2cff7`,
+frontend rollup `41eb9b5a67a9c65ceff9a001ce6b1db90a0e6669`, packaging `01db3751c0d157e9bdd103d71cffa823ecd8ac4a`
+and the held bundle remain excluded, including uncertain derivatives. The historical initialization archive is not
+a current work-order packet. Publication and merge require the separate coordinated review/authorization step.
