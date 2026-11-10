@@ -18,6 +18,7 @@ import os
 import re
 import secrets
 import sqlite3
+from time import monotonic, sleep
 
 from fastapi import APIRouter, Depends, Header, HTTPException
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, field_validator
@@ -56,6 +57,29 @@ def access_token(record_id: str) -> str:
     return base64.urlsafe_b64encode(digest).decode().rstrip("=")
 
 
+def enable_wal(connection):
+    # A concurrent first-use journal-mode upgrade can return SQLITE_BUSY
+    # immediately, bypassing SQLite's busy timeout. Retry only that operation,
+    # across independent connections/processes, within the same 15-second budget.
+    connection.execute("PRAGMA busy_timeout=0")
+    deadline = monotonic() + 15
+    while True:
+        try:
+            mode = connection.execute("PRAGMA journal_mode=WAL").fetchone()[0]
+            if mode != "wal":
+                raise sqlite3.OperationalError("The record service requires WAL journal mode.")
+            break
+        except sqlite3.OperationalError as exc:
+            # Extended BUSY codes (e.g. recovery) retain the same primary code.
+            if (getattr(exc, "sqlite_errorcode", 0) & 0xFF) != sqlite3.SQLITE_BUSY:
+                raise
+            remaining = deadline - monotonic()
+            if remaining <= 0:
+                raise
+            sleep(min(0.05, remaining))
+    connection.execute("PRAGMA busy_timeout=15000")
+
+
 @contextmanager
 def database():
     enabled()
@@ -64,17 +88,17 @@ def database():
     path.touch(mode=0o600, exist_ok=True)
     path.chmod(0o600)
     connection = sqlite3.connect(path, timeout=15, isolation_level=None)
-    connection.execute("PRAGMA journal_mode=WAL")
-    connection.executescript("""
-        CREATE TABLE IF NOT EXISTS records (
-          id TEXT PRIMARY KEY, kind TEXT NOT NULL, token_hash TEXT NOT NULL, document TEXT NOT NULL);
-        CREATE TABLE IF NOT EXISTS requests (
-          id TEXT PRIMARY KEY, fingerprint TEXT NOT NULL, record_id TEXT NOT NULL);
-        CREATE TABLE IF NOT EXISTS payment_events (
-          id TEXT PRIMARY KEY, fingerprint TEXT NOT NULL, order_id TEXT NOT NULL);
-        CREATE TABLE IF NOT EXISTS metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL);
-    """)
     try:
+        enable_wal(connection)
+        connection.executescript("""
+            CREATE TABLE IF NOT EXISTS records (
+              id TEXT PRIMARY KEY, kind TEXT NOT NULL, token_hash TEXT NOT NULL, document TEXT NOT NULL);
+            CREATE TABLE IF NOT EXISTS requests (
+              id TEXT PRIMARY KEY, fingerprint TEXT NOT NULL, record_id TEXT NOT NULL);
+            CREATE TABLE IF NOT EXISTS payment_events (
+              id TEXT PRIMARY KEY, fingerprint TEXT NOT NULL, order_id TEXT NOT NULL);
+            CREATE TABLE IF NOT EXISTS metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+        """)
         connection.execute("BEGIN IMMEDIATE")
         fingerprint = sha256(os.environ["SONORAN_ACCESS_SECRET"].encode()).hexdigest()
         old = connection.execute("SELECT value FROM metadata WHERE key='access_secret_fingerprint'").fetchone()
