@@ -20,7 +20,7 @@ import secrets
 import sqlite3
 
 from fastapi import APIRouter, Depends, Header, HTTPException
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, field_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, field_validator, model_validator
 
 from services.commerce.app.domain.prerequisites import ProductionPrerequisites
 
@@ -34,7 +34,7 @@ NOW = lambda: datetime.now(timezone.utc).isoformat()
 def enabled():
     if os.environ.get("SONORAN_REQUESTS_ENABLED") != "true":
         raise HTTPException(503, "Request services are not connected.")
-    if os.environ.get("SONORAN_STAGE", "scaffold") not in {"scaffold", "local"}:
+    if os.environ.get("SONORAN_STAGE", "scaffold") != "scaffold":
         raise HTTPException(503, "The local workflow is not qualified for production.")
     if len(os.environ.get("SONORAN_ACCESS_SECRET", "")) < 32:
         raise HTTPException(503, "Request service configuration is incomplete.")
@@ -64,8 +64,10 @@ def database():
     path.touch(mode=0o600, exist_ok=True)
     path.chmod(0o600)
     connection = sqlite3.connect(path, timeout=15, isolation_level=None)
-    connection.execute("PRAGMA journal_mode=WAL")
-    connection.executescript("""
+    # Keep the database's persisted journal mode. Switching to WAL on every
+    # connection races on a fresh file before SQLite's transaction wait applies.
+    try:
+        connection.executescript("""
         CREATE TABLE IF NOT EXISTS records (
           id TEXT PRIMARY KEY, kind TEXT NOT NULL, token_hash TEXT NOT NULL, document TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS requests (
@@ -73,8 +75,7 @@ def database():
         CREATE TABLE IF NOT EXISTS payment_events (
           id TEXT PRIMARY KEY, fingerprint TEXT NOT NULL, order_id TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL);
-    """)
-    try:
+        """)
         connection.execute("BEGIN IMMEDIATE")
         fingerprint = sha256(os.environ["SONORAN_ACCESS_SECRET"].encode()).hexdigest()
         old = connection.execute("SELECT value FROM metadata WHERE key='access_secret_fingerprint'").fetchone()
@@ -137,6 +138,24 @@ class StrictModel(BaseModel):
 Short = Annotated[str, Field(max_length=200)]
 
 
+class PhotoReference(StrictModel):
+    local_file_id: UUID
+    filename: str = Field(min_length=1, max_length=255)
+    note: str = Field(default="", max_length=500)
+
+
+class PhotoBrief(StrictModel):
+    instructions: str = Field(default="", max_length=2000)
+    photos: list[PhotoReference] = Field(min_length=1, max_length=8)
+    media_uploaded: Literal[False] = False
+
+    @model_validator(mode="after")
+    def unique_references(self):
+        if len({p.local_file_id for p in self.photos}) != len(self.photos):
+            raise ValueError("Photo references must be unique.")
+        return self
+
+
 class Item(StrictModel):
     product_slug: str = Field(max_length=100)
     quantity: StrictInt = Field(ge=1, le=500)
@@ -148,6 +167,7 @@ class Item(StrictModel):
     artwork_name: str = Field(default="", max_length=255)
     gift: StrictBool = False
     gift_message: str = Field(default="", max_length=300)
+    photo_brief: PhotoBrief | None = None
 
     @field_validator("product_slug")
     @classmethod
@@ -234,6 +254,10 @@ def create_request(body: Inquiry, kinds: set[str]):
     if body.kind not in kinds or (body.kind == "retail" and not body.items):
         raise HTTPException(422, "The request details do not match this workflow.")
     document = body.model_dump(mode="json")
+    # Preserve pre-brief idempotency fingerprints for old Item submissions.
+    for item in document["items"]:
+        if item.get("photo_brief") is None:
+            item.pop("photo_brief", None)
     fingerprint = sha256(json.dumps(document, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     key = str(body.request_id)
     with database() as db:
@@ -275,7 +299,13 @@ def get_quote(record_id: str, authorization: Annotated[str | None, Header()] = N
 def get_order(record_id: str, authorization: Annotated[str | None, Header()] = None):
     with database() as db:
         doc = private(db, record_id, authorization, {"order"})
-        doc["test_payment_available"] = os.environ.get("SONORAN_TEST_PAYMENTS_ENABLED") == "true" and os.environ.get("STRIPE_SECRET_KEY", "").startswith("sk_test_")
+        from services.commerce.app.payments import configured
+        try:
+            configured()
+            available = True
+        except HTTPException:
+            available = False
+        doc["test_payment_available"] = available and not doc.get("retail_test", False)
         return doc
 
 
@@ -356,7 +386,7 @@ class ProofRequest(StrictModel):
 def revise_proof(body: ProofRequest):
     with database() as db:
         order = load(db, body.order_id)
-        if order["kind"] != "order" or order["status"] in {"in_production", "shipped"}:
+        if order["kind"] != "order" or order["status"] in {"in_production", "shipped", "cancelled"}:
             raise HTTPException(409, "This order cannot receive a proof revision.")
         old = load(db, order["current_proof_id"]) if order.get("current_proof_id") else None
         if (old["version"] if old else 0) != body.expected_proof_version:
@@ -383,7 +413,7 @@ def proof_decision(record_id: str, body: Decision, authorization: str | None, de
         order = load(db, doc["order_id"])
         if order.get("current_proof_id") != doc["id"] or order.get("current_proof_version") != doc["version"]:
             raise HTTPException(409, "This is not the order's current proof.")
-        if order["status"] in {"in_production", "shipped"}:
+        if order["status"] in {"in_production", "shipped", "cancelled"}:
             raise HTTPException(409, "The piece has already been released for production. Contact the studio.")
         if decision == "approve":
             if doc["status"] == "approved":
@@ -432,15 +462,27 @@ def release_order(record_id: str, body: Release):
         doc = load(db, record_id)
         if doc["kind"] != "order" or doc["version"] != body.version:
             raise HTTPException(409, "The current order version is required.")
+        if not doc.get("retail_test"):
+            raise HTTPException(409, "Legacy quote orders need durable inventory and capacity migration before release.")
+        if doc.get("retail_test"):
+            from services.commerce.app.retail import retail_enabled, has_reservation
+            retail_enabled()
+            if doc["status"] == "in_production":
+                return doc
+            if doc["status"] in {"cancelled", "shipped"} or not has_reservation(db, doc):
+                raise HTTPException(409, "A complete active reservation is required for test release.")
         current = doc.get("current_proof_version")
         approved = doc.get("approved_proof_version")
-        gate = ProductionPrerequisites(payment_rule_satisfied=doc["payment_status"]=="paid", inventory_reserved=body.inventory_reserved, capacity_confirmed=body.capacity_confirmed, proof_required=doc["proof_required"], current_proof_version=str(current) if current else None, approved_proof_version=str(approved) if approved else None)
+        gate = ProductionPrerequisites(payment_rule_satisfied=doc["payment_status"]=="paid", inventory_reserved=has_reservation(db, doc), capacity_confirmed=doc.get("capacity_confirmed", False), proof_required=doc["proof_required"], current_proof_version=str(current) if current else None, approved_proof_version=str(approved) if approved else None)
         if not gate.releasable():
             raise HTTPException(409, "Payment, current proof, inventory, and capacity prerequisites are not all satisfied.")
         if doc["status"] == "in_production":
             return doc
         if doc["status"] == "shipped":
             raise HTTPException(409, "This order has already shipped.")
+        if doc.get("retail_test"):
+            from services.commerce.app.retail import consume_reservation
+            consume_reservation(db, doc)
         doc.update(status="in_production", inventory_reserved=True, capacity_confirmed=True, next_step="The studio has released this piece for production.")
         event(doc, "Released for production")
         save(db, doc)
@@ -489,5 +531,5 @@ def ship_order(record_id: str, body: Shipment):
 
 @router.get("/v1/capabilities", tags=["capabilities"])
 def capabilities():
-    active = os.environ.get("SONORAN_REQUESTS_ENABLED") == "true" and len(os.environ.get("SONORAN_ACCESS_SECRET", "")) >= 32
-    return {"catalog":True, "local_request_workflow":active, "production_ready":False, "live_payments":False, "private_uploads":False, "live_email":False, "ai_required":False}
+    active = os.environ.get("SONORAN_STAGE", "scaffold") == "scaffold" and os.environ.get("SONORAN_REQUESTS_ENABLED") == "true" and len(os.environ.get("SONORAN_ACCESS_SECRET", "")) >= 32
+    return {"catalog":True, "local_request_workflow":active, "local_retail_test":active and os.environ.get("SONORAN_RETAIL_TEST_ENABLED") == "true", "payment_provider":"square", "production_ready":False, "live_payments":False, "private_uploads":False, "live_email":False, "ai_required":False}

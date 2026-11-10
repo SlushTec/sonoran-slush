@@ -1,0 +1,749 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sonoran-slush:design-planning:1",
+  "$defs": {
+    "original": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "enum": [
+            "1"
+          ]
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "original"
+          ]
+        },
+        "owner_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+        },
+        "original_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "width_px": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000
+        },
+        "height_px": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000
+        },
+        "subjects": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+          },
+          "minItems": 1,
+          "maxItems": 64,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "schema_version",
+        "kind",
+        "owner_id",
+        "original_id",
+        "source_sha256",
+        "width_px",
+        "height_px",
+        "subjects"
+      ],
+      "additionalProperties": false
+    },
+    "version": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "enum": [
+            "1"
+          ]
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "restoration",
+            "collage",
+            "derivative"
+          ]
+        },
+        "owner_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+        },
+        "version_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "minItems": 1,
+          "maxItems": 64,
+          "uniqueItems": true
+        },
+        "recipe": {
+          "type": "object",
+          "properties": {
+            "version": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2147483647
+            },
+            "crop": {
+              "type": "object",
+              "properties": {
+                "x": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "y": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "width": {
+                  "type": "number",
+                  "minimum": 1e-06,
+                  "maximum": 1
+                },
+                "height": {
+                  "type": "number",
+                  "minimum": 1e-06,
+                  "maximum": 1
+                }
+              },
+              "required": [
+                "x",
+                "y",
+                "width",
+                "height"
+              ],
+              "additionalProperties": false
+            },
+            "background": {
+              "type": "string",
+              "enum": [
+                "preserve",
+                "remove"
+              ]
+            },
+            "tonal": {
+              "type": "object",
+              "properties": {
+                "brightness": {
+                  "type": "number",
+                  "minimum": -1,
+                  "maximum": 1
+                },
+                "contrast": {
+                  "type": "number",
+                  "minimum": -1,
+                  "maximum": 1
+                }
+              },
+              "required": [
+                "brightness",
+                "contrast"
+              ],
+              "additionalProperties": false
+            },
+            "cleanup": {
+              "type": "string",
+              "enum": [
+                "none",
+                "conservative",
+                "synthesized"
+              ]
+            },
+            "export": {
+              "type": "object",
+              "properties": {
+                "format": {
+                  "type": "string",
+                  "enum": [
+                    "png",
+                    "svg",
+                    "point-cloud-preview"
+                  ]
+                },
+                "width_px": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100000
+                },
+                "height_px": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100000
+                },
+                "aspect_ratio": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "maximum": 100000
+                }
+              },
+              "required": [
+                "format",
+                "width_px",
+                "height_px",
+                "aspect_ratio"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "version",
+            "crop",
+            "background",
+            "tonal",
+            "cleanup",
+            "export"
+          ],
+          "additionalProperties": false
+        },
+        "output": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "width_px": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100000
+                },
+                "height_px": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100000
+                },
+                "aspect_ratio": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "maximum": 100000
+                }
+              },
+              "required": [
+                "sha256",
+                "width_px",
+                "height_px",
+                "aspect_ratio"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "detail_flags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "uncertain",
+              "synthesized"
+            ]
+          },
+          "minItems": 0,
+          "maxItems": 64,
+          "uniqueItems": true
+        },
+        "collage": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "layout_version": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 2147483647
+                },
+                "placements": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "source_digest": {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{64}$"
+                      },
+                      "subject_id": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+                      },
+                      "x": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "y": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "width": {
+                        "type": "number",
+                        "minimum": 1e-06,
+                        "maximum": 1
+                      },
+                      "height": {
+                        "type": "number",
+                        "minimum": 1e-06,
+                        "maximum": 1
+                      },
+                      "scale": {
+                        "type": "number",
+                        "exclusiveMinimum": 0,
+                        "maximum": 100000
+                      },
+                      "rotation_degrees": {
+                        "type": "number",
+                        "minimum": -180,
+                        "maximum": 180
+                      }
+                    },
+                    "required": [
+                      "source_digest",
+                      "subject_id",
+                      "x",
+                      "y",
+                      "width",
+                      "height",
+                      "scale",
+                      "rotation_degrees"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "minItems": 1,
+                  "maxItems": 64,
+                  "uniqueItems": true
+                }
+              },
+              "required": [
+                "layout_version",
+                "placements"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "target": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "product_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+                },
+                "blank_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+                },
+                "blank_revision": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+                },
+                "material": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+                },
+                "finish": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+                },
+                "coating": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+                },
+                "dimensions": {
+                  "type": "object",
+                  "properties": {
+                    "width_mm": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "maximum": 100000
+                    },
+                    "height_mm": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "maximum": 100000
+                    },
+                    "depth_mm": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "maximum": 100000
+                    }
+                  },
+                  "required": [
+                    "width_mm",
+                    "height_mm",
+                    "depth_mm"
+                  ],
+                  "additionalProperties": false
+                },
+                "geometry_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+                },
+                "geometry_revision": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+                },
+                "curved": {
+                  "type": "boolean"
+                },
+                "method": {
+                  "type": "string",
+                  "enum": [
+                    "surface",
+                    "subsurface_2d",
+                    "subsurface_3d"
+                  ]
+                },
+                "machine_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+                },
+                "technology": {
+                  "type": "string",
+                  "enum": [
+                    "uv",
+                    "green",
+                    "co2",
+                    "diode",
+                    "ir",
+                    "fiber"
+                  ]
+                },
+                "profile_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+                },
+                "profile_version": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+                }
+              },
+              "required": [
+                "product_id",
+                "blank_id",
+                "blank_revision",
+                "material",
+                "finish",
+                "coating",
+                "dimensions",
+                "geometry_id",
+                "geometry_revision",
+                "curved",
+                "method",
+                "machine_id",
+                "technology",
+                "profile_id",
+                "profile_version"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": [
+        "schema_version",
+        "kind",
+        "owner_id",
+        "version_id",
+        "sources",
+        "recipe",
+        "output",
+        "detail_flags",
+        "collage",
+        "target"
+      ],
+      "additionalProperties": false
+    },
+    "review": {
+      "type": "object",
+      "properties": {
+        "owner_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+        },
+        "version_digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "output_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "purpose": {
+          "type": "string",
+          "enum": [
+            "restoration",
+            "collage",
+            "derivative",
+            "ambiguity"
+          ]
+        },
+        "actor_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+        },
+        "actor_role": {
+          "type": "string",
+          "enum": [
+            "customer",
+            "staff"
+          ]
+        },
+        "evidence_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "owner_id",
+        "version_digest",
+        "output_sha256",
+        "purpose",
+        "actor_id",
+        "actor_role",
+        "evidence_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "render": {
+      "type": "object",
+      "properties": {
+        "owner_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+        },
+        "version_digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "output": {
+          "type": "object",
+          "properties": {
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "width_px": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100000
+            },
+            "height_px": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100000
+            },
+            "aspect_ratio": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 100000
+            }
+          },
+          "required": [
+            "sha256",
+            "width_px",
+            "height_px",
+            "aspect_ratio"
+          ],
+          "additionalProperties": false
+        },
+        "renderer_evidence_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "owner_id",
+        "version_digest",
+        "output",
+        "renderer_evidence_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "profile": {
+      "type": "object",
+      "properties": {
+        "binding": {
+          "type": "object",
+          "properties": {
+            "product_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+            },
+            "blank_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+            },
+            "blank_revision": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+            },
+            "material": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+            },
+            "finish": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+            },
+            "coating": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+            },
+            "dimensions": {
+              "type": "object",
+              "properties": {
+                "width_mm": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "maximum": 100000
+                },
+                "height_mm": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "maximum": 100000
+                },
+                "depth_mm": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "maximum": 100000
+                }
+              },
+              "required": [
+                "width_mm",
+                "height_mm",
+                "depth_mm"
+              ],
+              "additionalProperties": false
+            },
+            "geometry_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+            },
+            "geometry_revision": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+            },
+            "curved": {
+              "type": "boolean"
+            },
+            "method": {
+              "type": "string",
+              "enum": [
+                "surface",
+                "subsurface_2d",
+                "subsurface_3d"
+              ]
+            },
+            "machine_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+            },
+            "technology": {
+              "type": "string",
+              "enum": [
+                "uv",
+                "green",
+                "co2",
+                "diode",
+                "ir",
+                "fiber"
+              ]
+            },
+            "profile_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+            },
+            "profile_version": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"
+            }
+          },
+          "required": [
+            "product_id",
+            "blank_id",
+            "blank_revision",
+            "material",
+            "finish",
+            "coating",
+            "dimensions",
+            "geometry_id",
+            "geometry_revision",
+            "curved",
+            "method",
+            "machine_id",
+            "technology",
+            "profile_id",
+            "profile_version"
+          ],
+          "additionalProperties": false
+        },
+        "qualification_evidence_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "physical_test_evidence_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "staff_review_evidence_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "synthetic": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "binding",
+        "qualification_evidence_sha256",
+        "physical_test_evidence_sha256",
+        "staff_review_evidence_sha256",
+        "synthetic"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "anyOf": [
+    {
+      "$ref": "#/$defs/original"
+    },
+    {
+      "$ref": "#/$defs/version"
+    }
+  ]
+}
