@@ -12,8 +12,8 @@ Implemented local paths include:
 - Versioned text proofs, approval/change decisions, and invalidation on revision.
 - Independent payment, exact proof, inventory, and capacity production gates.
 - Dispatch records with idempotent retry.
-- Test-mode-only Stripe hosted sessions, server-authoritative totals, signed test webhooks,
-  amount/currency/order/version/session binding, and duplicate payment-event protection.
+- Sandbox-only Square hosted sessions, server-authoritative totals, signed test webhooks,
+  merchant/location/payment/amount/currency/order/version/session binding, and duplicate payment-event protection.
 
 No production DynamoDB adapter, Cognito authorization, private artwork upload pipeline,
 live charging/refunds, live event confirmation/deposit workflow, or notification sender is enabled.
@@ -21,3 +21,5 @@ The optional local workflow is for private integration work, not public commerce
 Original images are outside this delivery.
 
 See [local workflow instructions](../../docs/runbooks/STOREFRONT-REVIEW.md).
+
+The next local retail slice adds synthetic authoritative carts, shared blank reservations and local payment simulation. See [retail/test contracts and limitations](RETAIL-TEST.md). Legacy quote release now requires inventory/capacity migration; request booleans alone cannot release production. The existing Stripe-specific runbook setup is superseded by the Square sandbox configuration in that document.

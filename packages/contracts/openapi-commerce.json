@@ -1,6 +1,51 @@
 {
   "components": {
     "schemas": {
+      "Capacity": {
+        "additionalProperties": false,
+        "properties": {
+          "confirmed": {
+            "title": "Confirmed",
+            "type": "boolean"
+          },
+          "version": {
+            "minimum": 1.0,
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "confirmed"
+        ],
+        "title": "Capacity",
+        "type": "object"
+      },
+      "CartRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RetailItem"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Items",
+            "type": "array"
+          },
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "items"
+        ],
+        "title": "CartRequest",
+        "type": "object"
+      },
       "Category": {
         "properties": {
           "description": {
@@ -319,6 +364,16 @@
             "title": "Options",
             "type": "object"
           },
+          "photo_brief": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PhotoBrief"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "product_slug": {
             "maxLength": 100,
             "title": "Product Slug",
@@ -350,35 +405,6 @@
         "title": "Item",
         "type": "object"
       },
-      "Offer": {
-        "additionalProperties": false,
-        "properties": {
-          "message": {
-            "maxLength": 3000,
-            "minLength": 1,
-            "title": "Message",
-            "type": "string"
-          },
-          "total_minor": {
-            "maximum": 99999999.0,
-            "minimum": 1.0,
-            "title": "Total Minor",
-            "type": "integer"
-          },
-          "version": {
-            "minimum": 1.0,
-            "title": "Version",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "version",
-          "total_minor",
-          "message"
-        ],
-        "title": "Offer",
-        "type": "object"
-      },
       "OrderRequest": {
         "additionalProperties": false,
         "properties": {
@@ -398,6 +424,65 @@
           "version"
         ],
         "title": "OrderRequest",
+        "type": "object"
+      },
+      "PhotoBrief": {
+        "additionalProperties": false,
+        "properties": {
+          "instructions": {
+            "default": "",
+            "maxLength": 2000,
+            "title": "Instructions",
+            "type": "string"
+          },
+          "media_uploaded": {
+            "const": false,
+            "default": false,
+            "title": "Media Uploaded",
+            "type": "boolean"
+          },
+          "photos": {
+            "items": {
+              "$ref": "#/components/schemas/PhotoReference"
+            },
+            "maxItems": 8,
+            "minItems": 1,
+            "title": "Photos",
+            "type": "array"
+          }
+        },
+        "required": [
+          "photos"
+        ],
+        "title": "PhotoBrief",
+        "type": "object"
+      },
+      "PhotoReference": {
+        "additionalProperties": false,
+        "properties": {
+          "filename": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Filename",
+            "type": "string"
+          },
+          "local_file_id": {
+            "format": "uuid",
+            "title": "Local File Id",
+            "type": "string"
+          },
+          "note": {
+            "default": "",
+            "maxLength": 500,
+            "title": "Note",
+            "type": "string"
+          }
+        },
+        "required": [
+          "local_file_id",
+          "filename"
+        ],
+        "title": "PhotoReference",
         "type": "object"
       },
       "Problem": {
@@ -618,6 +703,95 @@
         "title": "Release",
         "type": "object"
       },
+      "RetailItem": {
+        "additionalProperties": false,
+        "properties": {
+          "artwork_name": {
+            "default": "",
+            "maxLength": 255,
+            "title": "Artwork Name",
+            "type": "string"
+          },
+          "font": {
+            "default": "Classic serif",
+            "enum": [
+              "Classic serif",
+              "Modern sans",
+              "Handwritten"
+            ],
+            "title": "Font",
+            "type": "string"
+          },
+          "gift": {
+            "default": false,
+            "title": "Gift",
+            "type": "boolean"
+          },
+          "gift_message": {
+            "default": "",
+            "maxLength": 300,
+            "title": "Gift Message",
+            "type": "string"
+          },
+          "notes": {
+            "default": "",
+            "maxLength": 1500,
+            "title": "Notes",
+            "type": "string"
+          },
+          "options": {
+            "additionalProperties": {
+              "maxLength": 200,
+              "type": "string"
+            },
+            "maxProperties": 16,
+            "propertyNames": {
+              "maxLength": 60
+            },
+            "title": "Options",
+            "type": "object"
+          },
+          "photo_brief": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PhotoBrief"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "product_slug": {
+            "maxLength": 100,
+            "title": "Product Slug",
+            "type": "string"
+          },
+          "quantity": {
+            "maximum": 500.0,
+            "minimum": 1.0,
+            "title": "Quantity",
+            "type": "integer"
+          },
+          "secondary": {
+            "default": "",
+            "maxLength": 120,
+            "title": "Secondary",
+            "type": "string"
+          },
+          "text": {
+            "default": "",
+            "maxLength": 120,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "product_slug",
+          "quantity"
+        ],
+        "title": "RetailItem",
+        "type": "object"
+      },
       "ServicePath": {
         "properties": {
           "name": {
@@ -694,6 +868,71 @@
         "title": "Shipment",
         "type": "object"
       },
+      "Stock": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_version": {
+            "minimum": 0.0,
+            "title": "Expected Version",
+            "type": "integer"
+          },
+          "on_hand": {
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "On Hand",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "expected_version",
+          "on_hand"
+        ],
+        "title": "Stock",
+        "type": "object"
+      },
+      "TestPayment": {
+        "additionalProperties": false,
+        "properties": {
+          "amount_minor": {
+            "maximum": 99999999.0,
+            "minimum": 1.0,
+            "title": "Amount Minor",
+            "type": "integer"
+          },
+          "currency": {
+            "const": "USD",
+            "title": "Currency",
+            "type": "string"
+          },
+          "event_id": {
+            "format": "uuid",
+            "title": "Event Id",
+            "type": "string"
+          },
+          "outcome": {
+            "enum": [
+              "paid",
+              "failed"
+            ],
+            "title": "Outcome",
+            "type": "string"
+          },
+          "version": {
+            "minimum": 1.0,
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "event_id",
+          "version",
+          "amount_minor",
+          "currency",
+          "outcome"
+        ],
+        "title": "TestPayment",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -732,6 +971,87 @@
           "type"
         ],
         "title": "ValidationError",
+        "type": "object"
+      },
+      "Version": {
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "minimum": 1.0,
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version"
+        ],
+        "title": "Version",
+        "type": "object"
+      },
+      "services__commerce__app__retail__Offer": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_version": {
+            "minimum": 0.0,
+            "title": "Expected Version",
+            "type": "integer"
+          },
+          "stock_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Stock Id",
+            "type": "string"
+          },
+          "unit_price_minor": {
+            "maximum": 99999999.0,
+            "minimum": 1.0,
+            "title": "Unit Price Minor",
+            "type": "integer"
+          },
+          "units_per_item": {
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Units Per Item",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "expected_version",
+          "unit_price_minor",
+          "stock_id",
+          "units_per_item"
+        ],
+        "title": "Offer",
+        "type": "object"
+      },
+      "services__commerce__app__workflows__Offer": {
+        "additionalProperties": false,
+        "properties": {
+          "message": {
+            "maxLength": 3000,
+            "minLength": 1,
+            "title": "Message",
+            "type": "string"
+          },
+          "total_minor": {
+            "maximum": 99999999.0,
+            "minimum": 1.0,
+            "title": "Total Minor",
+            "type": "integer"
+          },
+          "version": {
+            "minimum": 1.0,
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "total_minor",
+          "message"
+        ],
+        "title": "Offer",
         "type": "object"
       }
     }
@@ -1075,7 +1395,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Offer"
+                "$ref": "#/components/schemas/services__commerce__app__workflows__Offer"
               }
             }
           },
@@ -1163,6 +1483,276 @@
         ]
       }
     },
+    "/v1/admin/retail-test/offers/{slug}": {
+      "post": {
+        "operationId": "set_offer_v1_admin_retail_test_offers__slug__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_-]+$",
+              "title": "Slug",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/services__commerce__app__retail__Offer"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set Offer",
+        "tags": [
+          "local test retail"
+        ]
+      }
+    },
+    "/v1/admin/retail-test/orders/{record_id}/capacity": {
+      "post": {
+        "operationId": "capacity_v1_admin_retail_test_orders__record_id__capacity_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "record_id",
+            "required": true,
+            "schema": {
+              "title": "Record Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Capacity"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Capacity",
+        "tags": [
+          "local test retail"
+        ]
+      }
+    },
+    "/v1/admin/retail-test/orders/{record_id}/payments": {
+      "post": {
+        "operationId": "reconcile_test_payment_v1_admin_retail_test_orders__record_id__payments_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "record_id",
+            "required": true,
+            "schema": {
+              "title": "Record Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestPayment"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reconcile Test Payment",
+        "tags": [
+          "local test retail"
+        ]
+      }
+    },
+    "/v1/admin/retail-test/stock/{stock_id}": {
+      "post": {
+        "operationId": "set_stock_v1_admin_retail_test_stock__stock_id__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "stock_id",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_-]+$",
+              "title": "Stock Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Stock"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set Stock",
+        "tags": [
+          "local test retail"
+        ]
+      }
+    },
     "/v1/admin/summary": {
       "get": {
         "operationId": "summary_v1_admin_summary_get",
@@ -1231,22 +1821,162 @@
     },
     "/v1/cart": {
       "post": {
-        "operationId": "post__v1_cart_v1_cart_post",
+        "operationId": "create_cart_v1_cart_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CartRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
-          "503": {
+          "200": {
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemResponse"
-                }
+                "schema": {}
               }
             },
             "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
           }
         },
-        "summary": "Post  V1 Cart",
+        "summary": "Create Cart",
         "tags": [
-          "not implemented"
+          "local test retail"
+        ]
+      }
+    },
+    "/v1/cart/{record_id}": {
+      "get": {
+        "operationId": "get_cart_v1_cart__record_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "record_id",
+            "required": true,
+            "schema": {
+              "title": "Record Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Cart",
+        "tags": [
+          "local test retail"
+        ]
+      }
+    },
+    "/v1/cart/{record_id}/orders": {
+      "post": {
+        "operationId": "order_from_cart_v1_cart__record_id__orders_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "record_id",
+            "required": true,
+            "schema": {
+              "title": "Record Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Version"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Order From Cart",
+        "tags": [
+          "local test retail"
         ]
       }
     },
@@ -1459,6 +2189,72 @@
         "summary": "Get Order",
         "tags": [
           "private"
+        ]
+      }
+    },
+    "/v1/orders/{record_id}/cancel-test": {
+      "post": {
+        "operationId": "cancel_v1_orders__record_id__cancel_test_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "record_id",
+            "required": true,
+            "schema": {
+              "title": "Record Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Version"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Cancel",
+        "tags": [
+          "local test retail"
         ]
       }
     },
@@ -1918,6 +2714,25 @@
         ]
       }
     },
+    "/v1/retail-test/catalog": {
+      "get": {
+        "operationId": "catalog_v1_retail_test_catalog_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Catalog",
+        "tags": [
+          "local test retail"
+        ]
+      }
+    },
     "/v1/uploads": {
       "post": {
         "operationId": "post__v1_uploads_v1_uploads_post",
@@ -1945,7 +2760,7 @@
         "parameters": [
           {
             "in": "header",
-            "name": "stripe-signature",
+            "name": "x-square-hmacsha256-signature",
             "required": false,
             "schema": {
               "anyOf": [
@@ -1956,7 +2771,7 @@
                   "type": "null"
                 }
               ],
-              "title": "Stripe-Signature"
+              "title": "X-Square-Hmacsha256-Signature"
             }
           }
         ],

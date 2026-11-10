@@ -12,6 +12,8 @@ from services.commerce.app.workflows import router as workflow_router
 app.include_router(workflow_router)
 from services.commerce.app.payments import router as payment_router
 app.include_router(payment_router)
+from services.commerce.app.retail import router as retail_router
+app.include_router(retail_router)
 
 @app.get("/v1/catalog", response_model=ReferenceCatalog, tags=["reference"])
 def catalog():
@@ -32,7 +34,6 @@ async def pending_capability(request: Request):
     return unavailable(request)
 
 for route, method in [
-    ("/v1/cart", "POST"),
     ("/v1/uploads", "POST"),
 ]:
     app.add_api_route(route, pending_capability, methods=[method], status_code=503,

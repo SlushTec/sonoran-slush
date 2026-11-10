@@ -1,5 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 from hashlib import sha256
+import base64
 import hmac
 import json
 import time
@@ -19,8 +20,12 @@ def connected(tmp_path, monkeypatch):
     monkeypatch.setenv("SONORAN_STAFF_TOKEN", "test-only-staff-token-" + "x"*40)
     monkeypatch.setenv("SONORAN_DB_PATH", str(tmp_path/"commerce.sqlite3"))
     monkeypatch.setenv("SONORAN_TEST_PAYMENTS_ENABLED", "true")
-    monkeypatch.setenv("STRIPE_SECRET_KEY", "sk_test_local_unit_fixture")
-    monkeypatch.setenv("STRIPE_WEBHOOK_SECRET", "whsec_test_fixture_only")
+    monkeypatch.setenv("SQUARE_ENVIRONMENT", "sandbox")
+    monkeypatch.setenv("SQUARE_SANDBOX_ACCESS_TOKEN", "sandbox-unit-fixture")
+    monkeypatch.setenv("SQUARE_SANDBOX_LOCATION_ID", "location-test")
+    monkeypatch.setenv("SQUARE_SANDBOX_MERCHANT_ID", "merchant-test")
+    monkeypatch.setenv("SQUARE_SANDBOX_WEBHOOK_KEY", "sandbox-webhook-test")
+    monkeypatch.setenv("SQUARE_WEBHOOK_NOTIFICATION_URL", "https://review.example.test/v1/webhooks/payments")
     monkeypatch.setenv("SONORAN_STOREFRONT_ORIGIN", "https://review.example.test")
     with TestClient(app) as client:
         yield client
@@ -73,28 +78,27 @@ def proof(c, o, expected=0):
 
 
 def payment_event(oid, amount=12345, event_id="evt_local_test", paid=True):
-    return {"id":event_id, "livemode":False, "type":"checkout.session.completed",
-            "data":{"object":{"id":"cs_test_fixture","payment_status":"paid" if paid else "unpaid",
-              "amount_total":amount, "currency":"usd", "client_reference_id":oid,
-              "metadata":{"order_id":oid,"order_version":"1"}}}}
+    return {"event_id":event_id, "merchant_id":"merchant-test", "type":"payment.updated",
+            "data":{"id":"payment-"+oid,"object":{"payment":{"id":"payment-"+oid,"status":"COMPLETED" if paid else "APPROVED",
+              "amount_money":{"amount":amount,"currency":"USD"}, "location_id":"location-test", "order_id":"square-"+oid}}}}
 
 
 def send_event(c, payload, stamp=None, valid=True):
     raw = json.dumps(payload,separators=(",",":")).encode()
-    stamp = int(time.time()) if stamp is None else stamp
-    sig = hmac.new(b"whsec_test_fixture_only",str(stamp).encode()+b"."+raw,sha256).hexdigest()
+    url = "https://review.example.test/v1/webhooks/payments" if stamp is None else "https://wrong-url.example.test"
+    sig = base64.b64encode(hmac.new(b"sandbox-webhook-test",url.encode()+raw,sha256).digest()).decode()
     return c.post("/v1/webhooks/payments", content=raw, headers={
-        "Stripe-Signature":f"t={stamp},v1={sig if valid else 'invalid'}",
-        "Content-Type":"application/json"})
+        "x-square-hmacsha256-signature":sig if valid else "invalid", "Content-Type":"application/json"})
 
 
 def session(c, o, monkeypatch):
-    def fake(fields, key):
-        assert fields["line_items[0][price_data][unit_amount]"] == "12345"
-        assert fields["client_reference_id"] == o["id"]
-        assert key == "sonoran:"+o["id"]+":1"
-        return {"id":"cs_test_fixture", "url":"https://checkout.stripe.com/c/pay/cs_test_fixture"}
-    monkeypatch.setattr(payments, "stripe_checkout", fake)
+    def fake(fields):
+        assert fields["order"]["line_items"][0]["base_price_money"]["amount"] == 12345
+        assert fields["order"]["reference_id"] == o["id"]
+        assert fields["order"]["metadata"]["order_version"] == "1"
+        assert fields["idempotency_key"] == "sonoran:"+o["id"]+":1"
+        return {"id":"link-"+o["id"], "order_id":"square-"+o["id"], "url":"https://sandbox.square.link/u/fTkKKauH"}
+    monkeypatch.setattr(payments, "square_checkout", fake)
     response = c.post("/v1/checkout/sessions", json={"order_id":o["id"],"version":1}, headers=auth(o))
     assert response.status_code == 200, response.text
     assert response.json()["test_mode"] is True
@@ -210,16 +214,16 @@ def test_unpaid_order_cannot_be_released_even_with_approved_proof(connected):
     assert connected.post("/v1/admin/orders/"+o["id"]+"/release",json=body,headers=staff()).status_code == 422
 
 
-def test_invalid_stale_live_and_mismatched_payment_events_do_not_pay(connected, monkeypatch):
+def test_invalid_wrong_url_wrong_merchant_and_mismatched_payment_events_do_not_pay(connected, monkeypatch):
     o = order(connected)
     session(connected,o,monkeypatch)
     event = payment_event(o["id"])
     assert send_event(connected,event,valid=False).status_code == 400
     assert send_event(connected,event,stamp=int(time.time())-301).status_code == 400
-    event["livemode"] = True
+    event["merchant_id"] = "wrong-merchant"
     assert send_event(connected,event).status_code == 400
-    event["livemode"] = False
-    event["data"]["object"]["amount_total"] = 1
+    event["merchant_id"] = "merchant-test"
+    event["data"]["object"]["payment"]["amount_money"]["amount"] = 1
     assert send_event(connected,event).status_code == 409
     assert connected.get("/v1/orders/"+o["id"],headers=auth(o)).json()["payment_status"] == "unpaid"
 
@@ -235,7 +239,7 @@ def test_signed_paid_event_is_idempotent_and_does_not_release_production(connect
     event = payment_event(o["id"])
     assert send_event(connected,event).json()["applied"] is True
     assert send_event(connected,event).json()["applied"] is False
-    event["id"] = "evt_second_delivery"
+    event["event_id"] = "evt_second_delivery"
     send_event(connected,event)
     data = connected.get("/v1/orders/"+o["id"],headers=auth(o)).json()
     assert data["payment_status"] == "paid"
@@ -243,23 +247,17 @@ def test_signed_paid_event_is_idempotent_and_does_not_release_production(connect
     assert len([x for x in data["timeline"] if "Payment verified" in x["label"]]) == 1
 
 
-def test_full_local_payment_proof_release_dispatch_and_retry(connected, monkeypatch):
+def test_legacy_quote_cannot_release_with_unverified_inventory_boolean(connected, monkeypatch):
     o = order(connected)
     p = proof(connected,o)
     session(connected,o,monkeypatch)
     send_event(connected,payment_event(o["id"]))
-    assert connected.post("/v1/admin/orders/"+o["id"]+"/release",
-         json={"version":1,"inventory_reserved":True,"capacity_confirmed":True},headers=staff()).status_code == 409
     connected.post("/v1/proofs/"+p["id"]+"/approve",json={"version":1,"decision":"approve"},headers=auth(p))
     response = connected.post("/v1/admin/orders/"+o["id"]+"/release",
          json={"version":1,"inventory_reserved":True,"capacity_confirmed":True},headers=staff())
-    assert response.json()["status"] == "in_production"
-    assert connected.post("/v1/admin/proofs",json={"order_id":o["id"],"expected_proof_version":1,"proof_text":"too late"},headers=staff()).status_code == 409
-    shipment = {"version":1,"carrier":"TEST CARRIER","tracking":"TEST-NOT-A-REAL-SHIPMENT"}
-    first = connected.post("/v1/admin/orders/"+o["id"]+"/ship",json=shipment,headers=staff())
-    second = connected.post("/v1/admin/orders/"+o["id"]+"/ship",json=shipment,headers=staff())
-    assert first.json() == second.json()
-    assert first.json()["status"] == "shipped"
+    assert response.status_code == 409
+    assert "migration" in response.text
+    assert connected.post("/v1/admin/orders/"+o["id"]+"/ship",json={"version":1,"carrier":"TEST","tracking":"TEST"},headers=staff()).status_code == 409
 
 
 def test_payment_return_is_never_payment_authority(connected):
@@ -278,5 +276,5 @@ def test_access_secret_mismatch_fails_closed_without_rewriting_records(connected
 
 
 def test_signed_malformed_event_is_rejected(connected):
-    event = {"id":"evt_malformed","livemode":False,"type":"checkout.session.completed","data":"not an object"}
+    event = {"event_id":"evt_malformed","merchant_id":"merchant-test","type":"payment.updated","data":"not an object"}
     assert send_event(connected,event).status_code == 400
