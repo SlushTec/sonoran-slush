@@ -35,6 +35,7 @@ const pages = [
   "accessibility",
   ...catalog.categories.map((c) => "shop/" + c.slug),
   ...catalog.products.map((p) => "products/" + p.slug),
+  "products/photo-crystal-collection",
 ];
 const routes = new Set(pages.map((p) => "/" + p.replace(/\/$/, "")));
 let links = 0;
@@ -49,11 +50,16 @@ for (const p of pages) {
   );
   assert.match(html, /<main[^>]+id="main"/, "Missing main landmark: /" + p);
   assert.match(html, /noindex/, "Review route must not be indexed: /" + p);
-  assert.equal(
-    (html.match(/<img[\s>]/g) || []).length,
-    0,
-    "Unexpected built-in product image: /" + p,
-  );
+  for (const image of html.matchAll(/<img[^>]+src="([^"]+)"/g)) {
+    assert.ok(
+      image[1].startsWith("/"),
+      "Image must be self-hosted: " + image[1],
+    );
+    assert.ok(
+      fs.existsSync(path.join(out, image[1])),
+      "Missing image: " + image[1],
+    );
+  }
   for (const match of html.matchAll(/<a[^>]+href="([^"]+)"/g)) {
     if (!match[1].startsWith("/")) continue;
     const target =
@@ -76,7 +82,14 @@ console.log(
       categories: catalog.categories.length,
       products: catalog.products.length,
       internal_links_checked: links,
-      initial_product_images: 0,
+      self_hosted_product_images: Object.keys(
+        JSON.parse(
+          fs.readFileSync(
+            path.join(root, "apps/storefront/src/lib/product-media.json"),
+            "utf8",
+          ),
+        ),
+      ).length,
       one_h1_per_page: true,
       archive_public: false,
     },

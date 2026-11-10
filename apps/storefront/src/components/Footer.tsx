@@ -1,16 +1,12 @@
 import Link from "next/link";
 import Icon from "./Icon";
+import Brand from "./Brand";
 export default function Footer() {
   return (
     <footer className="site-footer">
       <div className="container footer-main">
         <div className="footer-story">
-          <Link href="/" className="brand">
-            <span className="brand-name">
-              SONORAN SLUSH<span className="brand-dot">✦</span>
-            </span>
-            <span className="brand-sub">CREATIVE CREATIONS</span>
-          </Link>
+          <Brand full />
           <p>
             For the moments worth keeping.
             <br />
@@ -25,7 +21,7 @@ export default function Footer() {
         <div>
           <h2>Find your gift</h2>
           <Link href="/shop">All gifts</Link>
-          <Link href="/shop/photo-crystals">3D photo crystals</Link>
+          <Link href="/shop/photo-crystals">Photo crystals</Link>
           <Link href="/shop/drinkware">Drinkware</Link>
           <Link href="/shop/kitchen">Kitchen & entertaining</Link>
           <Link href="/gift-finder">Help me choose</Link>
@@ -60,8 +56,8 @@ export default function Footer() {
         </div>
       </div>
       <div className="review-note">
-        Private storefront review · Product imagery, final pricing, and live
-        service connections are pending.
+        Private storefront review · Supplier examples shown. Final pricing and
+        live service connections are pending.
       </div>
     </footer>
   );

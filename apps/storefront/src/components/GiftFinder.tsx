@@ -76,8 +76,7 @@ export default function GiftFinder() {
           (infoFor(p).occasions.includes(answers.occasion) ? 4 : 0) +
           (preferred[answers.style]?.includes(p.category) ? 3 : 0) +
           (answers.person === "A pet person" &&
-          (p.category === "jewelry-pets" ||
-            p.slug === "photo-crystal-collection")
+          (p.category === "jewelry-pets" || p.slug === "photo-crystal-dog-bone")
             ? 4
             : 0) +
           (answers.person === "A group of guests" &&
@@ -103,6 +102,7 @@ export default function GiftFinder() {
         </div>
         <div
           className="finder-steps"
+          role="group"
           aria-label={"Step " + (finished ? 3 : step + 1) + " of 3"}
         >
           {questions.map((q, i) => (

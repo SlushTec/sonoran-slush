@@ -6,7 +6,10 @@ import Customizer from "@/components/Customizer";
 import ProductCard from "@/components/ProductCard";
 export const dynamicParams = false;
 export function generateStaticParams() {
-  return catalog.products.map((p) => ({ slug: p.slug }));
+  return [
+    ...catalog.products.map((p) => ({ slug: p.slug })),
+    { slug: "photo-crystal-collection" },
+  ];
 }
 export async function generateMetadata({
   params,
@@ -27,6 +30,27 @@ export default async function ProductPage({
 }) {
   const { slug } = await params;
   const p = catalog.products.find((p) => p.slug === slug);
+  if (slug === "photo-crystal-collection")
+    return (
+      <div className="container section">
+        <p className="eyebrow">Photo crystals</p>
+        <h1>Find the shape of your memory.</h1>
+        <p className="section-description">
+          Each shape has its own page and supported size options. Choose your
+          starting point.
+        </p>
+        <div className="product-grid">
+          {catalog.products
+            .filter(
+              (x) =>
+                x.category === "photo-crystals" && x.slug !== "crystal-bases",
+            )
+            .map((x) => (
+              <ProductCard product={x} key={x.slug} />
+            ))}
+        </div>
+      </div>
+    );
   if (!p) notFound();
   const related = catalog.products
     .filter((x) => x.category === p.category && x.slug !== p.slug)

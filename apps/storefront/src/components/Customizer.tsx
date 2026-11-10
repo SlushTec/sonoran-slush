@@ -2,22 +2,26 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { Product } from "@/lib/catalog";
-import { infoFor, categoryShort, fonts, crystalSizes } from "@/lib/shop";
+import { infoFor, categoryShort, fonts } from "@/lib/shop";
+import { crystalForSlug } from "@/lib/crystals";
+import references from "@/lib/product-references.json";
+import { mediaFor } from "@/lib/media";
 import { readLocal, writeLocal } from "@/lib/client";
 import { useStore, emptyDesign, parseDesign, type Design } from "./Store";
 import { ProductVisual } from "./ProductCard";
 import Icon from "./Icon";
 export default function Customizer({ product }: { product: Product }) {
+  const reference = (
+    references as Record<string, { url: string; status: string; note: string }>
+  )[product.slug];
   const info = infoFor(product),
+    crystal = crystalForSlug(product.slug),
     store = useStore(),
     [design, setDesign] = useState<Design | null>(() => {
       const initial = emptyDesign(product.slug);
       for (const option of info.options)
         initial.options[option.label] = option.values[0];
-      if (product.slug === "photo-crystal-collection")
-        initial.options.Size = crystalSizes(
-          initial.options["Crystal shape"],
-        )[0];
+      if (crystal) initial.options["Crystal shape"] = crystal.shape;
       return initial;
     }),
     [restored, setRestored] = useState(false),
@@ -33,8 +37,7 @@ export default function Customizer({ product }: { product: Product }) {
     [reading, setReading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const isPhoto = info.personalization === "photo",
-    allowsPhoto = isPhoto || info.personalization === "either",
-    isCrystal = product.slug === "photo-crystal-collection";
+    allowsPhoto = isPhoto || info.personalization === "either";
   useEffect(() => {
     if (!store.hydrated) return;
     const id = new URLSearchParams(location.search).get("design");
@@ -49,9 +52,10 @@ export default function Customizer({ product }: { product: Product }) {
     for (const o of info.options)
       if (!o.values.includes(next.options[o.label]))
         next.options[o.label] = o.values[0];
-    if (isCrystal) {
-      const sizes = crystalSizes(next.options["Crystal shape"]);
-      if (!sizes.includes(next.options.Size)) next.options.Size = sizes[0];
+    if (crystal) {
+      next.options["Crystal shape"] = crystal.shape;
+      if (!crystal.sizes.some((s) => s.value === next.options.Size))
+        next.options.Size = crystal.sizes[0].value;
     }
     setDesign(next);
     setRestored(true);
@@ -74,7 +78,7 @@ export default function Customizer({ product }: { product: Product }) {
   function setOption(label: string, value: string) {
     if (!design) return;
     const opts = { ...design.options, [label]: value };
-    if (label === "Crystal shape") opts.Size = crystalSizes(value)[0];
+    if (crystal) opts["Crystal shape"] = crystal.shape;
     update({ options: opts });
   }
   async function attach(file: File | undefined) {
@@ -173,11 +177,18 @@ export default function Customizer({ product }: { product: Product }) {
   return (
     <div className="product-detail">
       <div className="product-media">
-        <ProductVisual category={product.category} large />
+        <ProductVisual
+          category={product.category}
+          product={product}
+          variant={design.options.Orientation}
+          large
+        />
         <div className="media-note">
           <Icon name="pencil" size={16} />
           <span>
-            Product photography to come. Your layout preview appears below.
+            {mediaFor(product.slug)?.caption ||
+              "Photo being matched to the exact blank."}{" "}
+            Your layout preview appears below.
           </span>
         </div>
         <div className="layout-preview">
@@ -291,6 +302,29 @@ export default function Customizer({ product }: { product: Product }) {
               About this piece <Icon name="plus" size={17} />
             </summary>
             <p>{info.description}</p>
+            {reference && (
+              <aside aria-label="Supplier reference">
+                <p>
+                  <strong>{reference.status}</strong>
+                </p>
+                <p>{reference.note}</p>
+                <p>
+                  <a
+                    href={reference.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Supplier reference page
+                  </a>{" "}
+                  · Checked November 6, 2026
+                </p>
+                <p>
+                  Private review only. Supplier examples are not studio finished
+                  work. Availability, final contents and any selling price
+                  require confirmation.
+                </p>
+              </aside>
+            )}
             {info.details.length > 0 && (
               <dl>
                 {info.details.map(([k, v]) => (
@@ -307,12 +341,6 @@ export default function Customizer({ product }: { product: Product }) {
               Care & keeping <Icon name="plus" size={17} />
             </summary>
             <p>{info.care}</p>
-            {info.material === "Wood" && (
-              <p>
-                Do not soak wood products or put them in the dishwasher. Use the
-                unengraved side for cutting.
-              </p>
-            )}
           </details>
           <details>
             <summary>
@@ -386,6 +414,15 @@ export default function Customizer({ product }: { product: Product }) {
           {step === 0 && (
             <>
               <h2>Start with the right details.</h2>
+              {crystal && (
+                <div className="shape-selected">
+                  <span className="eyebrow">Your crystal shape</span>
+                  <strong>{crystal.title}</strong>
+                  <Link href="/shop/photo-crystals">
+                    Explore a different shape <Icon name="arrow" size={14} />
+                  </Link>
+                </div>
+              )}
               {info.options.length === 0 && (
                 <p className="muted">
                   This piece starts with your personal design. Tell us about any
@@ -396,40 +433,20 @@ export default function Customizer({ product }: { product: Product }) {
                 <label className="field" key={o.label}>
                   {o.label}
                   <select
+                    aria-label={o.label}
                     value={design.options[o.label] || o.values[0]}
                     onChange={(e) => setOption(o.label, e.target.value)}
                   >
                     {o.values.map((v) => (
-                      <option key={v}>{v}</option>
+                      <option key={v} value={v}>
+                        {o.label === "Size" && crystal
+                          ? crystal.sizes.find((s) => s.value === v)?.label || v
+                          : v}
+                      </option>
                     ))}
                   </select>
                 </label>
               ))}
-              {isCrystal && (
-                <label className="field">
-                  Supported size
-                  <select
-                    value={design.options.Size || ""}
-                    onChange={(e) => setOption("Size", e.target.value)}
-                  >
-                    {crystalSizes(design.options["Crystal shape"]).map((v) => (
-                      <option key={v}>{v}</option>
-                    ))}
-                  </select>
-                </label>
-              )}
-              {design.options["Crystal shape"] === "Dog bone" && (
-                <label className="field">
-                  Orientation
-                  <select
-                    value={design.options.Orientation || "Horizontal"}
-                    onChange={(e) => setOption("Orientation", e.target.value)}
-                  >
-                    <option>Horizontal</option>
-                    <option>Vertical</option>
-                  </select>
-                </label>
-              )}
               <label className="field">
                 Quantity
                 <input
@@ -697,10 +714,7 @@ export default function Customizer({ product }: { product: Product }) {
             store.saveDesign(design);
             const next = emptyDesign(product.slug);
             for (const o of info.options) next.options[o.label] = o.values[0];
-            if (isCrystal)
-              next.options.Size = crystalSizes(
-                next.options["Crystal shape"],
-              )[0];
+            if (crystal) next.options["Crystal shape"] = crystal.shape;
             setDesign(next);
             setStep(0);
             setLocalURL("");

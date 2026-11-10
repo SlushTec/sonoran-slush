@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-17",
+  "request": "Separate crystal products by shape with size options; source product photos and supplier links; apply supplied logo and Southwest typography.",
+  "base_commit": "3560719b2cb0997832ff808cb8a457a67d51d9d8",
+  "branch": "feature/southwest-product-imagery-20261017",
+  "catalog_products": 41,
+  "crystal_shapes": 13,
+  "self_hosted_photo_references": 40,
+  "photo_held": [
+    "balsa-earrings"
+  ],
+  "python_tests_passed": 59,
+  "frontend_dom_tests_passed": 17,
+  "typecheck": "passed",
+  "standalone_build": "passed",
+  "static_build": "passed",
+  "archive_files_unchanged": 67,
+  "business_documents_unchanged": 41,
+  "source_asset_hash_bindings": "40 passed",
+  "browser_qa": "32 browser checks passed on GitHub Actions, including accessibility routes and responsive overflow at 320/390/768/1440 widths.",
+  "independent_peer_review": "pending",
+  "audience": "owner_private",
+  "production_commerce": "not connected; existing release gates unchanged",
+  "limitations": [
+    "One balsa-earring image is held because species and painted finish are not verified.",
+    "17 photo sources are candidate blanks rather than recovered original purchasing suppliers.",
+    "Public commercial image-reuse permissions are not established by this private review."
+  ],
+  "pages_checked": 72,
+  "internal_links_checked": 4402,
+  "active_document_links_checked": 27,
+  "brochure_photos": 11,
+  "supplier_photo_references": 29,
+  "browser_tests_passed": 32,
+  "browser_ci_url": "https://github.com/SlushTec/sonoran-slush/actions/runs/39042611443",
+  "qualified_application_commit": "6a10cfdfe717bf8e36389bb319a30bf0a30cd9b3",
+  "container_ci": "passed",
+  "terraform_ci": "passed",
+  "publication_receipt": "docs/delivery/SOUTHWEST-PUBLICATION-2026-10-17.json"
+}

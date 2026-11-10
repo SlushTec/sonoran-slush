@@ -6,6 +6,7 @@ import { catalog } from "@/lib/catalog";
 import { categoryShort, infoFor } from "@/lib/shop";
 import { useStore } from "./Store";
 import Icon from "./Icon";
+import Brand from "./Brand";
 const links = [
   ["Shop gifts", "/shop"],
   ["Custom & bulk", "/custom-orders"],
@@ -61,12 +62,7 @@ export default function Header() {
           >
             <Icon name="menu" />
           </button>
-          <Link href="/" className="brand" aria-label="Sonoran Slush home">
-            <span className="brand-name">
-              SONORAN SLUSH<span className="brand-dot">✦</span>
-            </span>
-            <span className="brand-sub">CREATIVE CREATIONS</span>
-          </Link>
+          <Brand />
           <nav className="primary-nav" aria-label="Main navigation">
             {links.map(([label, url]) => (
               <Link

@@ -50,7 +50,7 @@ export function Bag() {
                 href={"/products/" + d.slug + "?design=" + d.id}
                 aria-label={"Edit " + infoFor(p).title}
               >
-                <ProductVisual category={p.category} />
+                <ProductVisual category={p.category} product={p} />
               </Link>
               <div>
                 <h2>

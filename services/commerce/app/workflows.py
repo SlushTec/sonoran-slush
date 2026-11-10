@@ -18,6 +18,7 @@ import os
 import re
 import secrets
 import sqlite3
+from time import monotonic, sleep
 
 from fastapi import APIRouter, Depends, Header, HTTPException
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, field_validator
@@ -27,6 +28,7 @@ from services.commerce.app.domain.prerequisites import ProductionPrerequisites
 router = APIRouter()
 ROOT = Path(__file__).resolve().parents[3]
 PRODUCTS = {p["slug"]: p for p in json.loads((ROOT / "packages/contracts/catalog.reference.json").read_text())["products"]}
+CRYSTAL_SHAPES = json.loads((ROOT / "packages/contracts/crystal-shapes.json").read_text())["shapes"]
 NOW = lambda: datetime.now(timezone.utc).isoformat()
 
 
@@ -55,6 +57,29 @@ def access_token(record_id: str) -> str:
     return base64.urlsafe_b64encode(digest).decode().rstrip("=")
 
 
+def enable_wal(connection):
+    # A concurrent first-use journal-mode upgrade can return SQLITE_BUSY
+    # immediately, bypassing SQLite's busy timeout. Retry only that operation,
+    # across independent connections/processes, within the same 15-second budget.
+    connection.execute("PRAGMA busy_timeout=0")
+    deadline = monotonic() + 15
+    while True:
+        try:
+            mode = connection.execute("PRAGMA journal_mode=WAL").fetchone()[0]
+            if mode != "wal":
+                raise sqlite3.OperationalError("The record service requires WAL journal mode.")
+            break
+        except sqlite3.OperationalError as exc:
+            # Extended BUSY codes (e.g. recovery) retain the same primary code.
+            if (getattr(exc, "sqlite_errorcode", 0) & 0xFF) != sqlite3.SQLITE_BUSY:
+                raise
+            remaining = deadline - monotonic()
+            if remaining <= 0:
+                raise
+            sleep(min(0.05, remaining))
+    connection.execute("PRAGMA busy_timeout=15000")
+
+
 @contextmanager
 def database():
     enabled()
@@ -63,17 +88,17 @@ def database():
     path.touch(mode=0o600, exist_ok=True)
     path.chmod(0o600)
     connection = sqlite3.connect(path, timeout=15, isolation_level=None)
-    connection.execute("PRAGMA journal_mode=WAL")
-    connection.executescript("""
-        CREATE TABLE IF NOT EXISTS records (
-          id TEXT PRIMARY KEY, kind TEXT NOT NULL, token_hash TEXT NOT NULL, document TEXT NOT NULL);
-        CREATE TABLE IF NOT EXISTS requests (
-          id TEXT PRIMARY KEY, fingerprint TEXT NOT NULL, record_id TEXT NOT NULL);
-        CREATE TABLE IF NOT EXISTS payment_events (
-          id TEXT PRIMARY KEY, fingerprint TEXT NOT NULL, order_id TEXT NOT NULL);
-        CREATE TABLE IF NOT EXISTS metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL);
-    """)
     try:
+        enable_wal(connection)
+        connection.executescript("""
+            CREATE TABLE IF NOT EXISTS records (
+              id TEXT PRIMARY KEY, kind TEXT NOT NULL, token_hash TEXT NOT NULL, document TEXT NOT NULL);
+            CREATE TABLE IF NOT EXISTS requests (
+              id TEXT PRIMARY KEY, fingerprint TEXT NOT NULL, record_id TEXT NOT NULL);
+            CREATE TABLE IF NOT EXISTS payment_events (
+              id TEXT PRIMARY KEY, fingerprint TEXT NOT NULL, order_id TEXT NOT NULL);
+            CREATE TABLE IF NOT EXISTS metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+        """)
         connection.execute("BEGIN IMMEDIATE")
         fingerprint = sha256(os.environ["SONORAN_ACCESS_SECRET"].encode()).hexdigest()
         old = connection.execute("SELECT value FROM metadata WHERE key='access_secret_fingerprint'").fetchone()
@@ -151,29 +176,29 @@ class Item(StrictModel):
     @field_validator("product_slug")
     @classmethod
     def known_product(cls, value):
-        if value not in PRODUCTS:
+        if value not in PRODUCTS and value != "photo-crystal-collection":
             raise ValueError("Select a product from the collection.")
         return value
 
     @field_validator("options")
     @classmethod
     def supported_crystal_sizes(cls, value, info):
-        if info.data.get("product_slug") != "photo-crystal-collection":
+        slug = info.data.get("product_slug")
+        shape = next((s for s in CRYSTAL_SHAPES if s["slug"] == slug), None)
+        if slug == "photo-crystal-collection":
+            shape = next((s for s in CRYSTAL_SHAPES if s["shape"] == value.get("Crystal shape")), None)
+            if shape is None:
+                raise ValueError("Choose a supported crystal shape and size.")
+        elif shape is None:
             return value
-        shape = value.get("Crystal shape", "")
-        supported = {
-          "Rectangle tall": {"Small", "Medium", "Large", "XLarge", "Mini Mantel (6 × 4 in)"},
-          "Rectangle wide": {"Small", "Medium", "Large", "XLarge", "Mini Mantel (6 × 4 in)"},
-          "Heart": {"Small", "Medium", "Large"}, "Cut corner diamond": {"Small", "Medium", "Large"},
-          "Prestige Iceberg small": {"Small only"}, "Dog bone": {"6 × 4 in"},
-          "Candle": {"4 × 2.4 × 2.4 in"}, "Small notched": {"Size confirmed during review"},
-          "Circle ornament": {"Size confirmed during review"}, "Heart keychain": {"3.5 × 3.5 × 1.2 cm"},
-          "Rectangle keychain": {"3 × 2 × 1.5 cm"}, "2D heart necklace": {"3.5 × 3.5 × 0.8 cm"},
-          "2D rectangle necklace": {"3 × 4 cm"},
-        }
-        if shape not in supported or value.get("Size") not in supported[shape]:
-            raise ValueError("Choose a supported crystal shape and size.")
-        return value
+        if value.get("Crystal shape", shape["shape"]) != shape["shape"]:
+            raise ValueError("The selected shape must match this crystal product.")
+        if value.get("Size") not in {s["value"] for s in shape["sizes"]}:
+            raise ValueError("Choose a supported size for this crystal shape.")
+        if shape["orientations"] and value.get("Orientation", "Horizontal") not in shape["orientations"]:
+            raise ValueError("Choose a supported crystal orientation.")
+        return {**value, "Crystal shape": shape["shape"]}
+
 
 
 class Inquiry(StrictModel):
