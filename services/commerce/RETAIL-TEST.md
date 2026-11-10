@@ -146,3 +146,48 @@ production stock qualification, deployment or activation were performed by this 
 Independent review correction: timezone-aware inputs whose UTC normalization would fall outside years 1 through 9999
 now return validation error 422 before any order mutation, rather than raising an unhandled overflow. Both lower/upper
 boundary inputs have regression coverage. The corrected candidate requires re-review at its new exact commit/tree.
+
+
+## Synthetic isolated restore drill (RPG-138 / SS-070)
+
+`tests/unit/test_sqlite_restore_drill.py` is a test-only drill, not a backup service, restore endpoint or operator tool.
+It accepts no existing database or asset directory. Each test creates its own fresh root, database and deterministic
+byte fixtures. The fixture replaces the database path and synthetic access configuration only inside the test process;
+it never reads a real `.env` file or uses ambient provider credentials. Square is disabled, provider/HTTP/DNS transports
+fail fast, and raw socket connects are blocked after the test client's internal event-loop startup and before fixture work.
+No external action is attempted during seeding, backup, restore or replay. Readiness, live payments and private uploads stay false.
+
+The fixture uses the existing local APIs to create unpaid, paid, consumed, cancelled, expired and late-payment-recovery
+orders with exact current proof versions and local file-reference metadata. Independent assertions establish expected
+stock totals, line amounts, reference identities, access fingerprints and request/payment-event fingerprints before sealing
+any snapshot. A separate read transaction keeps committed frames in the source WAL. SQLite's connection backup API uses
+another read connection; a concurrent uncommitted write is excluded. The snapshot is finalized into standalone DELETE mode,
+so copying only the live main database file is explicitly rejected by a negative test.
+
+Restore validates the internally owned snapshot before opening the application or creating a target: exact owned file/directory
+identities, no links/reparse points/hard-link aliases or extra sidecars, bounded sizes, supported harness format, hashes,
+SQLite integrity, complete schema/rows, required access fingerprint and synthetic reference bytes. Hashes check integrity;
+even a byte-identical unregistered bundle is not authorized source. The harness format and its expected fixture header are
+not an application schema/behavior-version compatibility or migration mechanism. Restores use exclusive fresh target
+creation and never replace an existing file, directory or sidecar. Failed partial outputs remain isolated and unaccepted;
+the harness does not clean or overwrite them, and a retry must choose another fresh target.
+
+After raw validation, the restored application must replay cart/order/request/payment identities without duplicate stock or
+payment transitions, reject changed retries and unauthorized reads, preserve expired/reconciliation holds, and remain offline.
+A success marker is set only after validation and replay. Separate checks exercise post-restore expiry, paid-hold protection
+and wrong-secret failure. Negative tests mutate only their own synthetic copies and cover corrupt/truncated/main-file-only
+images, unsupported format/header, missing or mismatched state/references, unsafe targets/aliases, resource bounds, copy
+interruption and post-copy validation failure. Source main-file/WAL/fixture bytes are preserved during the drill; SHM reader
+lock bytes are transient and are not represented as backed-up state. Every connection is closed after its test.
+
+Run with `python -X utf8 -m pytest -q tests/unit/test_sqlite_restore_drill.py`. For local work, pass a **new, nonexistent**
+`--basetemp` directory on the authorized workspace volume; pytest may remove a pre-existing base. The tests use pytest-owned
+roots and remain platform-neutral for CI. Parameter IDs are compact, including size/resource cases; no resource tests are skipped.
+Windows junctions and hard links, or POSIX symbolic links and hard links, exercise actual filesystem alias rejection.
+
+**NOT ASSESSED:** job/outbox recovery (no implemented queue), real private-asset storage/recovery, historical proof-file
+recovery (the local current proof document is updated in place), production schema/behavior-version qualification, cloud
+persistence or restore, financial/supplier reconnection, production RPO/RTO, backup costs or retention. The byte fixtures are
+not uploaded private assets, and metadata hashes confer no asset authorization. This is a controlled single-process synthetic
+harness, not protection against an untrusted process racing arbitrary namespace changes. Full SS-064, SS-068, SS-069, SS-070
+and OPS-04 acceptance and all owner decisions remain open. A snapshot's existence alone is not acceptance.
