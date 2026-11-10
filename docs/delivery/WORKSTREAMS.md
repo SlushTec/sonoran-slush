@@ -125,3 +125,15 @@ The reviewer first checks this checkpoint before feature edits, then reviews the
 Publication and readiness/merge require separate exact-target confirmation; earlier PR approvals do not transfer.
 At most two store lanes remain active. Stop new implementation by **2026-11-11T02:20:00Z** and complete safe preservation,
 verification and reporting by **2026-11-11T03:00:00Z**; no automatic extension. All existing source and activation holds apply.
+
+
+### Reserve author verification: 2026-11-10
+
+The narrowed synthetic restore implementation adds 57 drill cases. The author-run related regression passed
+212 tests; the full Python run passed **514 tests and 94 subtests**, with no skips and only the existing
+Starlette/httpx deprecation warning. Archive verification passed (67 archived and 41 retained business files),
+31 active-document internal links passed, and generated OpenAPI contracts matched. The source changes are confined
+to the drill test and the existing retail/checkpoint documentation; production code, workflows and dependencies are unchanged.
+The implementation remains unpublished pending independent exact-source review and coordinated publication approval.
+Fresh exact-head CI and separate readiness/merge confirmation are still required. These checks do not change the
+NOT ASSESSED areas or full acceptance boundaries above.
