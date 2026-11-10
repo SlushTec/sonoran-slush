@@ -1,11 +1,25 @@
-# Storefront lane — AGENT-01
+# Customer storefront
 
-Next.js App Router, React and TypeScript. Local routes, product-family navigation and simple reference search are real.
-Everything transactional is explicitly disabled. Product photography placeholders are labeled; no synthetic reviews,
-prices, stock, production promises, authentication or successful orders are fabricated.
+Next.js App Router and TypeScript. Navy/gold, image-free presentation across the full documented catalog.
 
-Use `npm ci`, `npm run dev`, `npm run build`, `npm run typecheck` at the repository root.
-The shared reference fixture sits in `packages/contracts/`; do not create a competing product data source.
-No-index headers and robots apply to the entire scaffold. This is not authentication: do not deploy private data.
-`SONORAN_STAGE` values other than `scaffold` deliberately fail closed until release gating is implemented.
-Production data adapters, authentication, nonce-based CSP, SEO/sitemaps, imagery and all commerce flows remain backlog work.
+- All seven collections and 29 product routes, with product-specific design options.
+- Search, material/occasion filters, favorites, and a catalog-based gift finder.
+- Names, inscriptions, font layouts, supported crystal shapes/sizes, and local photo/logo layout controls.
+- Device-local drafts and bag, explicit 30-day retention, download and clear controls.
+- Guest pricing requests, custom/bulk inquiries, live-event inquiries, and contact forms.
+- Private reference/access-code portals for quotes, orders, and exact-version proof decisions.
+- Authorized staff workspace for reviewed quotes, order/proof preparation, production checks, and dispatch.
+- Help, care, artwork guidance, privacy behavior, ordering guidance, and accessibility information.
+
+## Modes
+
+`npm run dev` from the repository starts local development.
+`npm run build` creates a standalone Next.js build for the AWS hosting direction.
+`npm run build:review` creates an image-free static review in `out/`.
+
+Without `NEXT_PUBLIC_COMMERCE_API_URL`, no request details are sent.
+Draft downloads and local customization still work; unavailable service actions produce recoverable errors.
+No successful checkout, sign-in, or artwork upload is simulated.
+
+The local artwork layout is not a production proof. Original file bytes and local crop adjustments are not persisted.
+Pricing, stock, shipping, tax, and timing are never supplied by client fixtures.

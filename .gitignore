@@ -25,3 +25,6 @@ artifacts/
 *.pem
 *.key
 .DS_Store
+
+.state/
+*.sqlite3*
