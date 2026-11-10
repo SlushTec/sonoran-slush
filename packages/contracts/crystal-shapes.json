@@ -164,10 +164,7 @@
           "label": "6 × 4 in"
         }
       ],
-      "orientations": [
-        "Horizontal",
-        "Vertical"
-      ]
+      "orientations": ["Horizontal", "Vertical"]
     },
     {
       "slug": "photo-crystal-candle",
@@ -197,8 +194,8 @@
       "sizes": [
         {
           "value": "Size confirmed during review",
-          "dimensions": "Supported small size; dimensions confirmed during review",
-          "label": "Size confirmed during review"
+          "dimensions": "Supplier Small reference: 6 × 4 × 1.2 in; final blank confirmed during review",
+          "label": "Supplier Small reference: 6 × 4 × 1.2 in; final blank confirmed during review"
         }
       ],
       "orientations": []
@@ -214,8 +211,8 @@
       "sizes": [
         {
           "value": "Size confirmed during review",
-          "dimensions": "Dimensions confirmed during review",
-          "label": "Size confirmed during review"
+          "dimensions": "Supplier reference: 3 in diameter × 3/8 in thick; final blank confirmed during review",
+          "label": "Supplier reference: 3 in diameter × 3/8 in thick; final blank confirmed during review"
         }
       ],
       "orientations": []

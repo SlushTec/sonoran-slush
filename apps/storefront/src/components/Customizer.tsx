@@ -4,12 +4,16 @@ import Link from "next/link";
 import type { Product } from "@/lib/catalog";
 import { infoFor, categoryShort, fonts } from "@/lib/shop";
 import { crystalForSlug } from "@/lib/crystals";
+import references from "@/lib/product-references.json";
 import { mediaFor } from "@/lib/media";
 import { readLocal, writeLocal } from "@/lib/client";
 import { useStore, emptyDesign, parseDesign, type Design } from "./Store";
 import { ProductVisual } from "./ProductCard";
 import Icon from "./Icon";
 export default function Customizer({ product }: { product: Product }) {
+  const reference = (
+    references as Record<string, { url: string; status: string; note: string }>
+  )[product.slug];
   const info = infoFor(product),
     crystal = crystalForSlug(product.slug),
     store = useStore(),
@@ -298,6 +302,29 @@ export default function Customizer({ product }: { product: Product }) {
               About this piece <Icon name="plus" size={17} />
             </summary>
             <p>{info.description}</p>
+            {reference && (
+              <aside aria-label="Supplier reference">
+                <p>
+                  <strong>{reference.status}</strong>
+                </p>
+                <p>{reference.note}</p>
+                <p>
+                  <a
+                    href={reference.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Supplier reference page
+                  </a>{" "}
+                  · Checked November 6, 2026
+                </p>
+                <p>
+                  Private review only. Supplier examples are not studio finished
+                  work. Availability, final contents and any selling price
+                  require confirmation.
+                </p>
+              </aside>
+            )}
             {info.details.length > 0 && (
               <dl>
                 {info.details.map(([k, v]) => (
@@ -314,12 +341,6 @@ export default function Customizer({ product }: { product: Product }) {
               Care & keeping <Icon name="plus" size={17} />
             </summary>
             <p>{info.care}</p>
-            {info.material === "Wood" && (
-              <p>
-                Do not soak wood products or put them in the dishwasher. Use the
-                unengraved side for cutting.
-              </p>
-            )}
           </details>
           <details>
             <summary>

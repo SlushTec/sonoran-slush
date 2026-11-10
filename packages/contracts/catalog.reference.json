@@ -36,7 +36,7 @@
     },
     {
       "slug": "photo-crystals",
-      "name": "3D photo crystals",
+      "name": "Photo crystals",
       "description": "Keep-list shapes, photo keepsakes and compatible bases."
     }
   ],
@@ -487,7 +487,7 @@
     },
     {
       "slug": "balsa-earrings",
-      "name": "Hand-painted balsa earrings",
+      "name": "Earrings concept — material and finish unverified",
       "category": "jewelry-pets",
       "source_paths": [
         "docs/FAQ.md"
