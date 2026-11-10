@@ -591,3 +591,15 @@ def test_incomplete_provider_metadata_remains_ambiguous(connected, monkeypatch, 
     assert cancel(connected, o).status_code == 409
     assert simulate(connected, o).status_code == 409
     assert rows(o) == [("shared", 1, "active")]
+
+
+@pytest.mark.parametrize("value", [
+    "0001-01-01T00:00:00+01:00", "9999-12-31T23:59:59-01:00",
+], ids=["utc-before-year-one", "utc-after-year-9999"])
+def test_utc_normalization_overflow_is_validation_error(connected, monkeypatch, clock, value):
+    setup(connected, monkeypatch)
+    o = purchase(connected, cart(connected)).json()
+    before = doc(connected, o)
+    assert hold(connected, o, value).status_code == 422
+    assert doc(connected, o) == before
+    assert rows(o) == [("shared", 1, "active")]

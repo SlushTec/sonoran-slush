@@ -269,6 +269,14 @@ class TestHoldDeadline(Version):
             raise ValueError("Supply an explicit timezone-aware ISO test deadline.")
         return value
 
+    @field_validator("test_hold_expires_at")
+    @classmethod
+    def representable_utc(cls, value):
+        try:
+            return value.astimezone(timezone.utc)
+        except (OverflowError, ValueError):
+            raise ValueError("The test deadline must be representable in UTC.")
+
 
 @router.post("/v1/admin/retail-test/orders/{record_id}/hold-deadline", dependencies=[Depends(retail_enabled), Depends(staff)], tags=["local test retail"])
 def set_hold_deadline(record_id: str, body: TestHoldDeadline, clock: Clock):
@@ -276,7 +284,7 @@ def set_hold_deadline(record_id: str, body: TestHoldDeadline, clock: Clock):
         schema(db)
         doc = load(db, record_id)
         current_test_order(doc, body.version)
-        deadline = body.test_hold_expires_at.astimezone(timezone.utc).isoformat()
+        deadline = body.test_hold_expires_at.isoformat()
         if doc.get("test_hold_expires_at") is not None:
             if doc["test_hold_expires_at"] != deadline:
                 raise HTTPException(409, "A test hold deadline is immutable; it cannot be extended or replaced.")

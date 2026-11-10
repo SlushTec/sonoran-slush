@@ -132,8 +132,8 @@ Starlette/httpx deprecation warning. This is not evidence of completed COM-02 or
 
 
 Author validation on the frozen expiry candidate (2026-11-10, with `PYTHONUTF8=1`):
-`python -m pytest -q tests/unit/test_reservation_expiry.py` passed **49 tests**;
-`python -m pytest -q` passed **361 tests and 94 subtests**, with only the existing Starlette/httpx warning.
+`python -m pytest -q tests/unit/test_reservation_expiry.py` passed **51 tests**;
+`python -m pytest -q` passed **363 tests and 94 subtests**, with only the existing Starlette/httpx warning.
 Coverage includes exact deadline boundaries, strict input/auth/stage gates, immutable replay, multi-component release,
 unknown/paid/provider-bound holds (including incomplete metadata), cancellation/payment/buyer races, a clock advanced
 while waiting for the database lock, full transaction rollback, independent-process restart and cross-process contention.
@@ -141,3 +141,8 @@ while waiting for the database lock, full transaction rollback, independent-proc
 `python scripts/check_links.py` (31 links) and `git diff --check` pass. Infrastructure and CI workflows are unchanged.
 Independent review and exact-head CI remain pending at author freeze. No frontend/browser checks, real provider calls,
 production stock qualification, deployment or activation were performed by this backend-only candidate.
+
+
+Independent review correction: timezone-aware inputs whose UTC normalization would fall outside years 1 through 9999
+now return validation error 422 before any order mutation, rather than raising an unhandled overflow. Both lower/upper
+boundary inputs have regression coverage. The corrected candidate requires re-review at its new exact commit/tree.
