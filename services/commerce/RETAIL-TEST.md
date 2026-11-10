@@ -69,7 +69,7 @@ No Square network request occurred during tests. Transport is mocked; sandbox ac
 
 ## Storage and operational limits
 
-SQLite file-backed transactions (`BEGIN IMMEDIATE`, 15-second lock wait) serialize reservations, cancellation, payment updates and release. Stock/offer and payment-binding tables are additive. Existing journal mode is preserved; connections no longer race to switch a fresh database to WAL. File permissions and access-secret fingerprint protection remain. This is a single-host local adapter, not DynamoDB or a production concurrency/backup qualification.
+SQLite file-backed transactions (`BEGIN IMMEDIATE`, 15-second lock wait) serialize reservations, cancellation, payment updates and release. Stock/offer and payment-binding tables are additive. WAL initialization retries only SQLite BUSY-family failures within a 15-second deadline, restores the normal lock timeout after success, and closes connections if WAL or schema initialization fails. File permissions and access-secret fingerprint protection remain. This is a single-host local adapter, not DynamoDB or a production concurrency/backup qualification.
 
 Reservations have no automatic expiry: unpaid tests require explicit cancellation, paid holds require staff reconciliation. No refund/restock API, external notification, image upload, live payment, legal/tax/shipping policy, production stock approval or live launch is included. General options are carried as request text under a synthetic base price; production option/variant surcharge rules are not approved by this slice.
 
