@@ -71,3 +71,26 @@ provider configuration and release policy remain owner decisions. Guided-design 
 frontend rollup `41eb9b5a67a9c65ceff9a001ce6b1db90a0e6669`, packaging `01db3751c0d157e9bdd103d71cffa823ecd8ac4a`
 and the held bundle remain excluded, including uncertain derivatives. The historical initialization archive is not
 a current work-order packet. Publication and merge require the separate coordinated review/authorization step.
+
+
+### Verified update: SVG integration, 2026-11-10
+
+The bounded restricted-SVG source slice for RPG-132 / AI-04 was independently reviewed and merged through
+[PR #8](https://github.com/SlushTec/sonoran-slush/pull/8). Reviewed source
+`73df66222b9f45ab893c1a413b4123ccb2490e28` and public main merge
+`88201a504c5a6a59f83312b68825480e74dc01e2` have the same tree,
+`7e0a7ef05eed6d50564aee1fcb8fe1cfade61e2e`. This accepts the bounded source slice only; full AI-04/SS-058 acceptance
+and physical manufacturing qualification remain open.
+
+[Exact-head PR verification](https://github.com/SlushTec/sonoran-slush/actions/runs/42907328027) and
+[post-merge main verification](https://github.com/SlushTec/sonoran-slush/actions/runs/42907778255) both passed all four
+existing verification jobs: preservation/Python, storefront, Terraform layout and container smoke checks.
+The workflows and infrastructure were unchanged; no deployment or live activation occurred.
+
+Corrected synthetic expiry candidate `284ad1d50d21632631c20e706fda144bcfbaf4b3`, tree
+`897c939e108cb0a110f77d6a573fcf3165ca7466`, passed independent source review and 12 additional adversarial probes,
+plus 51 focused tests, 363 aggregate tests and 94 subtests. UTC-normalization overflow is rejected before mutation.
+It is being reconciled with the verified public main above without replacing either source history.
+The exact combined source still requires composition review, publication approval and fresh exact-head CI before merge.
+Full COM-02/SS-047 acceptance and production hold/recovery policy remain open. The finite cutoff and all release/source
+holds recorded above remain unchanged. Test/review receipts are technical evidence, not production authorization.
