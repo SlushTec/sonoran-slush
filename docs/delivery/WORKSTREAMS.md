@@ -439,3 +439,53 @@ probes were rerun successfully; final frozen independent full/adversarial review
 No actual identity/legacy history/export hashes, prices, machine qualification, providers, deployment or live action.
 
 Final correction rejects present malformed binding markers (boolean, null, string or unsupported integer) on both history reads and fresh preparation; legacy means absent marker only. Four additional regressions passed in the final 828-test run. Independent frozen-source review remains required.
+
+
+## November 11: RPG-121 public proof portal checkpoint (admission pending)
+
+Producer: review_stock_ledger; independent reviewer/integration: plan_execute_store_cards.
+Base: merged PR16 53b5feba866f0845af474cb96f510728bcaefe93, tree 24ab9cbc6755bfd54c8b6fa1c195111311ab85c2.
+Existing scope: customer-facing consumer of bound proof history under RPG-121, partial SS-032.
+This is not another registry, actual customer import, deployment, production approval or completion of the broad card.
+Only tracked public-main CustomerPortal/client contracts and relevant public styles/tests may be inspected.
+Held guided-design/frontend-rollup/bundle sources and derivatives remain prohibited; no reconstruction from them.
+
+Planned paths: apps/storefront/src/components/CustomerPortal.tsx (thin Portal dispatcher and renamed legacy function),
+new ProofReviewPortal.tsx, new tests/frontend/proof-review.test.cjs, new tests/e2e/proof-review.spec.ts,
+and proof documentation/checkpoint. Public CSS may be reused, not redesigned. No shared client or backend changes.
+Portal dispatcher has no hooks: proofs render new ProofReviewPortal; orders/quotes render LegacyRecordPortal.
+The original legacy body, payment behavior, Stripe URL guard and quote behavior remain unchanged.
+No conditional early return before existing hooks and no changes to held/customization surfaces.
+
+Private session: credentials only in component/ref memory, never URL, storage, analytics or logs.
+Loaded credentials are an immutable pair tied to record identity and a monotonically invalidated generation.
+Synchronous action locks prevent duplicate submissions before React state updates.
+Every lookup/history/detail/action result, error and finally block checks its generation/request identity.
+Close, credential edits, unmount, browser Back/popstate and pagehide invalidate all pending responses and clear private state.
+BFCache restoration clears again; reopening requires fresh credentials. Close remains available during requests.
+Network timeout remains the existing client's 12 seconds; no false claim that ignored requests were canceled server-side.
+
+Current proof and historical version views are explicitly separate. Historical views contain no action controls.
+Current approval requires current exact integer version, binding_schema 1 and matching fetched revision identity/order/text/hash.
+Returning to current refetches current proof and its bound evidence, clears confirmation/comment and never reuses stale authority.
+A stale/malformed/missing context or 409 blocks approval with a refresh/reconciliation action, not optimistic success.
+Unbound legacy wording stays readable with a clear request for a newly prepared bound revision; unknown history is not invented.
+Approval records this exact proof only; payment, inventory and production readiness are separate gates.
+No historical image guarantee: evidence binds wording/configuration, not immutable historical image bytes.
+
+History uses bounded metadata pages of 25 and explicit cursor navigation, not automatic crawling or fetching 25 contexts.
+Only one selected detail/context is loaded at a time; a context can reach 32 MiB, so no raw JSON or unbounded DOM rendering.
+Render concise configuration summaries and at most 25 per-piece entries per local page; never mount 2000 names at once.
+Validate response shape/identity and bounded monotonic cursor values; errors/retries must preserve session isolation.
+Treat response text as text, not HTML. Show recorded capability-holder labels, not invented real identities.
+Accessible labels, keyboard controls, status/error announcements and focus restoration accompany mobile overflow checks.
+
+Planned verification: existing full Python and Node regressions, separate new Node component tests, typecheck/build,
+headless Playwright synthetic API fixtures, axe and actual screenshot inspection at desktop/mobile sizes.
+Deferred-response tests cover Close, edits, Back, unmount/reopen, cross-session lookup/action and stale finally blocks.
+Other tests cover duplicate clicks, error/retry, pagination, current-versus-historical actions, exact action versions,
+legacy unbound/malformed binding, 409 refresh and no credential persistence. Existing payment guard remains unchanged.
+Native Windows headless/local test servers only: do not touch the user's open browsers or spawn visible background windows.
+Stop owned test servers/processes after QA. Report unrelated existing failures without expanding scope.
+No feature edits before independent checkpoint admission; no publication before frozen-source independent review.
+Same authorized cutoff: November 12 03:00 UTC, with implementation stop at 02:20 UTC; no further agents, AWS or WSL.
