@@ -558,6 +558,78 @@ They show readable current/history/configuration/decision layouts with loaded br
 Useful external logs/config are retained under the existing D: delivery folder. Frozen independent review is still
 required; broad RPG-121/SS-032 and production qualification are not complete merely because this slice passes.
 
+### RPG-125 bounded Square sandbox order-portal alignment checkpoint
+
+Producer: second store worker; independent reviewer/integrator: store coordinator. Base is frozen PR17
+4dcdf820; no implementation until PR17 integration and independent design admission. Rebase docs onto
+actual merged equivalent source first. Same fixed 03:00 UTC cutoff, implementation stop 02:20 UTC.
+Only tracked public source; no held guided-design/frontend-rollup/bundle sources or derivatives.
+
+Observed mismatch: CustomerPortal.pay currently accepts Stripe while payments.py sandbox_checkout_url
+accepts only https://sandbox.square.link[:443]/u/[A-Za-z0-9_-]+ with whole raw-string matching.
+Replace the obsolete guard, not broaden it. Require raw string exact full match (JS dollar-anchor final
+newline must not pass), provider === square, test_mode === true and nonempty bounded string session_id.
+Do not normalize, trim, decode or repair URLs. Reject live Square, Stripe, userinfo, lookalike hosts,
+non-default/zero-padded ports, query/fragment, encoded paths, whitespace, controls and extra path segments.
+Backend remains payment authority; no new payment availability, paid status or production authorization.
+
+Use a separate order-only component via hook-free Portal routing so proof portal and quote body stay
+unchanged. Scope: CustomerPortal wrapper, new OrderReviewPortal component and focused tests/docs only;
+minimal explicit routine Node test wiring is allowed. No backend, shared client, provider or proof changes.
+Preserve order read display, existing local simulation and availability gates; backend tests remain final
+truth. Label processor action Open Square sandbox checkout, only for strict test_payment_available true.
+Do not interpret an accepted redirect as paid. Existing synthetic retail simulation remains separately
+labeled and never uses Square. Missing/malformed current id/version must disable mutation fail-closed.
+
+Loaded session binds immutable order id, trimmed capability, positive strict version and generation.
+Input edit, Close, Back/pagehide, persisted pageshow and unmount invalidate pending lookup/action results
+and navigation; ordinary pageshow does not clear typed input. Record id must match requested id.
+Use synchronous per-session action lock to prevent duplicate clicks before React state commits. Every
+success/error/finally checks session/request generation; stale old responses cannot alter a new session.
+Payment request remains exact {order_id,version} and captured bearer. Mutating responses must match loaded
+record identity; refresh after conflicts, not silently adopt an unrelated record. Private data stays in
+memory only, absent URL/local/session storage/logs. Close available while busy. No browser/provider opened
+by automated tests; test navigation is intercepted before any external request.
+
+QA: table-driven raw URL parity with backend allow/reject cases and final-newline edge; malformed provider,
+test_mode/session id, exact bearer/version, unavailable/malformed order gating, duplicate click, 409/retry,
+late lookup/action after Close/edit/Back/unmount and reopened session isolation. Retain order simulation
+and quote/proof regressions. Full Python/Node/typecheck/build/browser/accessibility/mobile/pixel checks.
+One separately labeled actual local ASGI checkout smoke may stub the provider adapter only within its
+isolated synthetic test process, exercising real endpoint/auth/order gates and browser response handling.
+No actual provider request, account credential, real customer or live payment; do not call this live Square
+verification. Owned hidden loopback test servers/headless browser only; verify cleanup and preserve evidence.
+Use existing locked dependencies without competing install. No production deploy, AWS or WSL.
+
+### Square order portal author implementation and verification
+
+Implemented the admitted order-only consumer with exact raw Square sandbox URL/provider metadata,
+captured capability/order/version, synchronous duplicate lock, stale-response/navigation invalidation,
+strict checkout availability and bounded record rendering. The complete LegacyRecordPortal function
+and ProofReviewPortal source were compared against 4dcdf820 and remain byte-equivalent after newline
+normalization. No local simulation action existed in that order surface; none was invented. Backend,
+shared client, production settings and held sources remain untouched.
+
+Author checks: 828 Python tests + 94 subtests, 104 Node tests (36 new), 43 browser tests (5 new),
+TypeScript and optimized build pass. Archive 67/41, document links 31 and diff checks pass. No skips.
+Whole-page WCAG2A/AA and all axe rules scoped to the new .lookup-layout pass at desktop/mobile sizes.
+An initial all-rules whole-page run found existing axe region best-practice violation on .announcement,
+Header.tsx:47 (unchanged against baseline). This is recorded, not suppressed as fixed or claimed
+all-page-all-rules clean. Existing background-prefetch Next NoFallbackError log noise remains separate.
+Pixel QA caught undefined new form-panel/text-link classes and corrected them to existing lookup-card,
+order-result and link-button styles before final build/browser/smoke reruns. Final artifacts/order-1440.png,
+order-390.png and order-real-backend.png were individually visually inspected: readable, no overflow,
+loaded brand assets and no plaintext access codes.
+
+Separately labeled actual loopback ASGI smoke passed: supported quote/offer/accept/order creation,
+real checkout endpoint/auth/gates, one intercepted sandbox navigation, persisted session replay and
+payment still unpaid. Provider adapter is stubbed only in isolated test process; urllib provider access
+is forbidden. This is not a live Square sandbox connection. Final owned PIDs18796/29444 and ports
+60150/60152 were stopped/closed, temporary synthetic DB removed; browser QA port3138 also closed.
+Only headless owned browsers used. No user browser, actual provider credential, payment or deployment.
+PR17 remains a stacked dependency until coordinator integrates its exact green source; no successor
+publication or merge is authorized ahead of that dependency. Frozen independent review is still required.
+
 ## RPG-138 / SS-070: bounded component-ledger recovery qualification checkpoint
 
 Base: public main 53b5feba866f0845af474cb96f510728bcaefe93. This independent test-only branch does not depend on or edit the frozen UI stack. Producer: second store lane; independent reviewer/integrator: first store lane. Implementation remains stopped until checkpoint admission.
