@@ -212,3 +212,27 @@ active floors on old outflows, competing reservations, release/consume race, oth
 interpreter restart, missing-allocation holds, and final-component/per-lot-audit rollback. No source outside the admitted
 scope changed. Independent frozen-source/adversarial review and hosted verification remain pending. No actual inventory,
 providers, production policy, deployment or live activation. Full feature acceptance remains open.
+
+### Existing RPG-123 SS-006: bounded commercial snapshot registry
+
+Baseline main `0b62029175c5a2a05aba72671694d7ae1014a844`, tree `2c755a79701d799ed56b77c2f46996cea4a6a0bd`.
+PR12 exact-head and post-merge runs43072560708/43072971293 passed all four jobs; native main is clean.
+Continue existing RPG-123 SS-006 with an explicitly disconnected, staff-only commercial-fixture registry.
+The narrow first slice models immutable catalog eligibility, integer-USD price and public-policy TEXT TEST FIXTURE snapshots,
+not actual commercial decisions. Draft, approved_test and retired_test states are distinct; shared synthetic staff test
+review never becomes owner/production approval. Snapshot bodies reject authority fields and unsupported data. No current
+price proposals, private costs, real inventory, customer files or held source are imported into the registry or Git.
+
+Exact snapshot references compose immutable test release sets, with versioned current-test pointer and explicit rollback.
+All referenced kinds/products must match and remain approved_test; retiring a referenced snapshot fails resolution closed.
+Publishing a new test set changes future fixture resolution only, never rewrites historical snapshots/orders. UUID replay,
+optimistic concurrency, immutable audit/provenance and transaction rollback guard state changes. Existing retail offers,
+checkout, payment/proof/production gates, public catalog and assistant activation remain unchanged and non-purchasable.
+All responses retain test_mode true, owner_approved false and production_approved false. No real approval or live release.
+
+Options, tax and machine-profile semantics are deliberately NOT QUALIFIED in this registry slice; consistent production
+version-set acceptance requires them, real reviewer identity and approved data. Full SS-006/COM-01 remains open.
+Two store workers: producer and independent reviewer. Reviewer admits checkpoint before feature edits, then frozen source
+and adversarial checks; any correction requires re-review. Same02:20Z implementation stop and03:00Z hard cutoff Nov12.
+No AWS/WSL, provider/API/model calls, credentials, deployment, live inventory, manufacturing or held-source access.
+Publication/conditional merge is a separate coordinated exact-target step after review; earlier approvals do not transfer.
