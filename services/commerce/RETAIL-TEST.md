@@ -310,3 +310,8 @@ No real price proposals, internal costs, customer files, current retail offers o
 No application/assistant consumer uses this fixture pointer. Existing public catalog stays non-purchasable and /ready503.
 No provider, production owner identity, actual approval, deployment or live activation. Full SS-006/COM-01 remains open.
 Disable the test gate and preserve fixture history before a normal reviewed source revert; do not delete records as rollback.
+
+Persisted fixture documents are independently type-checked before return or mutation: snapshot row schemas and kind/identity,
+audit/lifecycle shape, exact typed manifest references and hashes, and pointer identity/publication provenance. Null audits,
+list-valued references and invalid pointer IDs return409 for reconciliation. This boundary validation is not a repair tool
+or proof of source authority; malformed records are preserved, not silently rewritten or treated as approved business data.

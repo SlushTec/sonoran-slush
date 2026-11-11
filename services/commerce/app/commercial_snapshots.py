@@ -101,39 +101,27 @@ Draft = Annotated[CatalogDraft | PricesDraft | PoliciesDraft, Field(discriminato
 
 
 def replay(db, request_id, payload):
+    from services.commerce.app.commercial_fixture_validation import parse_document, checked_receipt
     digest = fingerprint(payload)
     row = db.execute("SELECT fingerprint,document FROM fixture_commercial_commands WHERE request_id=?", (str(request_id),)).fetchone()
     if row and row[0] != digest:
         raise HTTPException(409, "Commercial fixture command identity was reused with different contents.")
     if row:
-        try:
-            document = json.loads(row[1])
-            if not isinstance(document, dict):
-                raise ValueError("Invalid fixture receipt.")
-        except (ValueError, TypeError):
-            raise HTTPException(409, "Fixture command receipt needs reconciliation.") from None
-        return digest, {**document, **SCOPE}
+        document = parse_document(row[1], "command receipt")
+        return digest, checked_receipt({**document, **SCOPE}, payload)
     return digest, None
-
 
 def record(db, request_id, digest, result):
     db.execute("INSERT INTO fixture_commercial_commands VALUES(?,?,?)", (str(request_id), digest, json.dumps(result)))
 
 
 def read_snapshot(db, snapshot_id, revision):
-    row = db.execute("SELECT status,lifecycle_version,document FROM fixture_commercial_snapshots WHERE id=? AND revision=?", (snapshot_id, revision)).fetchone()
+    from services.commerce.app.commercial_fixture_validation import parse_document, checked_snapshot
+    row = db.execute("SELECT kind,status,lifecycle_version,document FROM fixture_commercial_snapshots WHERE id=? AND revision=?", (snapshot_id, revision)).fetchone()
     if row is None:
         raise HTTPException(404, "Commercial fixture snapshot not found.")
-    try:
-        doc = json.loads(row[2])
-        if not isinstance(doc, dict) or not all(k in doc for k in ("id", "revision", "kind", "source_reference", "rows", "audit")):
-            raise ValueError("Incomplete snapshot.")
-    except (ValueError, TypeError):
-        raise HTTPException(409, "Fixture snapshot content needs reconciliation.") from None
-    if doc.get("id") != snapshot_id or doc.get("revision") != revision:
-        raise HTTPException(409, "Fixture snapshot identity needs reconciliation.")
-    return {**doc, "status": row[0], "lifecycle_version": row[1], **SCOPE}
-
+    doc = parse_document(row[3], "snapshot content")
+    return checked_snapshot(doc, snapshot_id, revision, row[0], row[1], row[2])
 
 def content(document):
     return {k: document[k] for k in ("id", "revision", "kind", "source_reference", "rows")}
@@ -260,22 +248,11 @@ def create_set(set_id: Key, body: ReleaseSet):
 
 
 def read_set(db, set_id):
+    from services.commerce.app.commercial_fixture_validation import parse_document, checked_manifest
     row = db.execute("SELECT document FROM fixture_commercial_sets WHERE id=?", (set_id,)).fetchone()
     if row is None:
         raise HTTPException(404, "Commercial fixture set not found.")
-    try:
-        doc = json.loads(row[0])
-        if not isinstance(doc, dict) or not all(k in doc for k in ("id", "references", "content_hashes")):
-            raise ValueError("Incomplete set.")
-        if set(doc["references"]) != {"catalog", "prices", "policies"}:
-            raise ValueError("Incomplete fixture references.")
-        for ref in doc["references"].values():
-            SnapshotRef.model_validate(ref)
-    except (ValueError, TypeError, KeyError):
-        raise HTTPException(409, "Fixture set content needs reconciliation.") from None
-    if doc.get("id") != set_id:
-        raise HTTPException(409, "Fixture set identity needs reconciliation.")
-    return {**doc, **SCOPE}
+    return checked_manifest(parse_document(row[0], "set content"), set_id)
 
 
 @router.get("/sets/{set_id}")
@@ -332,14 +309,14 @@ def current_set():
         row = db.execute("SELECT version,document FROM fixture_commercial_pointer WHERE slot='current'").fetchone()
         if row is None:
             raise HTTPException(404, "No current commercial test set.")
-        try:
-            pointer = json.loads(row[1])
-            if not isinstance(pointer, dict) or "set_id" not in pointer:
-                raise ValueError("Incomplete pointer.")
-        except (ValueError, TypeError):
-            raise HTTPException(409, "Fixture pointer content needs reconciliation.") from None
-        if pointer.get("pointer_version") != row[0]:
-            raise HTTPException(409, "Fixture pointer version needs reconciliation.")
+        from services.commerce.app.commercial_fixture_validation import parse_document, checked_pointer
+        pointer = checked_pointer(parse_document(row[1], "pointer content"), row[0])
+        history = db.execute("SELECT set_id,document FROM fixture_commercial_publications WHERE version=?", (row[0],)).fetchone()
+        if history is None or history[0] != pointer["set_id"]:
+            raise HTTPException(409, "Fixture publication history needs reconciliation.")
+        previous = checked_pointer(parse_document(history[1], "publication history"), row[0], pointer["set_id"])
+        if previous != pointer:
+            raise HTTPException(409, "Fixture publication provenance needs reconciliation.")
         manifest = read_set(db, pointer["set_id"])
         documents, _ = qualified_set(db, manifest["references"], manifest["content_hashes"])
         return {**pointer, "manifest": manifest, "snapshots": documents, **SCOPE}

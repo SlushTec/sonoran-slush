@@ -286,3 +286,60 @@ def test_replay_never_promotes_stored_scope_metadata(connected,monkeypatch):
         doc.update(owner_approved=True,production_approved=True,test_mode=False)
         db.execute('UPDATE fixture_commercial_commands SET document=? WHERE request_id=?',(json.dumps(doc),request['request_id']))
     assert_scope(connected.post(url,json=request,headers=staff()).json())
+
+
+@pytest.mark.parametrize('change',[
+    {'audit':None},{'audit':{}},{'audit':[]},{'rows':None},{'rows':[1]},
+    {'rows':[{'product_slug':SLUG,'variant_key':'fixture','unit_price_minor':'1234','currency':'USD'}]},
+    {'kind':'catalog'},{'revision':True},{'id':'another-id'},
+    {'owner_approved':True},{'lifecycle_version':999},
+])
+def test_malformed_persisted_snapshot_is_rejected_before_return_or_review(connected,monkeypatch,change):
+    fixture(connected,monkeypatch)
+    with database() as db:
+        document=json.loads(db.execute("SELECT document FROM fixture_commercial_snapshots WHERE id='one-prices'").fetchone()[0])
+        document.update(change)
+        db.execute("UPDATE fixture_commercial_snapshots SET document=? WHERE id='one-prices'",(json.dumps(document),))
+        count=db.execute('SELECT COUNT(*) FROM fixture_commercial_commands').fetchone()[0]
+    assert snap(connected,'one-prices').status_code==409
+    assert review(connected,'one-prices',expected_lifecycle_version=2,decision='retire_test').status_code==409
+    with database() as db:
+        assert db.execute("SELECT status,lifecycle_version FROM fixture_commercial_snapshots WHERE id='one-prices'").fetchone()==('approved_test',2)
+        assert db.execute('SELECT COUNT(*) FROM fixture_commercial_commands').fetchone()[0]==count
+
+
+@pytest.mark.parametrize('change',[
+    {'references':['catalog','prices','policies']},{'references':None},
+    {'references':{'catalog':{'snapshot_id':'one-catalog','revision':1},'prices':None,'policies':{'snapshot_id':'one-policies','revision':1}}},
+    {'content_hashes':[]},{'audit':None},{'unqualified_domains':[]},
+])
+def test_malformed_persisted_manifest_fails_resolution_without_pointer_write(connected,monkeypatch,change):
+    fixture(connected,monkeypatch)
+    with database() as db:
+        document=json.loads(db.execute("SELECT document FROM fixture_commercial_sets WHERE id='one'").fetchone()[0])
+        document.update(change)
+        db.execute("UPDATE fixture_commercial_sets SET document=? WHERE id='one'",(json.dumps(document),))
+    assert connected.get(BASE+'/sets/one',headers=staff()).status_code==409
+    assert select(connected).status_code==409
+    assert connected.get(BASE+'/current-test',headers=staff()).status_code==404
+
+
+@pytest.mark.parametrize('change',[
+    {'set_id':None},{'set_id':{}},{'set_id':[]},{'set_id':123},{'audit':None},{'pointer_version':True},
+])
+def test_malformed_persisted_pointer_fails_before_sql_binding(connected,monkeypatch,change):
+    fixture(connected,monkeypatch);assert select(connected).status_code==200
+    with database() as db:
+        document=json.loads(db.execute('SELECT document FROM fixture_commercial_pointer').fetchone()[0])
+        document.update(change)
+        db.execute('UPDATE fixture_commercial_pointer SET document=?',(json.dumps(document),))
+    assert connected.get(BASE+'/current-test',headers=staff()).status_code==409
+
+
+def test_publication_provenance_mismatch_is_not_accepted_as_current(connected,monkeypatch):
+    fixture(connected,monkeypatch);assert select(connected).status_code==200
+    with database() as db:
+        document=json.loads(db.execute('SELECT document FROM fixture_commercial_publications').fetchone()[0])
+        document['audit']['reason']='Changed history'
+        db.execute('UPDATE fixture_commercial_publications SET document=?',(json.dumps(document),))
+    assert connected.get(BASE+'/current-test',headers=staff()).status_code==409

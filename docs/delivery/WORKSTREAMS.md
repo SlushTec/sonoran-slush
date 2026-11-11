@@ -246,3 +246,13 @@ exact compatible sets, current-pointer CAS/replay, valid prior-set rollback, ret
 transaction/audit rollback, restart and corrupt JSON/identity reconciliation. No real pricing/policy data or consumer was
 connected. Exact frozen source still requires independent source/adversarial review, publication approval and hosted CI.
 All production and source holds and the fixed cutoff remain unchanged; full SS-006/COM-01 is not accepted.
+
+### Independent review correction: persisted fixture containers
+
+Independent review of the first freeze reproduced two malformed persisted-state exceptions: null snapshot audit and
+list-valued set references. The correction adds typed boundary validation for stored rows, kind/identity, audit/lifecycle,
+manifest references/hashes/unqualified domains, pointer identity and publication provenance. Invalid stored structures now
+return controlled409 before mutation rather than blanket-catching business logic.24 additional regressions cover the
+reported failures and adjacent malformed rows, authority metadata, pointer values and history mismatch. Corrected author
+full regression passed678 tests and94 subtests; OpenAPI/archive67/41/doc31/diff checks pass. Corrected exact source requires
+independent re-review; the old654-test review does not transfer automatically. No publication or live action occurred.
