@@ -293,3 +293,44 @@ Tests cover both comparisons, strict inputs, lifecycles, hashes, invalid state, 
 absent DB/parent noncreation and a consistent read while another connection retires a reference. SQLite may create transient
 WAL/shared-memory reader coordination sidecars beside an existing database; zero filesystem activity is NOT claimed.
 No publication, actual approval, price decision, customer/order change, deployment or production activation occurred.
+
+### Existing RPG-124 SS-031.AC4: bounded piece-personalization design checkpoint
+
+Design only, based on reviewed comparison9ba01770dbbfa03c42ac90715e99d451ce34d075. Before implementation,
+rebase this checkpoint onto the integrated identical-tree main and obtain independent design admission.
+One producer plus one reviewer only; no new task or second inventory/configuration registry.
+
+Add an optional RetailItem-only personalization discriminated union to existing synthetic cart/order flow:
+identical: {mode: identical, text: nonblank string}; per_piece: {mode: per_piece, pieces: [{set_index: integer,
+piece_index: integer, text: nonblank string}]}. Indices are zero-based. Strict text is1..120 characters, no NUL or
+control characters; do not silently trim/case-fold customer wording. Repeated text is valid; repeated indices are not.
+No caller set_size, stock_units, item index, offer version or money fields in this object. Explicit null is rejected;
+omission retains legacy behavior. Both modes reject nonempty legacy text/secondary. In explicit mode allow only the
+existing known crystal-shape/Size/Orientation option keys, rejecting arbitrary options that could compete for names
+or set-size authority. Font remains common; notes/artwork metadata never supplies piece text or changes the mapping.
+
+Read exact current offer units_per_item and quantity, not a caller count. This existing field means stock consumption,
+so the new mapping is explicitly synthetic blank-position correspondence, not production set-size qualification or a
+claim that every consumable is an engraved piece. Bound explicit personalization to500 positions per line and2000
+across a cart, without reducing limits for legacy omitted-field carts. Require every pair in quantity x units_per_item
+exactly once for per_piece. Identical expands explicitly to the same bounded mapping. Never auto-fill missing names.
+
+Normalized output is a line-only personalization_snapshot: {schema_version:1, mode, line_index, quantity,
+units_per_item, pieces:[{set_index,piece_index,text}...]}, sorted by indices with stable original cart line order.
+Persist this exact mapping in existing cart lines and copied order lines; retain exact submitted item configuration.
+No separate endpoint/table, pricing effect, inventory authority, catalog sellability or manufacturing authorization.
+
+Compatibility: omit the new key from serialized legacy request items when absent, preserving existing normalized
+payload/fingerprint bytes including old defaults/photo_brief null. Never globally exclude_none or exclude_unset.
+Old carts missing the field retain identical priced-line shape, exact replay and cart-to-order behavior. Explicit-mode
+raw payload remains fingerprinted; reordered or changed input on the same UUID conflicts rather than mutating history.
+Repricing recomputes the same mapping; changed offer versions/counts fail409 before reservation. Validate persisted
+explicit item shape and snapshot equivalence before order creation; corrupt mapping cannot be copied or silently fixed.
+
+Proof revisions continue their independent text/version workflow and cannot rewrite ordered piece assignments. This
+slice does not interpret proof prose or establish per-piece manufacturing proof approval; those remain open criteria.
+Tests cover singleton/set/multi-line, missing/extra/duplicate/negative/bool indices, reordered deterministic mapping,
+Unicode text, collisions, cardinality bounds, altered offer, exact replay/restart, legacy fingerprints and old carts,
+rollback/no reservation on validation failure, copied order immutability and proof revision independence. Full tests,
+OpenAPI/archive/link/diff checks and exact frozen independent review required. No real names/prices/policies, providers,
+held sources, AWS/WSL or deployment. Stop implementation02:20Z, hard cutoff03:00Z November12; publication separate.
