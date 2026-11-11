@@ -1421,26 +1421,19 @@
             "type": "object"
           },
           "personalization": {
-            "anyOf": [
+            "discriminator": {
+              "mapping": {
+                "identical": "#/components/schemas/Identical",
+                "per_piece": "#/components/schemas/PerPiece"
+              },
+              "propertyName": "mode"
+            },
+            "oneOf": [
               {
-                "discriminator": {
-                  "mapping": {
-                    "identical": "#/components/schemas/Identical",
-                    "per_piece": "#/components/schemas/PerPiece"
-                  },
-                  "propertyName": "mode"
-                },
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/Identical"
-                  },
-                  {
-                    "$ref": "#/components/schemas/PerPiece"
-                  }
-                ]
+                "$ref": "#/components/schemas/Identical"
               },
               {
-                "type": "null"
+                "$ref": "#/components/schemas/PerPiece"
               }
             ],
             "title": "Personalization"
@@ -1909,17 +1902,10 @@
             "type": "integer"
           },
           "pieces_per_item": {
-            "anyOf": [
-              {
-                "maximum": 100.0,
-                "minimum": 1.0,
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Pieces Per Item"
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Pieces Per Item",
+            "type": "integer"
           },
           "stock_id": {
             "maxLength": 100,

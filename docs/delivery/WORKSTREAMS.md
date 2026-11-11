@@ -353,3 +353,12 @@ changed offers, no partial reservations, exact cart/order copying and proof-revi
 Unicode and surrounding whitespace remain exact; controls and surrogates are rejected only in the new text contract.
 No actual names/prices, manufacturing proof qualification, held-source access, deployment or live activation occurred.
 Frozen source awaits independent review and coordinated publication. Full SS-031/COM-02 remains open.
+
+### Independent contract correction: optional does not mean nullable
+
+Independent review found OpenAPI advertised null for new optional personalization/piece-count fields even though the
+runtime deliberately rejects explicit null. SkipJsonSchema omits that unsupported branch and removes default-null
+metadata while keeping fields optional. Two regressions inspect endpoint-linked schemas and actual422 behavior. The
+first test lookup used ambiguous Offer schema naming and was corrected to follow the actual endpoint reference.
+Final full regression passes782 tests+94 subtests; OpenAPI/archive67/41/doc31/diff checks pass. Runtime/legacy shape
+behavior is unchanged. Prior e30d4a8 bundle is superseded; corrected source requires independent exact-freeze review.

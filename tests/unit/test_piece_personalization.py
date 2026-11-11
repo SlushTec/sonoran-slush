@@ -202,3 +202,26 @@ def test_restart_and_proof_revision_do_not_change_mapping(connected,monkeypatch)
         r=connected.post('/v1/admin/proofs',headers=staff(),json={'order_id':o['id'],'proof_text':'Synthetic proof '+str(version),'expected_proof_version':version})
         assert r.status_code==200
     with database() as db: assert load(db,o['id'])['lines']==before
+
+@pytest.mark.parametrize('model,field',[('RetailItem','personalization'),('Offer','pieces_per_item')])
+def test_optional_not_nullable_contract_matches_runtime(connected,monkeypatch,model,field):
+    from services.commerce.app.main import app
+    schemas=app.openapi()['components']['schemas']
+    if model == 'Offer':
+        ref=app.openapi()['paths']['/v1/admin/retail-test/offers/{slug}']['post']['requestBody']['content']['application/json']['schema']['$ref']
+        schema=schemas[ref.rsplit('/',1)[-1]]
+    else:
+        schema=schemas[model]
+    prop=schema['properties'][field]
+    assert field not in schema.get('required',[])
+    assert 'default' not in prop
+    def no_null(node):
+        if isinstance(node,dict):
+            assert node.get('type')!='null'
+            for value in node.values():no_null(value)
+        elif isinstance(node,list):
+            for value in node:no_null(value)
+    no_null(prop)
+    setup(connected,monkeypatch)
+    response=offer(connected,None) if model=='Offer' else create(connected,[item(personalization=None)])
+    assert response.status_code==422

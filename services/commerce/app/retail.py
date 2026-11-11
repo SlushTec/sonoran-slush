@@ -10,6 +10,7 @@ from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, Header, HTTPException
 from pydantic import AwareDatetime, Field, StrictInt, StrictBool, field_validator, model_validator, model_serializer
+from pydantic.json_schema import SkipJsonSchema
 from services.commerce.app.workflows import (
     Item, StrictModel, NOW, database, enabled, event, load, private, receipt, save, staff,
 )
@@ -69,7 +70,7 @@ class Offer(StrictModel):
     unit_price_minor: Money
     stock_id: Key
     units_per_item: StrictInt = Field(ge=1, le=100)
-    pieces_per_item: Annotated[StrictInt, Field(ge=1, le=100)] | None = None
+    pieces_per_item: Annotated[StrictInt, Field(ge=1, le=100)] | SkipJsonSchema[None] = Field(default=None, json_schema_extra=lambda schema: schema.pop("default", None))
 
     @model_validator(mode="before")
     @classmethod
@@ -116,7 +117,7 @@ def catalog():
 class RetailItem(Item):
     # Also validate omitted options: a crystal cannot bypass its keep-list requirements.
     options: dict[Annotated[str, Field(max_length=60)], Annotated[str, Field(max_length=200)]] = Field(default_factory=dict, max_length=16, validate_default=True)
-    personalization: Personalization | None = None
+    personalization: Personalization | SkipJsonSchema[None] = Field(default=None, json_schema_extra=lambda schema: schema.pop("default", None))
 
     @model_serializer(mode="wrap")
     def preserve_legacy_shape(self, handler):
