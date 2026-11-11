@@ -191,3 +191,38 @@ persistence or restore, financial/supplier reconnection, production RPO/RTO, bac
 not uploaded private assets, and metadata hashes confer no asset authorization. This is a controlled single-process synthetic
 harness, not protection against an untrusted process racing arbitrary namespace changes. Full SS-064, SS-068, SS-069, SS-070
 and OPS-04 acceptance and all owner decisions remain open. A snapshot's existence alone is not acceptance.
+
+## Synthetic component ledger (RPG-124 / partial SS-044)
+
+The staff-only `/v1/admin/retail-test/component-ledger` routes use the same opt-in retail/scaffold/staff gates.
+They are a disconnected fixture ledger, **not checkout inventory**. Every returned record marks `test_mode: true`
+and `checkout_authoritative: false`. No fixture movement updates `retail_stock`, affects offer availability,
+approves a proof/payment, or authorizes production. Do not enter real stock or private supplier/customer data.
+
+- `PUT /components/{id}` accepts `kind` (blank/base/box/consumable) and an integer-count unit
+  (piece/millilitre/gram/millimetre). Definitions are immutable; identical replay succeeds, changed content conflicts.
+- `PUT /locations/{id}` accepts fixture `kind` workshop/market, with the same immutable behavior.
+- `PUT /lots/{id}` binds `component_id`, `supplier_reference`, `lot_reference` once. The component must exist.
+- `POST /lots/{id}/movements` takes UUID `request_id`, strict integer `expected_version`, `quantity` 1–1,000,000,
+  `purpose` receipt/transfer/count_correction, optional `source`/`destination` buckets and a nonblank single-line
+  `reason` of at most 200 characters. A bucket has `location_id` and condition
+  available/damaged/sample/in_production/completed/shipped. A receipt has destination only; a transfer needs two
+  distinct buckets; a count correction has exactly one leg. All referenced locations must exist.
+- `GET /lots/{id}` returns the definition, current version and ordered balances. `limit` defaults to 50, maximum 100;
+  follow `next_offset` using `offset` and restart if `version` changes while paging.
+- `GET /lots/{id}/movements` returns audit history in sequence order, with `after` and `limit` (maximum 100), and
+  `next_after` while more records exist. Version is current at that read; append-only history may grow between pages.
+
+The existing `BEGIN IMMEDIATE` transaction covers replay lookup, version check, both balance legs, version increment
+and audit insert. A failure rolls all of them back. Balances never go below zero or above the supported per-bucket
+1,000,000 units. Transfers conserve quantity; only explicit fixture receipts or reasoned count corrections change it.
+UUID request identities are ledger-global, not reusable for another lot or changed payload. An exact retry returns
+its original recorded receipt even if later lot versions exist. Audit time comes from the server. The actor is
+`synthetic_staff`, explicitly representing the shared staff test credential, **not per-person production attribution**.
+Do not supply `actor`, credentials, prices or business authority in a body; extra fields are rejected.
+
+This additive prototype creates only its own `fixture_*` tables in the existing local test database. No migration of
+retail stock occurs. Rollback: disable the test gate, preserve the database and movement history, then revert the source
+through review; do not delete test tables as a rollback shortcut. Individual production identities, bills of materials,
+lot-level reservations, inspected eligibility, real stock/costs, physical counts, purchasing, production policies,
+managed persistence and full SS-044/COM-02 qualification remain open. No provider, deployment or live activation.
