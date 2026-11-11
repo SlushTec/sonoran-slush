@@ -629,3 +629,53 @@ is forbidden. This is not a live Square sandbox connection. Final owned PIDs1879
 Only headless owned browsers used. No user browser, actual provider credential, payment or deployment.
 PR17 remains a stacked dependency until coordinator integrates its exact green source; no successor
 publication or merge is authorized ahead of that dependency. Frozen independent review is still required.
+
+
+### RPG-121 bounded private quote consumer checkpoint
+
+Producer: second store worker; independent reviewer/integrator: store coordinator. Stack base49b0c142,
+independently qualified Square slice; publication remains dependent on preceding green integrations.
+This checkpoint is documentation only. No feature edits before independent admission. Implementation
+stops02:20UTC, finalcutoff03:00UTC. No helpers, held guided frontend/design/rollup/bundle source, AWS/WSL.
+
+Observed public source: GET /v1/quotes/{id} reads retail/bulk/event/contact; accept permits only
+retail/bulk/event with exact current version, offered status and reviewed total. Current UI trusts
+mutable entered token and returned identity and lacks request-generation guards. Preserve backend truth.
+Create a separate QuoteReviewPortal and hook-free dispatch; keep complete legacy body, proof and Square
+components unchanged. No backend/shared client/payment/policy changes, new price or inferred identity.
+
+Read response must match requested ID, supported kind, positive safe-integer version and bounded status.
+Submitted requests remain readable with total_minor null; reviewed totals are integer1..99999999/USD.
+Message supports full3000 Unicode codepoints and valid multiline CR/LF/tab as accepted by public Offer;
+render escaped text with whitespace preserved, not HTML. Reject lone surrogates and malformed rendered
+containers safely. Do not blanket restrict unrendered legacy fields. Current quote accepted status must
+have accepted_version exactly equal to its version; inconsistent accepted metadata fails closed, not
+a success banner. Offered state must not imply accepted current version. Contact remains read-only
+even if malformed data labels it offered. Missing reviewed message/total disables acceptance honestly.
+
+Display actual status, total, full offered message and next step, with no invented people/timestamps.
+Show bounded recorded item summaries if supplied: actual max100 items, quantity1..500, product100 chars,
+text/secondary120 and known font; paginate10. Preserve full valid multiline/Unicode at backend bounds.
+If optional timeline is shown, metadata validates ISO timestamps/strings and paginates25; do not invent
+or reconstruct unavailable history. No historical quote versions are claimed by this current-only UI.
+
+Bind loaded record ID/kind/version and trimmed capability in immutable session plus request generation.
+Close/input edit/Back/pagehide/persisted pageshow/unmount clear confirmation and invalidate all pending
+lookup/action/error/finally responses; ordinary pageshow preserves input. Synchronous action lock blocks
+duplicate clicks before React commit. Checkbox explicitly acknowledges displayed exact version. POST
+uses captured bearer and {version,decision:accept}; returned success requires same ID/kind/version,
+status accepted, accepted_version equal requested version, and unchanged displayed commercial details
+(total/currency/message/items when shown). Never confirm a different quote/version or silent price change.
+Failures clear actionable record/checkbox and require reopening; late failures cannot clobber new session.
+Acceptance means holder of this private capability accepted this quote version, not verified personal
+identity, payment, booking, inventory or production confirmation. No credentials in storage/URL/logs.
+
+QA: full regression plus malformed identity/version/accepted metadata, contact read-only, null totals,
+exact multiline/emoji boundaries, maximum item pagination, changed price/message in success, repeated
+accept/replay, duplicate click,409/reopen and delayed lookup/action after each lifecycle invalidation.
+Browser tests include keyboard/mobile/current success/failure/interruption, WCAG2A/AA whole page and all
+axe rules scoped to new component, actual pixel views. Real loopback ASGI synthetic quote creation,
+offer and private acceptance with stored/replayed exact accepted_version, including contact read-only.
+No provider calls or actual customer data. Hidden owned localservers/headless browser only; cleanup
+verified. Existing locked dependencies reused, separate build. Frozen source and evidence go to peer
+review before any publication; this does not mark all RPG-121 or production delivery complete.
