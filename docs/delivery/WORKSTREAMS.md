@@ -137,3 +137,34 @@ to the drill test and the existing retail/checkpoint documentation; production c
 The implementation remains unpublished pending independent exact-source review and coordinated publication approval.
 Fresh exact-head CI and separate readiness/merge confirmation are still required. These checks do not change the
 NOT ASSESSED areas or full acceptance boundaries above.
+
+## Finite run checkpoint: 2026-11-11
+
+Brian authorized selecting and executing existing board cards through **20:00 America/Phoenix on 2026-11-11**
+(**2026-11-12T03:00:00Z**). This supersedes only the expired run window, not source or production holds.
+Baseline is public main `c30b109dd5bdc414713612ec58899f3df9030571`, tree
+`068be158f192929e267246bd144c2903391df2dc`. PRs #8-10 are merged; no production activation is implied.
+The canonical board remains Linear project P-RPG-4 under Slushtec. No new broad requirement is created.
+
+Selected existing card: [RPG-124 / COM-02](https://linear.app/rpg-chat/issue/RPG-124/com-02-qualify-durable-cart-and-stock),
+a bounded **SS-044 synthetic component/lot/location ledger**. It models fixture component definitions
+(blank/base/box/consumable, immutable unit), immutable supplier/lot metadata, explicit workshop/market fixture locations,
+and balances by lot/location/condition. Conditions distinguish available, damaged, sample, in-production,
+completed and shipped. A staff-only movement API records server-derived synthetic staff authority, reason and time;
+strict integer quantities, optimistic concurrency and exact request replay prevent silent duplicate movements.
+Receipts, multi-leg transfers and condition changes are transactional, cannot create negative balances, and conserve
+quantity except explicit fixture receipt or documented count correction. Read endpoints are staff-only and bounded.
+
+This is disconnected from `retail_stock`, retail offers, cart reservations and production release. It must say
+`test_mode: true`, `checkout_authoritative: false`, and cannot imply stock can be sold. Do not seed actual business
+stock, prices or suppliers, choose reorder/production policies, change existing checkout behavior, or claim full
+SS-044/SS-047/COM-02 acceptance. BOM integration, reservations against lots, inspection eligibility, real identities,
+production inventory, purchasing/count qualification and cloud persistence remain open.
+
+Two store workers only: producer and independent reviewer, separate worktrees. The reviewer admits this checkpoint
+before feature edits, then independently reviews the exact frozen source and runs adversarial tests. Any post-review
+code changes require re-review. Stop new implementation by **02:20Z** and preserve progress, close owned processes and
+report exact source/tests/blockers by **03:00Z**. No automatic extension. Keep all existing source holds, including
+excluded guided-design, frontend-rollup, packaging and held-bundle derivatives; do not read or reconstruct them.
+No AWS/WSL, external providers, credentials, customer data, paid calls, manufacturing, deployment or live activation.
+Publication and merge remain a separate coordinated exact-target step after review; do not bypass a prior denial.
