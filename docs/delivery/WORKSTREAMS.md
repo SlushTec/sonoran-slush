@@ -439,3 +439,31 @@ probes were rerun successfully; final frozen independent full/adversarial review
 No actual identity/legacy history/export hashes, prices, machine qualification, providers, deployment or live action.
 
 Final correction rejects present malformed binding markers (boolean, null, string or unsupported integer) on both history reads and fresh preparation; legacy means absent marker only. Four additional regressions passed in the final 828-test run. Independent frozen-source review remains required.
+
+## RPG-138 / SS-070: bounded component-ledger recovery qualification checkpoint
+
+Base: public main 53b5feba866f0845af474cb96f510728bcaefe93. This independent test-only branch does not depend on or edit the frozen UI stack. Producer: second store lane; independent reviewer/integrator: first store lane. Implementation remains stopped until checkpoint admission.
+
+### Scope and evidence contract
+
+- Extend the existing owned synthetic SQLite drill, not introduce a production backup service. Planned files: tests/unit/test_sqlite_restore_drill.py, optional focused test helper only if needed, services/commerce/RETAIL-TEST.md and this checkpoint/evidence log. No backend, contracts, dependency, workflow or runtime configuration change.
+- Retain an explicit legacy fixture profile and add an exact ledger/BOM profile. Each profile uses a fixed table set and exact schema/row expectations; unknown or missing tables remain rejected. Never derive the allowlist from the input database. Preserve schema/index comparison and source/target identity, alias, WAL, sidecar, time/size and non-mutation safeguards.
+- Add the ten existing tables: fixture_components, fixture_locations, fixture_lots, fixture_balances, fixture_movements, fixture_boms, fixture_holds, fixture_allocations, fixture_hold_commands and fixture_hold_events. The ledger/BOM profile explicitly includes sqlite_sequence with exact schema and the two independently expected movement/event counters. There is no existing sequence filter or exemption. Counter and orphan sequence-row tampering must fail closed; restored next-sequence continuity and replay non-mutation are tested.
+- Seed solely through supported staff fixture APIs with synthetic identifiers: two components, two locations, immutable lots/BOM, receipts and transfer/condition movements, and multi-component reservations in active/released/consumed states. Record deterministic expected quantities, lot versions, allocation states, BOM snapshot and event/command relationships independently before snapshot creation.
+- Verify restored conservation (received versus available/damaged/consumed quantities), active allocation floors, component/lot/location/BOM references, immutable BOM snapshot and lot audit/event identities. Check exact command fingerprints/receipts and global movement-versus-hold request identity, not just row counts.
+- After isolated restore, replay original movement/reserve/release/consume requests without duplicate stock, allocations, events or version changes; changed-payload replay and stale CAS fail closed. Exercise one eligible new transition on restored state and ensure original source bytes remain unchanged. No checkout authority or real inventory is implied.
+- Corrupt and rehash snapshots for missing/orphan component/lot/location, balance/conservation mismatch, allocation state/units, BOM snapshot, command/fingerprint and audit/event relationships. Reject before application open/target creation and preserve source. Keep existing unknown-table, unsafe path, WAL, failure-injection and legacy retail/proof replay cases unchanged in meaning.
+
+### Explicit exclusions and qualification limits
+
+Commercial snapshot tables, Square provider tables, large personalized contexts beyond this bounded fixture budget, populated legacy-proof observations, real private assets, jobs/outbox, schema migrations and production recovery targets/retention remain unqualified. Do not silently whitelist those namespaces or claim full OPS-04/SS-070 acceptance. Hashes establish integrity, not owner authority.
+
+### Gates
+
+Use only owned short D: synthetic pytest temporary roots and existing locked Python; no actual database or real backup/restore, network/provider, AWS/WSL, user browser, deletion of unrelated files or extra workers. Run focused drill and ledger/BOM tests, full Python regression, OpenAPI consistency, archive 67/41, documentation links and diff checks. Freeze clean exact SHA/tree and verified bundle for independent review. Publication is separately coordinated; no retry of queued CI. Implementation stops 02:20 UTC and final cutoff is 03:00 UTC on November 12.
+
+### Ledger/BOM recovery author validation
+
+The admitted sequence correction is implemented explicitly: no sqlite_sequence filtering, and only the two known AUTOINCREMENT counters are accepted for the ledger profile. Twenty-seven new synthetic cases passed; the full Windows suite passed 855 tests plus 94 subtests, including all 57 unchanged legacy drill cases and the existing ledger/BOM behavior tests. Archive 67/41, 31 documentation links, OpenAPI consistency and diff checks passed. One existing Starlette/httpx deprecation warning remains.
+
+Actual synthetic evidence covers committed WAL versus an uncommitted balance edit, three reservation lifecycle states, exact replay with no version/event/counter mutation, shared command-identity collisions, active allocation floor and stale per-lot CAS rejection. A new restored release and receipt continue event IDs at 11/12 and movement ID at 5. Twenty-five rehashed schema/row/counter corruptions are rejected before target creation while preserving the source. No actual database, customer asset, provider or production configuration was accessed. Commercial/Square/large-proof/legacy-observation exclusions remain unchanged. This source is ready for independent review, not yet published or production-qualified.

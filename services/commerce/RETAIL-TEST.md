@@ -315,3 +315,14 @@ Persisted fixture documents are independently type-checked before return or muta
 audit/lifecycle shape, exact typed manifest references and hashes, and pointer identity/publication provenance. Null audits,
 list-valued references and invalid pointer IDs return409 for reconciliation. This boundary validation is not a repair tool
 or proof of source authority; malformed records are preserved, not silently rewritten or treated as approved business data.
+
+
+### Component-ledger/BOM isolated recovery profile (partial SS-070)
+
+The synthetic restore drill retains its original strict retail/proof profile and adds a separately selected component-ledger/BOM profile. Only fixture-created databases are accepted. This is not a backup command for an existing database.
+
+The new profile covers the ten component/lot/location/movement/BOM/reservation tables and explicitly includes SQLite's `sqlite_sequence` table. Its exact expected sequence rows are only `fixture_movements` and `fixture_hold_events`; unknown tables, orphan sequence rows, missing indexes and rehashed changed state are rejected. The original profile does not implicitly admit these tables.
+
+Supported fixture APIs seed independent expected receipt/transfer/condition totals and active, released and consumed multi-component holds. Verification checks BOM and component/lot/location relationships, allocation floors, immutable command receipts/fingerprints, per-lot event identities, sequence counters and whole schema/row equality. Isolated restore exercises exact replay, changed-command collisions, shared movement/hold command identities, stale versions, active-hold protection and new transition/sequence continuity. Original source bytes remain unchanged.
+
+Qualification remains limited to bounded synthetic local SQLite state. Commercial snapshot and Square tables, large personalized proof contexts beyond the drill's 1 MiB fixture snapshot budget, populated legacy-proof observations, actual private assets, job/outbox recovery, production migrations, RPO/RTO and retention remain unassessed. Unknown namespaces fail closed rather than being silently omitted. No provider reconnection, checkout authority, live inventory or manufacturing approval follows from this test.

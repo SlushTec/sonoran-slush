@@ -105,14 +105,14 @@ def read_database(path, *, sealed=False):
         raise
 
 
-def state(connection):
+def state(connection, tables=TABLES):
     schema = connection.execute(
         "SELECT type,name,tbl_name,sql FROM sqlite_master ORDER BY type,name").fetchall()
     names = tuple(sorted(r[1] for r in schema if r[0] == "table"))
-    require(names == TABLES, "Unexpected or missing fixture tables")
+    require(names == tables, "Unexpected or missing fixture tables")
     # Table identifiers come exclusively from the constant allowlist, never input.
     rows = {name: tuple(sorted(connection.execute(f'SELECT * FROM "{name}"').fetchall()))
-            for name in TABLES}
+            for name in tables}
     return tuple(schema), rows
 
 
@@ -142,6 +142,7 @@ class Drill:
     """One fixture owns one live source, one snapshot and fresh isolated targets."""
 
     def __init__(self, tmp_path, monkeypatch, client, now):
+        self.tables = TABLES
         self.root = tmp_path / "drill"
         new_directory(self.root)
         self.source_dir = self.root / "src"
@@ -234,7 +235,7 @@ class Drill:
         self.post("/v1/admin/retail-test/orders/" + self.orders["expired"]["id"] + "/expire", {"version": 1}, staff=True)
         assert self.payment("recovery")["recovery_required"] is True
         with closing(read_database(self.source)) as reader:
-            self.expected = state(reader)
+            self.expected = state(reader, self.tables)
         self.assert_seed_contract(self.expected)
         assert Path(str(self.source) + "-wal").stat().st_size > 32
         self.assert_offline()
@@ -383,7 +384,7 @@ class Drill:
                 require(reader.execute("PRAGMA integrity_check").fetchall() == [("ok",)], "Invalid SQLite snapshot")
                 require(reader.execute("PRAGMA journal_mode").fetchone() == ("delete",), "Snapshot is not standalone")
                 require(reader.execute("PRAGMA user_version").fetchone() == (0,), "Unsupported fixture header")
-                require(state(reader) == self.expected, "Schema, rows or lineage differ from independent fixture expectations")
+                require(state(reader, self.tables) == self.expected, "Schema, rows or lineage differ from independent fixture expectations")
         except (sqlite3.DatabaseError, UnicodeError, json.JSONDecodeError) as exc:
             raise UnsafeDrill("Invalid synthetic snapshot") from exc
 
@@ -454,13 +455,13 @@ class Drill:
             self.post("/v1/admin/proofs", {"order_id": self.orders[name]["id"], "expected_proof_version": 1,
                                           "proof_text": "Must remain held"}, staff=True, status=409)
         with closing(read_database(target / "state.db")) as reader:
-            require(state(reader) == self.expected, "Replay changed durable identities or state")
+            require(state(reader, self.tables) == self.expected, "Replay changed durable identities or state")
         self.assert_offline()
         self.restored = target  # Set only after raw validation AND API replay.
 
 
 @pytest.fixture
-def drill(tmp_path, monkeypatch):
+def drill(tmp_path, monkeypatch, request):
     # Never import the existing connected fixture: it enables sandbox payment
     # configuration. These overrides live only in this isolated test process.
     for name in ("SQUARE_ENVIRONMENT", "SQUARE_SANDBOX_ACCESS_TOKEN", "SQUARE_SANDBOX_LOCATION_ID",
@@ -493,7 +494,8 @@ def drill(tmp_path, monkeypatch):
         # Block raw connects before any source, seed, backup or restore operation.
         monkeypatch.setattr(socket.socket, "connect", no_external)
         monkeypatch.setattr(socket.socket, "connect_ex", no_external)
-        instance = Drill(tmp_path, monkeypatch, client, now)
+        cls = LedgerDrill if getattr(request, "param", False) else Drill
+        instance = cls(tmp_path, monkeypatch, client, now)
         try:
             instance.seed()
             yield instance
@@ -823,4 +825,274 @@ def test_backup_budget(drill, monkeypatch):
     with pytest.raises(TimeoutError, match="bounded test budget"):
         drill.make_snapshot()
     assert drill.snapshot is None and drill.restored is None
+    assert before == drill.source_bytes()
+
+
+# A distinct, explicitly selected profile. No table discovery or sqlite_% bypass.
+LEDGER_TABLES = tuple(sorted((*TABLES, "fixture_components", "fixture_locations",
+    "fixture_lots", "fixture_balances", "fixture_movements", "fixture_boms",
+    "fixture_holds", "fixture_allocations", "fixture_hold_commands",
+    "fixture_hold_events", "sqlite_sequence")))
+LEDGER = "/v1/admin/retail-test/component-ledger"
+BILL_URL = LEDGER + "/boms/restore-gift/versions/1"
+
+
+def digest_document(value):
+    # Independently spell the public canonical request contract, not call producer fingerprint.
+    return sha256(json.dumps(value, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+
+
+class LedgerDrill(Drill):
+    def put(self, url, payload):
+        response = self.client.put(url, json=payload, headers={"Authorization": "Bearer " + STAFF})
+        assert response.status_code == 200, response.text
+        return response.json()
+
+    def seed(self):
+        super().seed()  # Keep the legacy profile independently valid before adding the namespace.
+        self.commands, self.movement_commands, self.holds = [], [], {}
+        for component, kind in (("blank", "blank"), ("base", "base")):
+            self.put(LEDGER + "/components/" + component, {"kind": kind, "unit": "piece"})
+        for location, kind in (("shop", "workshop"), ("market", "market")):
+            self.put(LEDGER + "/locations/" + location, {"kind": kind})
+        for number, (lot, component, units) in enumerate((("blank-lot", "blank", 10), ("base-lot", "base", 20))):
+            self.put(LEDGER + "/lots/" + lot,
+                     {"component_id": component, "supplier_reference": "synthetic", "lot_reference": lot})
+            self.seed_movement(lot, number + 300, 0, units, None, {"location_id": "shop", "condition": "available"})
+        self.seed_movement("blank-lot", 302, 1, 2,
+                           {"location_id": "shop", "condition": "available"},
+                           {"location_id": "market", "condition": "available"})
+        self.seed_movement("base-lot", 303, 1, 3,
+                           {"location_id": "shop", "condition": "available"},
+                           {"location_id": "shop", "condition": "damaged"})
+        self.bill = self.put(BILL_URL, {"product_slug": SLUG, "components": [
+            {"component_id": "blank", "units_per_item": 1},
+            {"component_id": "base", "units_per_item": 2}]})
+        version = 2
+        for number, name in enumerate(("active", "released", "consumed")):
+            payload = {"request_id": str(UUID(int=400 + number)), "quantity": 1,
+                       "allocations": [{"lot_id": "blank-lot", "location_id": "shop", "units": 1},
+                                       {"lot_id": "base-lot", "location_id": "shop", "units": 2}],
+                       "lot_versions": {"blank-lot": version, "base-lot": version}, "reason": "Synthetic reserve"}
+            hold = self.post(BILL_URL + "/reservations", payload, staff=True)
+            self.commands.append((BILL_URL + "/reservations", payload, hold,
+                                  {"operation": "reserve", "bom_id": "restore-gift", "revision": 1, **payload}))
+            version += 1
+            if name != "active":
+                action = "release" if name == "released" else "consume"
+                transition = {"request_id": str(UUID(int=500 + number)), "expected_version": 1,
+                              "lot_versions": {"blank-lot": version, "base-lot": version},
+                              "reason": "Synthetic transition"}
+                url = LEDGER + "/reservations/" + hold["id"] + "/" + action
+                hold = self.post(url, transition, staff=True)
+                self.commands.append((url, transition, hold,
+                                      {"operation": name, "hold_id": hold["id"], **transition}))
+                version += 1
+            self.holds[name] = hold
+        self.tables = LEDGER_TABLES
+        with closing(read_database(self.source)) as reader:
+            self.expected = state(reader, self.tables)
+        self.assert_seed_contract(self.expected)
+        self.assert_ledger_contract(self.expected)
+
+    def seed_movement(self, lot, number, version, units, source, destination):
+        payload = {"request_id": str(UUID(int=number)), "expected_version": version,
+                   "quantity": units, "source": source, "destination": destination,
+                   "purpose": "transfer" if source else "receipt", "reason": "Synthetic movement"}
+        url = LEDGER + "/lots/" + lot + "/movements"
+        result = self.post(url, payload, staff=True)
+        self.movement_commands.append((url, payload, result, {"lot_id": lot, **payload}))
+
+    def assert_ledger_contract(self, saved):
+        schema, rows = saved
+        assert tuple(sorted(rows)) == LEDGER_TABLES
+        assert rows["sqlite_sequence"] == (("fixture_hold_events", 10), ("fixture_movements", 4))
+        assert [r[0] for r in rows["fixture_movements"]] == list(range(1, 5))
+        assert [r[0] for r in rows["fixture_hold_events"]] == list(range(1, 11))
+        components = {key: json.loads(raw) for key, raw in rows["fixture_components"]}
+        locations = {key: json.loads(raw) for key, raw in rows["fixture_locations"]}
+        lots = {key: (json.loads(raw), version) for key, raw, version in rows["fixture_lots"]}
+        assert set(components) == {"blank", "base"} and set(locations) == {"shop", "market"}
+        for key, kind in (("blank", "blank"), ("base", "base")):
+            assert components[key] == {"id": key, "kind": kind, "unit": "piece",
+                                       "test_mode": True, "checkout_authoritative": False}
+        for key, kind in (("shop", "workshop"), ("market", "market")):
+            assert locations[key] == {"id": key, "kind": kind, "test_mode": True, "checkout_authoritative": False}
+        assert set(lots) == {"blank-lot", "base-lot"}
+        for key, (doc, version) in lots.items():
+            assert version == 7 and doc["component_id"] == key.removesuffix("-lot")
+            assert doc["component_id"] in components
+            assert doc["supplier_reference"] == "synthetic" and doc["lot_reference"] == key
+        assert rows["fixture_balances"] == (
+            ("base-lot", "shop", "available", 15), ("base-lot", "shop", "damaged", 3),
+            ("base-lot", "shop", "in_production", 2), ("blank-lot", "market", "available", 2),
+            ("blank-lot", "shop", "available", 7), ("blank-lot", "shop", "in_production", 1))
+        assert {lot: sum(r[3] for r in rows["fixture_balances"] if r[0] == lot)
+                for lot in lots} == {"blank-lot": 10, "base-lot": 20}
+        assert len(rows["fixture_boms"]) == 1
+        bom_id, revision, raw = rows["fixture_boms"][0]
+        bom = json.loads(raw)
+        assert (bom_id, revision) == ("restore-gift", 1)
+        assert bom == {"id": bom_id, "revision": 1, "product_slug": SLUG, "components": [
+            {"component_id": "base", "units_per_item": 2, "unit": "piece"},
+            {"component_id": "blank", "units_per_item": 1, "unit": "piece"}],
+            "test_mode": True, "checkout_authoritative": False}
+        allocations = []
+        for name, expected in self.holds.items():
+            hold = json.loads(dict(rows["fixture_holds"])[expected["id"]])
+            assert hold["state"] == name and hold["version"] == (1 if name == "active" else 2)
+            assert hold["bom"] == bom and hold["quantity"] == 1
+            assert hold["test_mode"] is True and hold["checkout_authoritative"] is False
+            assert sorted(hold["allocations"], key=lambda a: a["lot_id"]) == [
+                {"lot_id": "base-lot", "location_id": "shop", "units": 2, "component_id": "base", "unit": "piece"},
+                {"lot_id": "blank-lot", "location_id": "shop", "units": 1, "component_id": "blank", "unit": "piece"}]
+            assert [a["action"] for a in hold["audit"]] == (["reserved"] if name == "active" else ["reserved", name])
+            for allocation in hold["allocations"]:
+                assert lots[allocation["lot_id"]][0]["component_id"] == allocation["component_id"]
+                assert allocation["location_id"] in locations
+                allocations.append((hold["id"], allocation["lot_id"], "shop", allocation["units"], name))
+        assert rows["fixture_allocations"] == tuple(sorted(allocations))
+        assert len(rows["fixture_holds"]) == 3
+        for lot, location, condition, units in rows["fixture_balances"]:
+            if condition == "available":
+                assert sum(a[3] for a in allocations if a[1:3] == (lot, location) and a[4] == "active") <= units
+        moves = {r[1]: r for r in rows["fixture_movements"]}
+        commands = {r[0]: r for r in rows["fixture_hold_commands"]}
+        assert len(moves) == 4 and len(commands) == 5 and not (moves.keys() & commands.keys())
+        for _, payload, receipt, canonical in self.movement_commands:
+            sequence, key, fingerprint, lot, raw = moves[payload["request_id"]]
+            assert fingerprint == digest_document(canonical) and lot == canonical["lot_id"]
+            assert json.loads(raw) == receipt
+            assert receipt["version"] == payload["expected_version"] + 1
+            assert receipt["actor"] == "synthetic_staff" and receipt["checkout_authoritative"] is False
+        events = rows["fixture_hold_events"]
+        expected_event_versions = (3, 4, 5, 6, 7)
+        for index, (_, payload, receipt, canonical) in enumerate(self.commands):
+            key, fingerprint, raw = commands[payload["request_id"]]
+            assert fingerprint == digest_document(canonical) and json.loads(raw) == receipt
+            matched = [r for r in events if r[1] == key]
+            assert len(matched) == 2 and {r[2] for r in matched} == set(lots)
+            for sequence, request_id, lot_id, raw in matched:
+                event = json.loads(raw)
+                assert sequence == index * 2 + (1 if lot_id == "base-lot" else 2)
+                assert event["hold_id"] == receipt["id"] and event["request_id"] == key
+                assert event["state"] == receipt["state"] and event["hold_version"] == receipt["version"]
+                assert event["lot_id"] == lot_id and event["lot_version"] == expected_event_versions[index]
+                assert event["audit"] == receipt["audit"][-1]
+                assert event["allocations"] == [a for a in receipt["allocations"] if a["lot_id"] == lot_id]
+                assert event["checkout_authoritative"] is False and event["test_mode"] is True
+
+    def verify_ledger_replay(self, target):
+        self.verify_replay(target)  # Existing retail/proof/payment replay still qualifies.
+        for url, payload, expected, _ in (*self.movement_commands, *self.commands):
+            assert self.post(url, payload, staff=True) == expected
+            self.post(url, {**payload, "reason": "Changed contents"}, staff=True, status=409)
+        # The command namespace remains shared in both directions after restore.
+        move_url, move_body, _, _ = self.movement_commands[0]
+        hold_url, hold_body, _, _ = self.commands[0]
+        self.post(move_url, {**move_body, "request_id": hold_body["request_id"]}, staff=True, status=409)
+        self.post(hold_url, {**hold_body, "request_id": move_body["request_id"]}, staff=True, status=409)
+        self.post(move_url, {**move_body, "request_id": str(UUID(int=9990))}, staff=True, status=409)
+        with closing(read_database(target / "state.db")) as reader:
+            saved = state(reader, self.tables)
+        assert saved == self.expected
+        self.assert_ledger_contract(saved)
+
+
+@pytest.mark.parametrize("drill", [True], indirect=True)
+def test_ledger_bom_wal_restore_replay_and_sequence_continuity(drill):
+    before = drill.source_bytes()
+    writer = sqlite3.connect(drill.source, isolation_level=None)
+    writer.execute("BEGIN IMMEDIATE")
+    writer.execute("UPDATE fixture_balances SET units=999 WHERE lot_id='blank-lot'")
+    try:
+        drill.make_snapshot()
+        target = drill.restore()
+        drill.verify_ledger_replay(target)
+        assert before == drill.source_bytes()
+    finally:
+        writer.rollback()
+        writer.close()
+    # A new eligible transition allocates fresh event sequences, not recycled IDs.
+    active = drill.holds["active"]
+    response = drill.post(LEDGER + "/reservations/" + active["id"] + "/release",
+        {"request_id": str(UUID(int=9000)), "expected_version": 1,
+         "lot_versions": {"base-lot": 7, "blank-lot": 7}, "reason": "Restored transition"}, staff=True)
+    assert response["state"] == "released" and response["version"] == 2
+    move = {**drill.movement_commands[0][1], "request_id": str(UUID(int=9001)),
+            "expected_version": 8, "quantity": 1}
+    drill.post(drill.movement_commands[0][0], move, staff=True)
+    with closing(read_database(target / "state.db")) as reader:
+        rows = state(reader, drill.tables)[1]
+    assert rows["sqlite_sequence"] == (("fixture_hold_events", 12), ("fixture_movements", 5))
+    assert [r[0] for r in rows["fixture_hold_events"]] == list(range(1, 13))
+    assert [r[0] for r in rows["fixture_movements"]] == list(range(1, 6))
+    assert json.loads(rows["fixture_hold_events"][-1][3])["hold_id"] == active["id"]
+    assert dict((r[0], r[2]) for r in rows["fixture_lots"]) == {"base-lot": 8, "blank-lot": 9}
+    assert sum(r[3] for r in rows["fixture_balances"] if r[0] == "blank-lot") == 11
+    assert before == drill.source_bytes()
+
+
+LEDGER_DAMAGE = {
+    "missing-component": "DELETE FROM fixture_components WHERE id='blank'",
+    "orphan-lot-component": "UPDATE fixture_lots SET document=json_set(document,'$.component_id','missing') WHERE id='blank-lot'",
+    "missing-location": "DELETE FROM fixture_locations WHERE id='shop'",
+    "orphan-balance-lot": "UPDATE fixture_balances SET lot_id='orphan' WHERE lot_id='blank-lot'",
+    "balance-conservation": "UPDATE fixture_balances SET units=units+1 WHERE condition='available'",
+    "allocation-units": "UPDATE fixture_allocations SET units=units+1 WHERE state='active'",
+    "allocation-state": "UPDATE fixture_allocations SET state='released' WHERE state='active'",
+    "orphan-allocation-hold": "UPDATE fixture_allocations SET hold_id='orphan' WHERE state='active'",
+    "orphan-allocation-location": "UPDATE fixture_allocations SET location_id='orphan' WHERE state='active'",
+    "bom-snapshot": "UPDATE fixture_holds SET document=json_set(document,'$.bom.revision',2)",
+    "bom-definition": "UPDATE fixture_boms SET document=json_set(document,'$.product_slug','unknown')",
+    "hold-command-fingerprint": "UPDATE fixture_hold_commands SET fingerprint='wrong'",
+    "hold-command-receipt": "UPDATE fixture_hold_commands SET document=json_set(document,'$.state','released')",
+    "movement-fingerprint": "UPDATE fixture_movements SET fingerprint='wrong'",
+    "movement-receipt": "UPDATE fixture_movements SET document=json_set(document,'$.quantity',999)",
+    "event-lot-reference": "UPDATE fixture_hold_events SET lot_id='orphan' WHERE sequence=1",
+    "event-audit": "UPDATE fixture_hold_events SET document=json_set(document,'$.audit.actor','invented') WHERE sequence=1",
+    "event-missing": "DELETE FROM fixture_hold_events WHERE sequence=1",
+    "sequence-counter": "UPDATE sqlite_sequence SET seq=999 WHERE name='fixture_movements'",
+    "sequence-event-counter": "UPDATE sqlite_sequence SET seq=0 WHERE name='fixture_hold_events'",
+    "sequence-orphan": "INSERT INTO sqlite_sequence(name,seq) VALUES('orphan',42)",
+    "sequence-missing": "DELETE FROM sqlite_sequence WHERE name='fixture_hold_events'",
+    "unknown-table": "CREATE TABLE unrelated(value TEXT)",
+    "missing-table": "DROP TABLE fixture_allocations",
+    "missing-index": "DROP INDEX fixture_hold_events_by_lot",
+}
+
+
+@pytest.mark.parametrize("drill", [True], indirect=True)
+@pytest.mark.parametrize("damage", LEDGER_DAMAGE)
+def test_ledger_bom_rehashed_corruption_rejected_before_target(drill, damage):
+    snapshot = drill.make_snapshot()
+    before = drill.source_bytes()
+    with closing(sqlite3.connect(snapshot / "state.db")) as db:
+        db.execute(LEDGER_DAMAGE[damage])
+        db.commit()
+    reseal_digest(snapshot)
+    with pytest.raises(UnsafeDrill):
+        drill.restore()
+    assert not (drill.root / "restored").exists()
+    assert before == drill.source_bytes()
+    assert drill.restored is None
+
+
+@pytest.mark.parametrize("drill", [True], indirect=True)
+def test_ledger_bom_preserves_active_allocation_floor_after_restore(drill):
+    before = drill.source_bytes()
+    drill.make_snapshot()
+    target = drill.restore()
+    drill.verify_ledger_replay(target)
+    payload = {"request_id": str(UUID(int=9100)), "expected_version": 7, "quantity": 7,
+               "source": {"location_id": "shop", "condition": "available"},
+               "destination": {"location_id": "market", "condition": "available"},
+               "purpose": "transfer", "reason": "Must retain active hold"}
+    drill.post(LEDGER + "/lots/blank-lot/movements", payload, staff=True, status=409)
+    active = drill.holds["active"]
+    drill.post(LEDGER + "/reservations/" + active["id"] + "/consume",
+        {"request_id": str(UUID(int=9101)), "expected_version": 1,
+         "lot_versions": {"base-lot": 6, "blank-lot": 7}, "reason": "Stale one-lot CAS"}, staff=True, status=409)
+    with closing(read_database(target / "state.db")) as reader:
+        assert state(reader, drill.tables) == drill.expected
     assert before == drill.source_bytes()
