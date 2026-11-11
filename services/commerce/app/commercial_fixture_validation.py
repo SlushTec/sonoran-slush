@@ -17,6 +17,8 @@ def invalid(kind):
 
 
 def parse_document(value, kind):
+    if not isinstance(value, str):
+        raise invalid(kind)
     try:
         result = json.loads(value)
     except (json.JSONDecodeError, TypeError):

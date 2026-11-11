@@ -281,3 +281,15 @@ Run full regression, OpenAPI/archive/link/diff checks, freeze exact source and i
 publication. This is only AC3 fixture review-diff groundwork; completed orders and real commercial acceptance stay open.
 Two store workers only; no held source, costs, customer data, credentials, providers, GPU, AWS/WSL or live activation.
 Implementation stops November12 02:20Z; hard cutoff03:00Z. Publication is a separate exact-target coordinated decision.
+
+### Fixture comparison author freeze: 2026-11-11
+
+The read-only comparison slice adds57 regression cases; Windows full suite passed735 tests and94 subtests with no skips.
+OpenAPI consistency, archive67/41,31 document links and diff checks passed; existing Starlette/httpx warning remains.
+Early independent probes found nonASCII persisted fingerprint and invalidUTF8 BLOB document errors. Narrow guards now
+validate lowercase hexadecimal fingerprints before constant-time comparison and reject non-text persisted JSON containers.
+No blanket endpoint exception handling was added. Final source still requires independent exact-freeze review.
+Tests cover both comparisons, strict inputs, lifecycles, hashes, invalid state, bounded failures, no domain/schema changes,
+absent DB/parent noncreation and a consistent read while another connection retires a reference. SQLite may create transient
+WAL/shared-memory reader coordination sidecars beside an existing database; zero filesystem activity is NOT claimed.
+No publication, actual approval, price decision, customer/order change, deployment or production activation occurred.
