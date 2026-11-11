@@ -494,7 +494,7 @@ def drill(tmp_path, monkeypatch, request):
         # Block raw connects before any source, seed, backup or restore operation.
         monkeypatch.setattr(socket.socket, "connect", no_external)
         monkeypatch.setattr(socket.socket, "connect_ex", no_external)
-        cls = LedgerDrill if getattr(request, "param", False) else Drill
+        cls = drill_profile(getattr(request, "param", False))
         instance = cls(tmp_path, monkeypatch, client, now)
         try:
             instance.seed()
@@ -1096,3 +1096,285 @@ def test_ledger_bom_preserves_active_allocation_floor_after_restore(drill):
     with closing(read_database(target / "state.db")) as reader:
         assert state(reader, drill.tables) == drill.expected
     assert before == drill.source_bytes()
+
+
+def drill_profile(value):
+    if value is False:
+        return Drill
+    if value is True:
+        return LedgerDrill
+    if type(value) is str and value == "proof":
+        return ProofDrill
+    raise UnsafeDrill("Unknown explicit synthetic profile")
+
+
+class ProofDrill(Drill):
+    """Small personalized/legacy fixture; never migrates supplied databases."""
+
+    def history(self, name, version=None, status=200):
+        proof = self.proofs[name]
+        url = "/v1/proofs/" + proof["id"] + "/history"
+        if version is not None:
+            url += "/" + str(version)
+        response = self.client.get(url, headers={"Authorization": "Bearer " + proof["access_token"]})
+        assert response.status_code == status, response.text
+        return response.json()
+
+    def seed(self):
+        from services.commerce.app import proof_evidence
+        for module in (retail, workflows, proof_evidence):
+            self.monkeypatch.setattr(module, "NOW", lambda: self.now[0].isoformat())
+        self.post("/v1/admin/retail-test/stock/shared", {"expected_version": 0, "on_hand": 30}, staff=True)
+        self.post("/v1/admin/retail-test/offers/" + SLUG,
+                  {"expected_version": 0, "unit_price_minor": 1234, "stock_id": "shared",
+                   "units_per_item": 3, "pieces_per_item": 2}, staff=True)
+        self.mappings = {
+            "legacy": [{"set_index": 0, "piece_index": p, "text": "Synthetic café 🌼"} for p in range(2)],
+            "pieces": [{"set_index": i, "piece_index": p, "text": f"Synthetic É {i}-{p} 🌼"}
+                       for i in range(2) for p in range(2)],
+        }
+        self.decisions = {}
+        for number, name in enumerate(("legacy", "pieces")):
+            self.now[0] = START + timedelta(seconds=number * 3)
+            personalization = ({"mode": "identical", "text": "Synthetic café 🌼"} if name == "legacy"
+                               else {"mode": "per_piece", "pieces": list(reversed(self.mappings[name]))})
+            payload = {"request_id": str(UUID(int=700 + number)), "items": [{
+                "product_slug": SLUG, "quantity": number + 1, "personalization": personalization}]}
+            cart = self.post("/v1/cart", payload)
+            order = self.post("/v1/cart/" + cart["id"] + "/orders", {"version": 1}, receipt=cart)
+            proof = self.post("/v1/admin/proofs", {"order_id": order["id"], "expected_proof_version": 0,
+                                                  "proof_text": "Synthetic original " + name}, staff=True)
+            self.carts[name], self.orders[name], self.proofs[name], self.payloads[name] = cart, order, proof, payload
+            if name == "legacy":
+                # Explicit fixture shaping BEFORE another history exists. This is
+                # not a real migration or recovery technique for production data.
+                with sqlite3.connect(self.source) as db:
+                    row = db.execute("SELECT document FROM records WHERE id=?", (proof["id"],)).fetchone()
+                    old = json.loads(row[0])
+                    for key in ("binding_schema", "context_hash", "limitations"):
+                        old.pop(key, None)
+                    self.legacy_original = old
+                    db.execute("UPDATE records SET document=? WHERE id=?", (json.dumps(old), proof["id"]))
+                    for table in ("proof_revision_evidence", "proof_decision_evidence",
+                                  "proof_material_contexts", "proof_legacy_observations"):
+                        db.execute("DROP TABLE " + table)
+                before = self.source_bytes()
+                assert self.history(name)["items"] == []
+                self.history(name, 1, status=409)
+                self.post("/v1/proofs/" + proof["id"] + "/approve",
+                          {"version": 1, "decision": "approve"}, receipt=proof, status=409)
+                assert self.source_bytes() == before
+                self.now[0] = START + timedelta(seconds=1)
+                self.post("/v1/admin/proofs", {"order_id": order["id"], "expected_proof_version": 1,
+                                              "proof_text": "Synthetic newly bound legacy"}, staff=True)
+            version = 2 if name == "legacy" else 1
+            decision = {"version": version, "decision": "approve", "comment": "Synthetic decision " + name}
+            self.decisions[name] = decision
+            self.now[0] = START + timedelta(seconds=2 if name == "legacy" else 4)
+            self.post("/v1/proofs/" + proof["id"] + "/approve", decision, receipt=proof)
+        with closing(read_database(self.source)) as reader:
+            self.expected = state(reader, self.tables)
+        self.assert_proof_contract(self.expected)
+        self.assert_offline()
+
+    def assert_proof_contract(self, saved):
+        _, rows = saved
+        docs = {r[0]: json.loads(r[3]) for r in rows["records"]}
+        assert len(docs) == 6 and len(rows["requests"]) == 2
+        assert len(rows["proof_material_contexts"]) == 2
+        assert len(rows["proof_revision_evidence"]) == 2
+        assert len(rows["proof_decision_evidence"]) == 2
+        assert len(rows["proof_legacy_observations"]) == 1
+        assert rows["payment_events"] == ()
+        assert rows["retail_stock"] == (("shared", 30, 1),)
+        assert rows["metadata"] == (("access_secret_fingerprint", sha256(SECRET.encode()).hexdigest()),)
+        offer = json.loads(rows["retail_offers"][0][-1])
+        assert offer["pieces_per_item"] == 2 and offer["units_per_item"] == 3
+        request_rows = {r[0]: r[1:] for r in rows["requests"]}
+        contexts = {r[0]: (r[1], r[2]) for r in rows["proof_material_contexts"]}
+        revisions = {(r[0], r[1]): r for r in rows["proof_revision_evidence"]}
+        decisions = {(r[0], r[1]): r for r in rows["proof_decision_evidence"]}
+        reservations = {r[0]: r[1:] for r in rows["retail_reservations"]}
+        assert len(reservations) == 2
+        for number, name in enumerate(("legacy", "pieces")):
+            order, cart, proof = [docs[r[name]["id"]] for r in (self.orders, self.carts, self.proofs)]
+            quantity, version = number + 1, 2 if name == "legacy" else 1
+            assert order["items"] == cart["items"] and order["lines"] == cart["lines"]
+            assert len(order["items"]) == len(order["lines"]) == 1
+            assert order["total_minor"] == 1234 * quantity and order["currency"] == "USD"
+            assert order["payment_status"] == "unpaid" and order["reservation_status"] == "active"
+            assert (order["current_proof_id"], order["current_proof_version"],
+                    order["approved_proof_version"]) == (proof["id"], version, version)
+            assert proof["approved_version"] == proof["version"] == version
+            assert proof["status"] == "approved" and order["status"] == "awaiting_payment"
+            normalized = retail.CartRequest.model_validate(self.payloads[name]).model_dump(mode="json")
+            assert request_rows["retail-cart:" + normalized["request_id"]] == (retail.fingerprint(normalized), cart["id"])
+            assert order["cart_id"] == cart["id"] and cart["order_id"] == order["id"]
+            item, line = order["items"][0], order["lines"][0]
+            expected_item = {"product_slug": SLUG, "quantity": quantity, "text": "", "secondary": "",
+                             "font": "Classic serif", "options": {}, "notes": "", "artwork_name": "",
+                             "gift": False, "gift_message": "", "photo_brief": None,
+                             "personalization": self.payloads[name]["items"][0]["personalization"]}
+            assert item == expected_item
+            assert item["personalization"] == self.payloads[name]["items"][0]["personalization"]
+            assert line["item"] == item
+            assert (line["stock_id"], line["stock_units"], line["unit_price_minor"],
+                    line["line_total_minor"], line["offer_version"]) == ("shared", 3 * quantity, 1234, 1234 * quantity, 1)
+            assert line["personalization_snapshot"] == {
+                "schema_version": 1, "mode": "identical" if name == "legacy" else "per_piece",
+                "line_index": 0, "quantity": quantity, "pieces_per_item": 2, "pieces": self.mappings[name]}
+            assert reservations[order["id"]] == ("shared", 3 * quantity, "active")
+            row = revisions[(proof["id"], version)]
+            _, _, oid, digest, at, raw = row
+            assert oid == order["id"] and contexts[digest][0] == oid
+            raw_context = contexts[digest][1]
+            expected_mapping = {"schema_version": 1, "mode": "identical" if name == "legacy" else "per_piece",
+                                "line_index": 0, "quantity": quantity, "pieces_per_item": 2,
+                                "pieces": self.mappings[name]}
+            expected_line = {"item": expected_item, "offer_version": 1, "unit_price_minor": 1234,
+                             "line_total_minor": 1234 * quantity, "stock_id": "shared",
+                             "stock_units": 3 * quantity, "personalization_snapshot": expected_mapping}
+            expected_material = {"order_id": oid, "items": [expected_item], "lines": [expected_line],
+                                 "total_minor": 1234 * quantity, "currency": "USD"}
+            expected_bytes = json.dumps(expected_material, sort_keys=True, separators=(",", ":"),
+                                        ensure_ascii=False, allow_nan=False).encode("utf-8")
+            assert raw_context.encode("utf-8") == expected_bytes
+            assert sha256(expected_bytes).hexdigest() == digest
+            assert json.loads(raw_context) == {"order_id": oid, "items": order["items"], "lines": order["lines"],
+                                               "total_minor": 1234 * quantity, "currency": "USD"}
+            revision = json.loads(raw)
+            wording = "Synthetic newly bound legacy" if name == "legacy" else "Synthetic original pieces"
+            assert revision["proof_text"] == proof["proof_text"] == wording
+            assert (revision["proof_id"], revision["order_id"], revision["version"], revision["context_hash"],
+                    revision["prepared_at"]) == (proof["id"], oid, version, digest, at)
+            assert revision["actor_scope"] == "shared synthetic staff credential"
+            assert type(revision["schema_version"]) is int and revision["schema_version"] == 1
+            assert at == (START + timedelta(seconds=1 if name == "legacy" else 3)).isoformat()
+            decision_row = decisions[(proof["id"], version)]
+            assert decision_row[2] == 1
+            decision = json.loads(decision_row[3])
+            assert (decision["proof_id"], decision["order_id"], decision["version"], decision["context_hash"],
+                    decision["action"], decision["comment"]) == (proof["id"], oid, version, digest,
+                                                                "approve", "Synthetic decision " + name)
+            assert decision["actor_scope"] == "holder of this private proof capability"
+            assert type(decision["schema_version"]) is int and decision["schema_version"] == 1
+            assert decision["sequence"] == 1
+            assert decision["recorded_at"] == (START + timedelta(seconds=2 if name == "legacy" else 4)).isoformat()
+        pid, version, captured, raw = rows["proof_legacy_observations"][0]
+        assert (pid, version) == (self.proofs["legacy"]["id"], 1)
+        observed = json.loads(raw)
+        assert observed == self.legacy_original
+        assert observed["proof_text"] == "Synthetic original legacy" and observed["approved_version"] is None
+        assert "context_hash" not in observed and "binding_schema" not in observed
+        assert (pid, 1) not in revisions and (pid, 1) not in decisions
+        assert captured == (START + timedelta(seconds=1)).isoformat()
+        assert observed["created_at"] == START.isoformat()
+        for record_id, kind, token_hash, raw in rows["records"]:
+            assert docs[record_id]["id"] == record_id and docs[record_id]["kind"] == kind
+            assert token_hash == sha256(workflows.access_token(record_id).encode()).hexdigest()
+
+    def verify_replay(self, target):
+        self.validate_bundle(target)
+        self.monkeypatch.setenv("SONORAN_DB_PATH", str(target / "state.db"))
+        self.assert_offline()
+        for name in ("legacy", "pieces"):
+            cart = self.post("/v1/cart", self.payloads[name])
+            assert (cart["id"], cart["access_token"]) == (self.carts[name]["id"], self.carts[name]["access_token"])
+            order = self.post("/v1/cart/" + cart["id"] + "/orders", {"version": 1}, receipt=cart)
+            assert (order["id"], order["access_token"]) == (self.orders[name]["id"], self.orders[name]["access_token"])
+            changed_payload = json.loads(json.dumps(self.payloads[name]))
+            customization = changed_payload["items"][0]["personalization"]
+            if name == "legacy":
+                customization["text"] = "Changed synthetic inscription"
+            else:
+                customization["pieces"][0]["text"] = "Changed synthetic inscription"
+            self.post("/v1/cart", changed_payload, status=409)
+            proof = self.proofs[name]
+            version = 2 if name == "legacy" else 1
+            history = self.history(name)
+            assert [r["version"] for r in history["items"]] == [version]
+            assert history["legacy_history_unknown"] is (name == "legacy")
+            detail = self.history(name, version)
+            assert detail["revision"]["version"] == version
+            self.post("/v1/proofs/" + proof["id"] + "/approve", self.decisions[name], receipt=proof)
+            changed = {**self.decisions[name], "comment": "Changed synthetic decision"}
+            self.post("/v1/proofs/" + proof["id"] + "/approve", changed, receipt=proof, status=409)
+            assert self.client.get("/v1/proofs/" + proof["id"] + "/history").status_code == 404
+        self.history("legacy", 1, status=409)
+        self.post("/v1/proofs/" + self.proofs["legacy"]["id"] + "/approve",
+                  {"version": 1, "decision": "approve"}, receipt=self.proofs["legacy"], status=409)
+        with closing(read_database(target / "state.db")) as reader:
+            actual = state(reader, self.tables)
+        assert actual == self.expected
+        self.assert_proof_contract(actual)
+        self.restored = target
+
+
+@pytest.mark.parametrize("drill", ["proof"], indirect=True)
+def test_personalized_legacy_proof_roundtrip(drill):
+    original = drill.source_bytes()
+    drill.make_snapshot()
+    target = drill.restore()
+    drill.verify_replay(target)
+    assert drill.source_bytes() == original
+
+
+@pytest.mark.parametrize("value", [None, 0, 1, "", "ledger", "unknown", [], {}])
+def test_restore_profile_rejects_unknown_selection(value):
+    with pytest.raises(UnsafeDrill, match="Unknown explicit"):
+        drill_profile(value)
+
+
+@pytest.mark.parametrize("drill", ["proof"], indirect=True)
+@pytest.mark.parametrize("damage", [
+    "mapping", "stock_piece_confusion", "context_text", "context_hash", "context_order",
+    "legacy_wording", "legacy_approval", "legacy_bound", "legacy_version", "legacy_owner",
+    "revision_wording", "revision_version", "revision_context", "decision_comment", "decision_version",
+    "decision_context", "unknown_table", "orphan_observation",
+])
+def test_personalized_legacy_rehashed_corruption_rejected(drill, damage):
+    original = drill.source_bytes()
+    bundle = drill.make_snapshot()
+    path = bundle / "state.db"
+    pid = drill.proofs["legacy"]["id"]
+    with sqlite3.connect(path) as db:
+        if damage == "unknown_table":
+            db.execute("CREATE TABLE unexpected (value TEXT)")
+        elif damage in {"mapping", "stock_piece_confusion"}:
+            oid = drill.orders["pieces"]["id"]
+            doc = json.loads(db.execute("SELECT document FROM records WHERE id=?", (oid,)).fetchone()[0])
+            if damage == "mapping":
+                doc["lines"][0]["personalization_snapshot"]["pieces"][0]["text"] = "Changed"
+            else:
+                doc["lines"][0]["personalization_snapshot"]["pieces_per_item"] = 3
+            db.execute("UPDATE records SET document=? WHERE id=?", (json.dumps(doc), oid))
+        elif damage.startswith("legacy_"):
+            doc = json.loads(db.execute("SELECT document FROM proof_legacy_observations").fetchone()[0])
+            key, value = {"legacy_wording": ("proof_text", "Invented"), "legacy_approval": ("approved_version", 1),
+                          "legacy_bound": ("context_hash", "0"*64), "legacy_version": ("version", 2),
+                          "legacy_owner": ("order_id", "wrong")}[damage]
+            doc[key] = value
+            db.execute("UPDATE proof_legacy_observations SET document=?", (json.dumps(doc),))
+        elif damage == "orphan_observation":
+            db.execute("UPDATE proof_legacy_observations SET proof_id='unknown'")
+        elif damage.startswith("context_"):
+            if damage == "context_hash":
+                db.execute("UPDATE proof_material_contexts SET hash=? WHERE order_id=?", ("0"*64, drill.orders["legacy"]["id"]))
+            elif damage == "context_order":
+                db.execute("UPDATE proof_material_contexts SET order_id='unknown'")
+            else:
+                raw = db.execute("SELECT document FROM proof_material_contexts LIMIT 1").fetchone()[0]
+                doc = json.loads(raw); doc["items"][0]["personalization"]["text"] = "Changed"
+                db.execute("UPDATE proof_material_contexts SET document=? WHERE document=?", (json.dumps(doc), raw))
+        else:
+            table = "proof_revision_evidence" if damage.startswith("revision") else "proof_decision_evidence"
+            doc = json.loads(db.execute("SELECT document FROM " + table + " WHERE proof_id=?", (pid,)).fetchone()[0])
+            key = {"revision_wording": "proof_text", "revision_version": "version", "revision_context": "context_hash",
+                   "decision_comment": "comment", "decision_version": "version", "decision_context": "context_hash"}[damage]
+            doc[key] = 1 if key == "version" else "changed"
+            db.execute("UPDATE " + table + " SET document=? WHERE proof_id=?", (json.dumps(doc), pid))
+    reseal_digest(bundle)
+    with pytest.raises(UnsafeDrill):
+        drill.restore("rejected")
+    assert not (drill.root / "rejected").exists()
+    assert drill.source_bytes() == original
