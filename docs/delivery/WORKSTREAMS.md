@@ -236,3 +236,13 @@ Two store workers: producer and independent reviewer. Reviewer admits checkpoint
 and adversarial checks; any correction requires re-review. Same02:20Z implementation stop and03:00Z hard cutoff Nov12.
 No AWS/WSL, provider/API/model calls, credentials, deployment, live inventory, manufacturing or held-source access.
 Publication/conditional merge is a separate coordinated exact-target step after review; earlier approvals do not transfer.
+
+### Commercial fixture snapshot author freeze: 2026-11-11
+
+The narrow registry implementation adds42 focused cases. Final Windows author regression passed654 tests and94 subtests,
+with no skips and only the existing Starlette/httpx warning. OpenAPI consistency, archive67/41,31 document links and diff
+checks passed. Tests cover strict integer USD, immutable revision/kind, fake authority rejection, simulated lifecycle,
+exact compatible sets, current-pointer CAS/replay, valid prior-set rollback, retirement failclosed, concurrent publication,
+transaction/audit rollback, restart and corrupt JSON/identity reconciliation. No real pricing/policy data or consumer was
+connected. Exact frozen source still requires independent source/adversarial review, publication approval and hosted CI.
+All production and source holds and the fixed cutoff remain unchanged; full SS-006/COM-01 is not accepted.

@@ -135,6 +135,74 @@
         "title": "CartRequest",
         "type": "object"
       },
+      "CatalogDraft": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "catalog",
+            "title": "Kind",
+            "type": "string"
+          },
+          "previous_revision": {
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Previous Revision",
+            "type": "integer"
+          },
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/CatalogRow"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Rows",
+            "type": "array"
+          },
+          "source_reference": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Source Reference",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "previous_revision",
+          "source_reference",
+          "kind",
+          "rows"
+        ],
+        "title": "CatalogDraft",
+        "type": "object"
+      },
+      "CatalogRow": {
+        "additionalProperties": false,
+        "properties": {
+          "fixture_eligible": {
+            "title": "Fixture Eligible",
+            "type": "boolean"
+          },
+          "product_slug": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Product Slug",
+            "type": "string"
+          }
+        },
+        "required": [
+          "product_slug",
+          "fixture_eligible"
+        ],
+        "title": "CatalogRow",
+        "type": "object"
+      },
       "Category": {
         "properties": {
           "description": {
@@ -771,6 +839,160 @@
         "title": "Plan",
         "type": "object"
       },
+      "PoliciesDraft": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "policies",
+            "title": "Kind",
+            "type": "string"
+          },
+          "previous_revision": {
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Previous Revision",
+            "type": "integer"
+          },
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/PolicyRow"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Rows",
+            "type": "array"
+          },
+          "source_reference": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Source Reference",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "previous_revision",
+          "source_reference",
+          "kind",
+          "rows"
+        ],
+        "title": "PoliciesDraft",
+        "type": "object"
+      },
+      "PolicyRow": {
+        "additionalProperties": false,
+        "properties": {
+          "fixture_text": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Fixture Text",
+            "type": "string"
+          },
+          "policy_key": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Policy Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "policy_key",
+          "fixture_text"
+        ],
+        "title": "PolicyRow",
+        "type": "object"
+      },
+      "PriceRow": {
+        "additionalProperties": false,
+        "properties": {
+          "currency": {
+            "const": "USD",
+            "default": "USD",
+            "title": "Currency",
+            "type": "string"
+          },
+          "product_slug": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Product Slug",
+            "type": "string"
+          },
+          "unit_price_minor": {
+            "maximum": 99999999.0,
+            "minimum": 1.0,
+            "title": "Unit Price Minor",
+            "type": "integer"
+          },
+          "variant_key": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Variant Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "product_slug",
+          "variant_key",
+          "unit_price_minor"
+        ],
+        "title": "PriceRow",
+        "type": "object"
+      },
+      "PricesDraft": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "prices",
+            "title": "Kind",
+            "type": "string"
+          },
+          "previous_revision": {
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Previous Revision",
+            "type": "integer"
+          },
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/PriceRow"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Rows",
+            "type": "array"
+          },
+          "source_reference": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Source Reference",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "previous_revision",
+          "source_reference",
+          "kind",
+          "rows"
+        ],
+        "title": "PricesDraft",
+        "type": "object"
+      },
       "Problem": {
         "properties": {
           "code": {
@@ -989,6 +1211,33 @@
         "title": "Release",
         "type": "object"
       },
+      "ReleaseSet": {
+        "additionalProperties": false,
+        "properties": {
+          "catalog": {
+            "$ref": "#/components/schemas/SnapshotRef"
+          },
+          "policies": {
+            "$ref": "#/components/schemas/SnapshotRef"
+          },
+          "prices": {
+            "$ref": "#/components/schemas/SnapshotRef"
+          },
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "catalog",
+          "prices",
+          "policies"
+        ],
+        "title": "ReleaseSet",
+        "type": "object"
+      },
       "Reserve": {
         "additionalProperties": false,
         "properties": {
@@ -1135,6 +1384,90 @@
         "title": "RetailItem",
         "type": "object"
       },
+      "Review": {
+        "additionalProperties": false,
+        "properties": {
+          "decision": {
+            "enum": [
+              "approve_test",
+              "retire_test"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "expected_lifecycle_version": {
+            "maximum": 1000000.0,
+            "minimum": 1.0,
+            "title": "Expected Lifecycle Version",
+            "type": "integer"
+          },
+          "reason": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "expected_lifecycle_version",
+          "decision",
+          "reason"
+        ],
+        "title": "Review",
+        "type": "object"
+      },
+      "SelectSet": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "enum": [
+              "publish_test",
+              "rollback_test"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "expected_pointer_version": {
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Expected Pointer Version",
+            "type": "integer"
+          },
+          "reason": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "set_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Set Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "expected_pointer_version",
+          "set_id",
+          "action",
+          "reason"
+        ],
+        "title": "SelectSet",
+        "type": "object"
+      },
       "ServicePath": {
         "properties": {
           "name": {
@@ -1209,6 +1542,30 @@
           "tracking"
         ],
         "title": "Shipment",
+        "type": "object"
+      },
+      "SnapshotRef": {
+        "additionalProperties": false,
+        "properties": {
+          "revision": {
+            "maximum": 1000000.0,
+            "minimum": 1.0,
+            "title": "Revision",
+            "type": "integer"
+          },
+          "snapshot_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Snapshot Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "snapshot_id",
+          "revision"
+        ],
+        "title": "SnapshotRef",
         "type": "object"
       },
       "Stock": {
@@ -1891,6 +2248,481 @@
         "summary": "Staff Record",
         "tags": [
           "staff"
+        ]
+      }
+    },
+    "/v1/admin/retail-test/commercial/current-test": {
+      "get": {
+        "operationId": "current_set_v1_admin_retail_test_commercial_current_test_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Current Set",
+        "tags": [
+          "commercial test fixtures"
+        ]
+      },
+      "post": {
+        "operationId": "select_set_v1_admin_retail_test_commercial_current_test_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SelectSet"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Select Set",
+        "tags": [
+          "commercial test fixtures"
+        ]
+      }
+    },
+    "/v1/admin/retail-test/commercial/sets/{set_id}": {
+      "get": {
+        "operationId": "historical_set_v1_admin_retail_test_commercial_sets__set_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "set_id",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_-]+$",
+              "title": "Set Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Historical Set",
+        "tags": [
+          "commercial test fixtures"
+        ]
+      },
+      "post": {
+        "operationId": "create_set_v1_admin_retail_test_commercial_sets__set_id__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "set_id",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_-]+$",
+              "title": "Set Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReleaseSet"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Set",
+        "tags": [
+          "commercial test fixtures"
+        ]
+      }
+    },
+    "/v1/admin/retail-test/commercial/snapshots/{snapshot_id}/versions/{revision}": {
+      "get": {
+        "operationId": "snapshot_v1_admin_retail_test_commercial_snapshots__snapshot_id__versions__revision__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "snapshot_id",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_-]+$",
+              "title": "Snapshot Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "revision",
+            "required": true,
+            "schema": {
+              "maximum": 1000000,
+              "minimum": 1,
+              "title": "Revision",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Snapshot",
+        "tags": [
+          "commercial test fixtures"
+        ]
+      },
+      "post": {
+        "operationId": "create_snapshot_v1_admin_retail_test_commercial_snapshots__snapshot_id__versions__revision__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "snapshot_id",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_-]+$",
+              "title": "Snapshot Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "revision",
+            "required": true,
+            "schema": {
+              "maximum": 1000000,
+              "minimum": 1,
+              "title": "Revision",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "discriminator": {
+                  "mapping": {
+                    "catalog": "#/components/schemas/CatalogDraft",
+                    "policies": "#/components/schemas/PoliciesDraft",
+                    "prices": "#/components/schemas/PricesDraft"
+                  },
+                  "propertyName": "kind"
+                },
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CatalogDraft"
+                  },
+                  {
+                    "$ref": "#/components/schemas/PricesDraft"
+                  },
+                  {
+                    "$ref": "#/components/schemas/PoliciesDraft"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Snapshot",
+        "tags": [
+          "commercial test fixtures"
+        ]
+      }
+    },
+    "/v1/admin/retail-test/commercial/snapshots/{snapshot_id}/versions/{revision}/review-test": {
+      "post": {
+        "operationId": "review_snapshot_v1_admin_retail_test_commercial_snapshots__snapshot_id__versions__revision__review_test_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "snapshot_id",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_-]+$",
+              "title": "Snapshot Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "revision",
+            "required": true,
+            "schema": {
+              "maximum": 1000000,
+              "minimum": 1,
+              "title": "Revision",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Review"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Review Snapshot",
+        "tags": [
+          "commercial test fixtures"
         ]
       }
     },

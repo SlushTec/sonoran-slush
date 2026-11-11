@@ -18,6 +18,8 @@ from services.commerce.app.stock_ledger import router as stock_ledger_router
 app.include_router(stock_ledger_router)
 from services.commerce.app.component_reservations import router as component_reservation_router
 app.include_router(component_reservation_router)
+from services.commerce.app.commercial_snapshots import router as commercial_snapshot_router
+app.include_router(commercial_snapshot_router)
 
 @app.get("/v1/catalog", response_model=ReferenceCatalog, tags=["reference"])
 def catalog():

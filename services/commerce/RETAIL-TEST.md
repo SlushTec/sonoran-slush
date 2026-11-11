@@ -268,3 +268,45 @@ Per-lot reservation audit is separate from the earlier physical movement stream:
 uses bounded after/limit paging (maximum100) and records reserve/release/consume actor/reason/time, hold identity,
 allocations and resulting lot version. Read both streams when reconciling lot history. The event insert is part of
 the same transaction; exact command replay never appends another event. This does not create a production audit service.
+
+
+## Commercial snapshot fixtures (RPG-123 / partial SS-006)
+
+The new staff-only /v1/admin/retail-test/commercial routes use the existing opt-in retail/scaffold/staff gates.
+This is an isolated fixture registry. Every successful response says test_mode true, owner_approved false and
+production_approved false, including replay. approved_test is a simulated review state of the shared synthetic
+staff credential. It is NOT owner approval, separate-person review, commercial approval or permission to sell.
+
+POST /snapshots/{id}/versions/{revision} creates the next immutable content revision. Body fields:
+request_id UUID, previous_revision, source_reference (fixture reference key), kind and rows.
+Supported narrow kinds:
+- catalog: product_slug and strict fixture_eligible boolean, unique products from the current reference catalog.
+- prices: product_slug, variant_key, strict positive unit_price_minor integer and USD currency, unique product/variant.
+- policies: policy_key and bounded nonblank fixture_text, unique keys. Only synthetic text; no actual customer promises.
+Each kind accepts1..100 rows and rejects unknown fields/authority assertions. A snapshot identity cannot change kind.
+GET /snapshots/{id}/versions/{revision} reads current lifecycle metadata without rewriting immutable content.
+
+POST /snapshots/{id}/versions/{revision}/review-test requires request_id, expected_lifecycle_version,
+decision approve_test/retire_test and a nonblank reason. Only drafts can be test-approved; retirement is terminal.
+A new draft revision does not silently rewrite older approved-test content or historical records.
+
+POST /sets/{id} requires request_id and exact catalog/prices/policies references, each snapshot_id/revision.
+Every reference must have the exact kind and approved_test state. Fixture eligible products must match priced products
+exactly. The set retains content hashes, references and audit. These hashes prove consistency, not real source authority.
+Options, tax, machine profiles, owner identity and production remain explicitly unqualified.
+
+POST /current-test selects set_id with request_id, expected_pointer_version, action publish_test/rollback_test and reason.
+The pointer uses compare-and-set, records immutable publication history and rejects concurrent stale updates.
+Rollback requires a previously published set whose exact references are still approved_test and unchanged.
+GET /current-test resolves only the current valid test set; retiring a reference or detecting content mismatch fails closed.
+It does not silently fall back to stale prices/policies. GET /sets/{id} is a historical manifest, not a valid-current claim.
+
+UUID identities are global within the commercial-fixture command namespace across create/review/set/select.
+Exact replay returns its original receipt even after later state changes; changed or cross-operation reuse conflicts.
+All state, publication history and command/audit writes are transactional. Corrupt receipt/snapshot/set/pointer JSON
+returns controlled reconciliation errors. Historical snapshots and all existing orders remain untouched.
+
+No real price proposals, internal costs, customer files, current retail offers or public catalog records are imported.
+No application/assistant consumer uses this fixture pointer. Existing public catalog stays non-purchasable and /ready503.
+No provider, production owner identity, actual approval, deployment or live activation. Full SS-006/COM-01 remains open.
+Disable the test gate and preserve fixture history before a normal reviewed source revert; do not delete records as rollback.
