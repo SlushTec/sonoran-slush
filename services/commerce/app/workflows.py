@@ -415,10 +415,12 @@ def revise_proof(body: ProofRequest):
         if (old["version"] if old else 0) != body.expected_proof_version:
             raise HTTPException(409, "The proof has changed. Reload the current version.")
         if old:
-            doc = old
+            doc = dict(old)
             doc.update(version=old["version"]+1, status="awaiting_approval", proof_text=body.proof_text, approved_version=None)
         else:
             doc = {"id":"prf_"+uuid4().hex, "kind":"proof", "version":1, "status":"awaiting_approval", "order_id":order["id"], "proof_text":body.proof_text, "created_at":NOW(), "approved_version":None}
+        from services.commerce.app.proof_evidence import prepare
+        prepare(db, order, old, doc, body.proof_text)
         order.update(current_proof_id=doc["id"], current_proof_version=doc["version"], approved_proof_version=None, proof_status="awaiting_approval")
         if order["payment_status"] == "paid":
             order["status"] = "awaiting_approval"
@@ -438,8 +440,12 @@ def proof_decision(record_id: str, body: Decision, authorization: str | None, de
             raise HTTPException(409, "This is not the order's current proof.")
         if order["status"] in {"in_production", "shipped", "cancelled"} or order.get("reservation_status") == "expired":
             raise HTTPException(409, "This order cannot accept a proof decision. Contact the studio.")
+        from services.commerce.app.proof_evidence import verify, record_decision
+        revision_evidence, decision_history = verify(db, doc, order)
         if decision == "approve":
             if doc["status"] == "approved":
+                if decision_history[-1]["comment"] != body.comment:
+                    raise HTTPException(409, "The recorded approval comment differs; prepare a new revision.")
                 return doc
             if doc["status"] != "awaiting_approval":
                 raise HTTPException(409, "The studio needs to prepare a new proof.")
@@ -451,13 +457,16 @@ def proof_decision(record_id: str, body: Decision, authorization: str | None, de
         else:
             if not body.comment.strip():
                 raise HTTPException(422, "Describe the requested change.")
-            if doc["status"] == "changes_requested" and doc.get("change_request") == body.comment:
-                return doc
+            if doc["status"] == "changes_requested":
+                if doc.get("change_request") == body.comment:
+                    return doc
+                raise HTTPException(409, "A change decision is already recorded; prepare a new revision.")
             doc.update(status="changes_requested", change_request=body.comment, approved_version=None)
             order.update(proof_status="changes_requested", approved_proof_version=None)
             if order["payment_status"] == "paid":
                 order["status"] = "changes_requested"
             event(order, "Proof change requested")
+        record_decision(db, revision_evidence, decision_history, decision, body.comment)
         save(db, doc)
         save(db, order)
         return doc
@@ -494,6 +503,13 @@ def release_order(record_id: str, body: Release):
                 return doc
             if doc["status"] in {"cancelled", "shipped"} or not has_reservation(db, doc):
                 raise HTTPException(409, "A complete active reservation is required for test release.")
+        from services.commerce.app.proof_evidence import verify
+        if not doc.get("current_proof_id"):
+            raise HTTPException(409, "A freshly bound approved proof is required.")
+        actual_proof = load(db, doc["current_proof_id"])
+        verify(db, actual_proof, doc)
+        if actual_proof.get("status") != "approved":
+            raise HTTPException(409, "The exact bound proof is not approved.")
         current = doc.get("current_proof_version")
         approved = doc.get("approved_proof_version")
         gate = ProductionPrerequisites(payment_rule_satisfied=doc["payment_status"]=="paid", inventory_reserved=has_reservation(db, doc), capacity_confirmed=doc.get("capacity_confirmed", False), proof_required=doc["proof_required"], current_proof_version=str(current) if current else None, approved_proof_version=str(approved) if approved else None)

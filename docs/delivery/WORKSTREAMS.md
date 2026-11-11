@@ -362,3 +362,80 @@ metadata while keeping fields optional. Two regressions inspect endpoint-linked 
 first test lookup used ambiguous Offer schema naming and was corrected to follow the actual endpoint reference.
 Final full regression passes782 tests+94 subtests; OpenAPI/archive67/41/doc31/diff checks pass. Runtime/legacy shape
 behavior is unchanged. Prior e30d4a8 bundle is superseded; corrected source requires independent exact-freeze review.
+
+### Existing RPG-126 SS-032: proof history and material binding checkpoint
+
+Baseline integrated98abebb154f51a50e9f0c7a0e9e61f96f24f8943/treeffcf4fcaffa96c4c7dc1ada3bc0a9ddd9f7acd49.
+Design only before independent admission. Extend existing local proof/order flow, not a generic registry or new commerce
+system. Preserve proof IDs, current response fields, private capability authorization and exact-version checks.
+
+Add proof-specific append-only revision and decision evidence alongside current proof state in the same SQLite transaction.
+Revision evidence retains actual wording, exact version, server preparation timestamp, material context snapshot/hash and
+explicit limitations. Decision evidence retains exact version/hash, action/comment and server timestamp. Actor truth is
+shared synthetic staff credential for preparation and holder of this private proof capability for decisions; no individual
+customer identity or real signature is inferred. No overwrite/delete route for evidence. Current state remains compatible.
+
+Material context is exact order id, items, lines (including per-piece mappings), total_minor and currency. Missing lines on
+legacy quote orders are explicitly null, never invented. Exclude payment, status, capacity, holds, timeline and update times.
+Canonical JSON uses sorted keys, compact separators, ensure_ascii=False and UTF8, then SHA256. Validate admitted structures,
+strict money/types and new piece mapping before binding; malformed persisted state gives bounded409. Legacy unpaired
+surrogate text causes controlled409 reconciliation, not UTF8 crash, silent replacement or changed historical text.
+
+Capacity is32MiB per material context, not1MiB. Analytical envelope includes100 items duplicated in lines, bounded legacy
+text/options/photo fields with worst6-byte JSON control escapes, plus2000 structured pieces at120 supplementaryUnicode
+characters repeated in raw item/line item/normalized mapping and bounded JSON/index overhead; conservative envelope<24MiB.
+Validated synthetic probes: maxlegacy Unicode11,792,206B; mixed2000-piece Unicode14,789,806B; worst-control legacy17,596,106B;
+mixed worst-control legacy plus Unicode names20,523,090B. Escaping all Unicode would reach43,411,054B, so do not use that
+encoding. Automated valid-max fixtures and calculated-envelope regression must preserve every currently admitted order;
+any discovered higher legal bound must be reconciled before admission to a smaller downstream cap, not silently rejected.
+
+Legacy proof GET remains readable without mutation. A retained proof lacking bound evidence cannot obtain a new approval
+or fresh release: require staff to prepare a new revision presented for review. First actual revision preserves only the
+retained legacy current document as explicitly unbound observed evidence with captured_at now. Missing earlier revisions,
+actors, approval timestamps and past configurations are unknown, never reconstructed as facts. New preparation advances
+existing version/CAS, clears active approval and stores fresh bound revision. No migration/approval occurs on GET.
+
+Approval verifies current revision evidence and live material hash before an idempotent repeat; stale links/changed material
+fail closed. Release verifies the actual approved proof and context, not merely order flags, while preserving payment,
+reservation, capacity, exact proof-version and stage gates. Already executed in_production retries stay non-mutating receipts,
+not a new authorization or retroactive revocation. Legacy quote release remains blocked by its existing migration rule.
+
+Repeated prepare with stale expected version returns409 without duplicate history; it is not represented as successful replay.
+Identical current decision repeats add no evidence; conflicting repeated comment/decision requires explicit transition or409.
+Approved to changes_requested preserves prior approval as historical fact and clears active approval. New wording requires
+new revision. Any final proof/order/evidence write failure rolls back the entire transaction; contention cannot split state.
+Technical new-prepare version bound1000 is not a customer revisions policy; do not apply it retroactively to readable history.
+
+Bound history GET by strict cursor and limit<=25, metadata/digest summaries only (never25 full32MiB contexts), with same proof
+capability or staff authorization. Exact authorized revision GET may return one bounded snapshot; no cross-order leakage.
+Tests cover actual legacy readability/new reapproval, immutable old spelling/decisions, material changes versus nonmaterial
+churn, old proof links, exact repeats and concurrency, malformed/Unicode containers, rollback/restart, maxvalid size, bounded
+reads, altered piece mapping and current restore-drill compatibility. Full Python/OpenAPI/archive/link/diff checks and frozen
+independent source/adversarial review required. No fabricated image/export hashes, actual customer data, providers, machine
+profiles, real production qualification, held source, AWS/WSL or deployment. Full SS-032/COM-04 remains open. Two workers only;
+implementation stop02:20Z and hard cutoff03:00Z November12, no extension or publication implied by checkpoint admission.
+
+Storage refinement: persist each exact canonical material context once per SHA256 in a proof-specific immutable context
+store; hash includes order id. Revisions refer to that context hash rather than copying up to32MiB on each unchanged
+revision. On existing-hash insertion require identical canonical bytes and typed order identity, otherwise fail409; no
+silent collision overwrite. Reads verify stored bytes against hash and typed context; approval/release also compare the
+live order hash. Exact authorized revision resolution may fetch one bounded context; summary pagination never does.
+Context/revision/decision/current-proof/order writes share one transaction, including failure-injection coverage for each
+final write. No separate commercial authority or consumer registry; immutable contexts belong only to proof evidence.
+
+### Proof evidence author freeze: 2026-11-11
+
+Author full Windows regression passes 828 tests + 94 subtests, with 46 new cases and no skips. OpenAPI/archive67/41/doc31/diff
+checks pass. Restore drill now explicitly verifies all four added evidence tables and independent seeded counts/context
+hashes/order fields/revision wording/decision links; it does not ignore new tables. Tested current max configured material
+exceeds19MiB and fits the conservative<24MiB envelope under the32MiB cap. Empty legacy bulk orders remain readable but
+cannot acquire invented configuration; fresh bound preparation requires configured-order migration.
+
+Early independent probes found malformed history metadata timestamp transport errors/coercion and a corrupted private
+proof payload redirect. Narrow ISO-string/type checks and requested-record identity guards now reject those cases. SQL
+context type/byte-length metadata is checked before fetching/parsing the material blob. Strict integer schema/current/
+approved versions reject booleans. Exact revision/decision timestamps use the same ISO checks. Four originally reported
+probes were rerun successfully; final frozen independent full/adversarial review remains required before publication.
+No actual identity/legacy history/export hashes, prices, machine qualification, providers, deployment or live action.
+
+Final correction rejects present malformed binding markers (boolean, null, string or unsupported integer) on both history reads and fresh preparation; legacy means absent marker only. Four additional regressions passed in the final 828-test run. Independent frozen-source review remains required.
