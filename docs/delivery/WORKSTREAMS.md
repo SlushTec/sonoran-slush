@@ -789,3 +789,27 @@ Use only owned short D: synthetic pytest temporary roots and existing locked Pyt
 The admitted sequence correction is implemented explicitly: no sqlite_sequence filtering, and only the two known AUTOINCREMENT counters are accepted for the ledger profile. Twenty-seven new synthetic cases passed; the full Windows suite passed 855 tests plus 94 subtests, including all 57 unchanged legacy drill cases and the existing ledger/BOM behavior tests. Archive 67/41, 31 documentation links, OpenAPI consistency and diff checks passed. One existing Starlette/httpx deprecation warning remains.
 
 Actual synthetic evidence covers committed WAL versus an uncommitted balance edit, three reservation lifecycle states, exact replay with no version/event/counter mutation, shared command-identity collisions, active allocation floor and stale per-lot CAS rejection. A new restored release and receipt continue event IDs at 11/12 and movement ID at 5. Twenty-five rehashed schema/row/counter corruptions are rejected before target creation while preserving the source. No actual database, customer asset, provider or production configuration was accessed. Commercial/Square/large-proof/legacy-observation exclusions remain unchanged. This source is ready for independent review, not yet published or production-qualified.
+
+## RPG-121: unreachable legacy portal cleanup checkpoint
+
+Producer: second store lane; reviewer/integrator: first store lane. Checkpoint is based on frozen qualified staff reconciliation d2316e5da8867ecb7dc725db942be38d1bd4a87b. No implementation before PR21 integration and independent checkpoint admission; rebase this documentation-only checkpoint onto the confirmed identical-tree merged main first.
+
+### Bounded scope
+
+- Remove only the private, unexported and unreferenced LegacyRecordPortal function from apps/storefront/src/components/CustomerPortal.tsx, its exclusively used RecordData type, and now-unused useState and commerce imports.
+- The hook-free exported Portal already dispatches every supported kind to ProofReviewPortal, OrderReviewPortal or QuoteReviewPortal. Recheck tracked public source references and exports before deletion; no dynamic or module-level execution was found in the initial audit.
+- Preserve the Portal dispatcher, Account implementation and Admin re-export exactly. Preserve Link/useStore/Icon imports and all active proof/order/quote/staff component blobs, shared client, backend, contracts, workflows and business data. No held source, generated bundle or historical reconstruction is involved.
+- Add focused regression coverage for all three dispatcher kinds and Account/Admin export availability in the existing routine frontend test entrypoint, without weakening existing behavior assertions. Do not add a replacement portal, new feature, pricing decision or runtime configuration.
+
+### Verification and completion
+
+- Verify exact diff scope, absence of dead references and unchanged retained component bodies. Run the complete Python suite (baseline 855 tests plus 94 subtests), existing Node suite (baseline 189 plus new regressions), optimized static build, TypeScript, 53 headless browser cases, archive 67/41, OpenAPI consistency, documentation links and diff checks.
+- Rerun the four existing real loopback ASGI synthetic smokes on the final build: proof, isolated Square adapter-stub checkout, quote acceptance and staff workspace. No provider or live customer calls. Inspect resulting pixels and verify all owned helpers, ports and short temporary fixtures/receipts are cleaned up.
+- Use existing locked dependencies and owned D: work paths only. Never touch the user's browser, unrelated processes, AWS/WSL, production services or held sources. No new helpers/agents.
+- Freeze a clean exact commit/tree and verified bundle for independent review. No push or merge before that gate and parent integration authorization. This removes technical debt only; it neither adds commerce capability nor qualifies production readiness. Implementation stop remains November 12 02:20 UTC and final cutoff 03:00 UTC.
+
+### Portal cleanup author validation
+
+Removed 416 unreachable lines: the private legacy portal, its data type and unused React/commerce imports. The active three-way dispatcher, Account body, Admin export and all active portal/staff/backend sources remain unchanged. Two new routine Node regressions check exact dispatch/export identities and parsed-source absence of the retired declarations/import authority.
+
+Final Windows validation passed 855 Python tests plus 94 subtests, 191 Node tests, 53 headless browser cases, optimized static build, TypeScript, archive 67/41, 31 documentation links, OpenAPI consistency and diff checks. All four separately labeled real loopback ASGI smokes passed on this build; Square uses only the existing isolated test adapter stub and intercepted navigation, never a provider call. Fresh proof/order/quote/staff screenshots were inspected without a layout regression. Owned helper PIDs 9332/22516/4276/3332/35772/17372/22412/24072 and ports 3145/55217/55218/57083/57084/53171/53172/50177/50178 were verified absent/closed; synthetic temporary databases and downloaded receipts were removed by existing guarded cleanup. Exact source is ready for independent review, not published or production-qualified.
