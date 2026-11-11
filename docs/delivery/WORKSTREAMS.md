@@ -508,3 +508,19 @@ test backdoor, new credential, provider activation or modification of the shared
 Do not skip browser flows when the origin is absent: fail the QA setup clearly. No change to deployment configuration
 or the separate containers job; its closed readiness behavior remains unchanged.
 Any owned background server helper must use hidden-window startup and be stopped after required headless QA.
+
+
+### Integrated local proof smoke acceptance
+
+Before publication, run at least one headless browser flow against the actual current Python ASGI commerce app,
+not only mocked browser responses. Start an owned Uvicorn process on an unused loopback port with an isolated
+temporary fixture database and disposable synthetic fixture credentials. Seed a synthetic offer/cart/order/proof
+through supported fixture/staff APIs, then open the new portal, retrieve bound evidence, record an exact-version
+decision and verify the actual persisted history through the app. Include a later revision and read-only prior view.
+The test harness may relay requests for the compiled https://commerce.qa.invalid origin to this owned loopback app,
+preserving request method, body and authorization and returning actual backend responses. This relay exists solely
+in the headless test runner, never in application/runtime code. No production fallback or runtime test backdoor.
+Keep this integrated smoke separately labeled from mocked lifecycle tests. If frontend CI lacks Python dependencies,
+run and document it locally with exact source and outcomes rather than claiming mocked tests are full-stack evidence.
+Use only synthetic data, no live provider/payment or customer details. Start background helpers hidden, verify HTTP
+readiness and stop all owned Uvicorn/frontend/browser processes afterward without touching unrelated ports/processes.
