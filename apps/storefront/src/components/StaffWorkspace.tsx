@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { commerce, downloadJSON } from "@/lib/client";
 import Icon from "./Icon";
 type Doc = {
@@ -13,8 +13,8 @@ type Doc = {
   notes?: string;
   message?: string;
   location?: string;
-  date?: string;
-  quantity?: number;
+  date?: string | null;
+  quantity?: number | null;
   design_type?: string;
   total_minor?: number | null;
   current_proof_version?: number;
@@ -22,6 +22,7 @@ type Doc = {
   payment_status?: string;
   items?: { product_slug: string; quantity: number; text: string }[];
 };
+type Session = { token: string; generation: number };
 type Receipt = { id: string; status: string; access_token: string };
 type Summary = {
   counts: Record<string, number>;
@@ -41,70 +42,258 @@ export default function StaffWorkspace() {
     [capacity, setCapacity] = useState(false),
     [tracking, setTracking] = useState(""),
     [carrier, setCarrier] = useState(""),
-    [receipt, setReceipt] = useState<Receipt | null>(null);
-  async function overview() {
-    setSummary(await commerce<Summary>("/v1/admin/summary", undefined, token));
+    [receipt, setReceipt] = useState<Receipt | null>(null),
+    [outcome, setOutcome] = useState("");
+  const generation = useRef(0),
+    context = useRef(0),
+    session = useRef<Session | null>(null),
+    locked = useRef(false);
+  function clearDrafts() {
+    setDoc(null);
+    setReceipt(null);
+    setPrice("");
+    setMessage("");
+    setProof("");
+    setInventory(false);
+    setCapacity(false);
+    setTracking("");
+    setCarrier("");
+    setOutcome("");
+  }
+  function invalidateRecord() {
+    context.current++;
+    locked.current = false;
+    setBusy(false);
+    setError("");
+    clearDrafts();
+  }
+  function lock() {
+    generation.current++;
+    session.current = null;
+    invalidateRecord();
+    setToken("");
+    setSummary(null);
+    setRef("");
+  }
+  useEffect(() => {
+    const leave = () => lock(),
+      restore = (e: PageTransitionEvent) => {
+        if (e.persisted) lock();
+      };
+    window.addEventListener("popstate", leave);
+    window.addEventListener("pagehide", leave);
+    window.addEventListener("pageshow", restore);
+    return () => {
+      generation.current++;
+      context.current++;
+      session.current = null;
+      locked.current = false;
+      window.removeEventListener("popstate", leave);
+      window.removeEventListener("pagehide", leave);
+      window.removeEventListener("pageshow", restore);
+    };
+  }, []);
+  const active = (s: Session, c: number) =>
+    session.current === s &&
+    generation.current === s.generation &&
+    context.current === c;
+  function validDoc(value: unknown): value is Doc {
+    if (!value || typeof value !== "object" || Array.isArray(value))
+      return false;
+    const d = value as Doc;
+    return (
+      typeof d.id === "string" &&
+      d.id.length > 0 &&
+      d.id.length <= 100 &&
+      typeof d.kind === "string" &&
+      typeof d.status === "string" &&
+      Number.isSafeInteger(d.version) &&
+      d.version > 0 &&
+      [
+        d.name,
+        d.email,
+        d.details,
+        d.notes,
+        d.message,
+        d.location,
+        d.design_type,
+        d.proof_status,
+        d.payment_status,
+      ].every((v) => v === undefined || typeof v === "string") &&
+      (d.total_minor === undefined ||
+        d.total_minor === null ||
+        (Number.isSafeInteger(d.total_minor) && d.total_minor >= 0)) &&
+      (d.current_proof_version === undefined ||
+        (Number.isSafeInteger(d.current_proof_version) &&
+          d.current_proof_version >= 0)) &&
+      (d.date === undefined || d.date === null || typeof d.date === "string") &&
+      (d.quantity === undefined ||
+        d.quantity === null ||
+        (Number.isSafeInteger(d.quantity) && d.quantity > 0)) &&
+      (d.items === undefined ||
+        (Array.isArray(d.items) &&
+          d.items.length <= 100 &&
+          d.items.every(
+            (i) =>
+              i &&
+              typeof i === "object" &&
+              typeof i.product_slug === "string" &&
+              Number.isSafeInteger(i.quantity) &&
+              i.quantity > 0 &&
+              (i.text === undefined || typeof i.text === "string"),
+          )))
+    );
+  }
+  async function overview(s: Session, c: number) {
+    if (!active(s, c)) return;
+    const value = await commerce<Summary>(
+      "/v1/admin/summary",
+      undefined,
+      s.token,
+    );
+    if (!active(s, c)) return;
+    if (
+      !value ||
+      typeof value !== "object" ||
+      !value.counts ||
+      typeof value.counts !== "object" ||
+      Array.isArray(value.counts) ||
+      !Array.isArray(value.recent) ||
+      Object.values(value.counts).some(
+        (n) => !Number.isSafeInteger(n) || n < 0,
+      ) ||
+      value.recent.some(
+        (r) =>
+          !r ||
+          typeof r.id !== "string" ||
+          typeof r.kind !== "string" ||
+          typeof r.status !== "string",
+      )
+    )
+      throw Error("Summary response could not be verified.");
+    setSummary(value);
   }
   async function login(e: React.FormEvent) {
     e.preventDefault();
+    if (locked.current) return;
+    const credential = token.trim();
+    lock();
+    setToken(credential);
+    if (!credential) return;
+    const s = { token: credential, generation: generation.current },
+      c = context.current;
+    session.current = s;
+    locked.current = true;
     setBusy(true);
-    setError("");
     try {
-      await overview();
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Staff access could not be verified.",
-      );
+      await overview(s, c);
+    } catch {
+      if (active(s, c)) setError("Staff access could not be verified.");
     } finally {
-      setBusy(false);
+      if (active(s, c)) {
+        locked.current = false;
+        setBusy(false);
+      }
     }
   }
   async function openRecord(id: string) {
+    const s = session.current;
+    if (!s || generation.current !== s.generation || locked.current) return;
+    invalidateRecord();
+    const c = context.current,
+      recordID = id.trim();
+    setRef(recordID);
+    locked.current = true;
     setBusy(true);
-    setError("");
-    setReceipt(null);
     try {
       const d = await commerce<Doc>(
-        "/v1/admin/records/" + encodeURIComponent(id),
+        "/v1/admin/records/" + encodeURIComponent(recordID),
         undefined,
-        token,
+        s.token,
       );
+      if (!active(s, c)) return;
+      if (!validDoc(d) || d.id !== recordID) throw Error("Record mismatch");
       setDoc(d);
-      setRef(id);
       setPrice(d.total_minor != null ? (d.total_minor / 100).toFixed(2) : "");
       setMessage(d.message || "");
-      setInventory(false);
-      setCapacity(false);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "The record could not be opened.",
-      );
+    } catch {
+      if (active(s, c))
+        setError("The record could not be verified. Reopen it before acting.");
     } finally {
-      setBusy(false);
+      if (active(s, c)) {
+        locked.current = false;
+        setBusy(false);
+      }
     }
   }
   async function action(path: string, body: unknown) {
+    const s = session.current,
+      d = doc,
+      c = context.current;
+    if (!s || !d || !active(s, c) || locked.current) return;
+    locked.current = true;
     setBusy(true);
     setError("");
+    setOutcome("");
+    setReceipt(null);
+    let confirmed = false;
     try {
-      const result = await commerce<Doc | Receipt>(path, body, token);
-      if ("access_token" in result) setReceipt(result);
-      else setDoc(result);
-      await overview();
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "The action could not be confirmed.",
+      const result = await commerce<Doc | Receipt>(path, body, s.token);
+      if (!active(s, c)) return;
+      if (path === "/v1/admin/orders" || path === "/v1/admin/proofs") {
+        const r = result as Receipt,
+          prefix = path.endsWith("/orders") ? "ord_" : "prf_";
+        if (
+          !r ||
+          typeof r.id !== "string" ||
+          !r.id.startsWith(prefix) ||
+          r.id.length > 100 ||
+          typeof r.status !== "string" ||
+          typeof r.access_token !== "string" ||
+          !r.access_token ||
+          r.access_token.length > 1000
+        )
+          throw Error("Receipt mismatch");
+        setReceipt(r);
+      } else {
+        if (
+          !validDoc(result) ||
+          result.id !== d.id ||
+          result.kind !== d.kind ||
+          result.version < d.version
+        )
+          throw Error("Action response mismatch");
+        setDoc(result);
+      }
+      confirmed = true;
+      setOutcome(
+        "The service confirmed this action. Payment and production gates remain separate.",
       );
+      if (!active(s, c)) return;
+      await overview(s, c);
+    } catch {
+      if (active(s, c)) {
+        if (confirmed)
+          setError(
+            "The action was confirmed, but the overview could not refresh. Do not repeat the action; reopen the record to reconcile.",
+          );
+        else {
+          setDoc(null);
+          setReceipt(null);
+          setError(
+            "The action could not be confirmed. Reopen the record to reconcile before retrying.",
+          );
+        }
+      }
     } finally {
-      setBusy(false);
+      if (active(s, c)) {
+        locked.current = false;
+        setBusy(false);
+      }
     }
   }
   function offer() {
-    if (!doc) return;
+    if (!doc || locked.current) return;
     if (!/^\d+(\.\d{1,2})?$/.test(price) || !message.trim()) {
       setError(
         "Enter a reviewed USD total with up to two decimal places and the complete quote details.",
@@ -136,7 +325,10 @@ export default function StaffWorkspace() {
                 required
                 autoComplete="off"
                 value={token}
-                onChange={(e) => setToken(e.target.value)}
+                onChange={(e) => {
+                  lock();
+                  setToken(e.target.value);
+                }}
                 maxLength={500}
               />
             </label>
@@ -144,6 +336,11 @@ export default function StaffWorkspace() {
               Open workspace <Icon name="lock" size={16} />
             </button>
           </form>
+          {busy && (
+            <button type="button" className="link-button" onClick={lock}>
+              Lock workspace
+            </button>
+          )}
           {error && (
             <p className="form-error" role="alert">
               {error}
@@ -170,18 +367,14 @@ export default function StaffWorkspace() {
     <div style={{ paddingBottom: 70 }}>
       <div className="section-heading">
         <h2>Needs a little attention.</h2>
-        <button
-          className="link-button"
-          onClick={() => {
-            setToken("");
-            setSummary(null);
-            setDoc(null);
-            setReceipt(null);
-          }}
-        >
+        <button className="link-button" onClick={lock}>
           Lock workspace
         </button>
       </div>
+      <p className="field-help">
+        Lock hides and forgets this browser session. It does not cancel actions
+        already sent to the service.
+      </p>
       <div className="dashboard-grid">
         {Object.entries(summary.counts).map(([s, n]) => (
           <article className="dashboard-card" key={s}>
@@ -205,7 +398,10 @@ export default function StaffWorkspace() {
               <input
                 required
                 value={ref}
-                onChange={(e) => setRef(e.target.value)}
+                onChange={(e) => {
+                  invalidateRecord();
+                  setRef(e.target.value);
+                }}
                 maxLength={100}
               />
             </label>
@@ -247,6 +443,11 @@ export default function StaffWorkspace() {
               {error}
             </p>
           )}
+          {outcome && (
+            <p className="form-success" role="status">
+              {outcome}
+            </p>
+          )}
           {receipt && (
             <div className="form-success">
               <h3>Prepared: {receipt.id}</h3>
@@ -257,9 +458,14 @@ export default function StaffWorkspace() {
               <button
                 className="button primary"
                 style={{ marginTop: 15 }}
-                onClick={() =>
-                  downloadJSON("sonoran-slush-private-receipt.json", receipt)
-                }
+                onClick={() => {
+                  if (
+                    session.current &&
+                    active(session.current, context.current) &&
+                    receipt
+                  )
+                    downloadJSON("sonoran-slush-private-receipt.json", receipt);
+                }}
               >
                 Download receipt <Icon name="download" size={16} />
               </button>
@@ -322,6 +528,7 @@ export default function StaffWorkspace() {
                     Final reviewed total (USD)
                     <input
                       inputMode="decimal"
+                      disabled={busy}
                       value={price}
                       onChange={(e) => setPrice(e.target.value)}
                       placeholder="0.00"
@@ -332,6 +539,7 @@ export default function StaffWorkspace() {
                     <textarea
                       rows={5}
                       maxLength={3000}
+                      disabled={busy}
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                     />
@@ -383,6 +591,7 @@ export default function StaffWorkspace() {
                     <textarea
                       rows={5}
                       maxLength={5000}
+                      disabled={busy}
                       value={proof}
                       onChange={(e) => setProof(e.target.value)}
                     />
@@ -410,6 +619,7 @@ export default function StaffWorkspace() {
                   <label className="check-field">
                     <input
                       type="checkbox"
+                      disabled={busy}
                       checked={inventory}
                       onChange={(e) => setInventory(e.target.checked)}
                     />
@@ -420,6 +630,7 @@ export default function StaffWorkspace() {
                   <label className="check-field">
                     <input
                       type="checkbox"
+                      disabled={busy}
                       checked={capacity}
                       onChange={(e) => setCapacity(e.target.checked)}
                     />
@@ -452,6 +663,7 @@ export default function StaffWorkspace() {
                       <label className="field">
                         Carrier / delivery method
                         <input
+                          disabled={busy}
                           value={carrier}
                           maxLength={100}
                           onChange={(e) => setCarrier(e.target.value)}
@@ -460,6 +672,7 @@ export default function StaffWorkspace() {
                       <label className="field">
                         Tracking reference
                         <input
+                          disabled={busy}
                           value={tracking}
                           maxLength={200}
                           onChange={(e) => setTracking(e.target.value)}

@@ -751,3 +751,13 @@ Full Python/Node/typecheck/build/browser regression, headless pixel/WCAG2A/AA an
 loopbackASGI synthetic staff offer/receipt flow plus lock/reopen verification, no real account/provider.
 Owned hidden processes/headless browsers only, verify cleanup and preserve exact frozen evidence for
 independent review. No publication ahead of green dependency chain.
+
+### RPG-122 / SS-071 staff-session repair: author evidence
+
+- Repaired the reproduced pending-action/Lock race with immutable staff session and record generations. A retired continuation neither restores private state nor starts an old overview request. Lock hides/forgets this browser session; it does not cancel an already-submitted server action.
+- Record reference edits and record changes clear engraving, shipment, pricing/message, readiness and receipt drafts. Synchronous operation guards and stale success/error/finally checks preserve new-session state. Confirmed writes followed by refresh failure are reported honestly, without prompting a duplicate mutation.
+- Final author validation: 189 Node tests (36 added), 828 Python tests plus 94 subtests, 53 headless browser tests (4 added), TypeScript and optimized static build passed. Existing backend permissions, endpoints and business gates are unchanged.
+- The separately labeled real loopback ASGI smoke exercised staff offer, customer acceptance, staff order creation and private receipt download against a synthetic database. It exposed legitimate null date/quantity fields; the response guard was corrected to the actual backend contract and a regression added before the final build and reruns. No provider or live customer calls were made.
+- Final desktop 1440px, mobile 390px and real-backend screenshots were inspected. Whole-page WCAG 2A/AA and all axe rules scoped to the new workspace main content passed; the previously documented global announcement-region best-practice issue remains outside this repair.
+- Owned smoke PIDs 8388/12940 and ports 63748/63749 were stopped; browser test port 3140 is closed. Synthetic database and private downloaded receipt were removed by the validated temporary-root cleanup. No user browser was manipulated.
+- Evidence remains locally under the worktree artifacts directory and the existing delivery folder. Publication and independent qualification are separate subsequent gates; this is not production readiness or activation.
