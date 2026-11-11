@@ -168,3 +168,14 @@ report exact source/tests/blockers by **03:00Z**. No automatic extension. Keep a
 excluded guided-design, frontend-rollup, packaging and held-bundle derivatives; do not read or reconstruct them.
 No AWS/WSL, external providers, credentials, customer data, paid calls, manufacturing, deployment or live activation.
 Publication and merge remain a separate coordinated exact-target step after review; do not bypass a prior denial.
+
+### Synthetic ledger author freeze: 2026-11-11
+
+The selected disconnected ledger implementation adds 54 focused cases: immutable definitions, strict validation,
+exact/global request replay, version conflicts, authority/stage gates, bounded history/balance reads, condition/location
+conservation, competing last-unit movements, audit-insert rollback, overflow rollback, separate-interpreter persistence
+and no influence on retail stock or offers. Author-run full regression passed **568 tests and 94 subtests**;
+OpenAPI consistency, archive preservation (67/41), 31 document links and diff checks passed. Only the existing
+Starlette/httpx warning remains. No skipped checks were counted as passes. Independent source/adversarial review,
+Windows verification, publication and exact-head hosted CI are still pending. The implementation stays fixture-only;
+all whole-feature gaps, source holds and fixed run boundaries above remain unchanged.
