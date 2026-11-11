@@ -179,3 +179,36 @@ OpenAPI consistency, archive preservation (67/41), 31 document links and diff ch
 Starlette/httpx warning remains. No skipped checks were counted as passes. Independent source/adversarial review,
 Windows verification, publication and exact-head hosted CI are still pending. The implementation stays fixture-only;
 all whole-feature gaps, source holds and fixed run boundaries above remain unchanged.
+
+### Continued SS-044 slice: synthetic BOM and reservation planning
+
+PR11 merged as main `72c72c188491f8f7f012685283b4d8e83fb5e5e9`, identical reviewed tree `d22121c6309ff8fcfc678a3c116385cf929e702f`.
+All four exact-head jobs passed at run43067147498; Windows/Linux568+94 and19 independent adversarial probes passed.
+Post-merge checks must pass before the next feature edits. Native main is clean. No live activation occurred.
+
+Continue existing RPG-124 SS-044/SS-047 with immutable fixture BOM versions and explicit lot/location allocations.
+A read-only plan verifies every integer component requirement exactly, rejects duplicate/wrong/missing/overflow allocations,
+and reports current lot versions and free units. No automatic lot substitution or production-policy selection.
+Fixture reservations are staff-only and disconnected from checkout. States active/released/consumed, with no default expiry.
+All-component reserve/release/consume, lot-version changes and audit receipts happen in one transaction. Active allocations
+protect the available-stock floor on EVERY ledger transfer/negative correction. Consumption changes fixture condition to
+in_production only after removing its own active hold in that same transaction; it never authorizes manufacturing.
+Exact command replay is global across movement and reservation operations. Staff time/actor remains server-derived synthetic
+shared credential truth. Immutable BOM snapshots cannot be rewritten by a new BOM version or caller-supplied price/actor.
+
+Independent review covers current outflow integration, multi-component contention, release/consume races, final-leg/audit
+failure rollback, restart, stale versions and unchanged retail/payment/proof/production gates. Two store workers remain the
+producer/reviewer only; exact frozen source and all corrections require independent review. No actual stock, commercial values,
+credentials, providers, customer data, AWS/WSL, held source, deployment or activation. Full SS-044/SS-047/COM-02 remains open.
+The same implementation stop02:20Z and hard cutoff03:00Z on November12 apply. Publication/conditional merge is a separate
+coordinated exact-target step; prior approvals do not cover changed payload automatically.
+
+### BOM/reservation author freeze: 2026-11-11
+
+The fixture BOM and all-component hold slice adds44 focused cases. Final Windows author regression passed612 tests
+and94 subtests with no skips; OpenAPI consistency, archive67/41,31 document links and diff checks passed. The existing
+Starlette/httpx warning is unchanged. Tests cover immutable BOMs, exact allocations, strict bodies, command replay,
+active floors on old outflows, competing reservations, release/consume race, other-hold preservation, independent
+interpreter restart, missing-allocation holds, and final-component/per-lot-audit rollback. No source outside the admitted
+scope changed. Independent frozen-source/adversarial review and hosted verification remain pending. No actual inventory,
+providers, production policy, deployment or live activation. Full feature acceptance remains open.

@@ -1,6 +1,65 @@
 {
   "components": {
     "schemas": {
+      "Allocation": {
+        "additionalProperties": false,
+        "properties": {
+          "location_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Location Id",
+            "type": "string"
+          },
+          "lot_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Lot Id",
+            "type": "string"
+          },
+          "units": {
+            "maximum": 1000000.0,
+            "minimum": 1.0,
+            "title": "Units",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "lot_id",
+          "location_id",
+          "units"
+        ],
+        "title": "Allocation",
+        "type": "object"
+      },
+      "Bill": {
+        "additionalProperties": false,
+        "properties": {
+          "components": {
+            "items": {
+              "$ref": "#/components/schemas/Need"
+            },
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Components",
+            "type": "array"
+          },
+          "product_slug": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Product Slug",
+            "type": "string"
+          }
+        },
+        "required": [
+          "product_slug",
+          "components"
+        ],
+        "title": "Bill",
+        "type": "object"
+      },
       "Bucket": {
         "additionalProperties": false,
         "properties": {
@@ -582,6 +641,30 @@
         "title": "Movement",
         "type": "object"
       },
+      "Need": {
+        "additionalProperties": false,
+        "properties": {
+          "component_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Component Id",
+            "type": "string"
+          },
+          "units_per_item": {
+            "maximum": 1000000.0,
+            "minimum": 1.0,
+            "title": "Units Per Item",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "component_id",
+          "units_per_item"
+        ],
+        "title": "Need",
+        "type": "object"
+      },
       "OrderRequest": {
         "additionalProperties": false,
         "properties": {
@@ -660,6 +743,32 @@
           "filename"
         ],
         "title": "PhotoReference",
+        "type": "object"
+      },
+      "Plan": {
+        "additionalProperties": false,
+        "properties": {
+          "allocations": {
+            "items": {
+              "$ref": "#/components/schemas/Allocation"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Allocations",
+            "type": "array"
+          },
+          "quantity": {
+            "maximum": 500.0,
+            "minimum": 1.0,
+            "title": "Quantity",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "quantity",
+          "allocations"
+        ],
+        "title": "Plan",
         "type": "object"
       },
       "Problem": {
@@ -878,6 +987,63 @@
           "capacity_confirmed"
         ],
         "title": "Release",
+        "type": "object"
+      },
+      "Reserve": {
+        "additionalProperties": false,
+        "properties": {
+          "allocations": {
+            "items": {
+              "$ref": "#/components/schemas/Allocation"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Allocations",
+            "type": "array"
+          },
+          "lot_versions": {
+            "maxProperties": 100,
+            "minProperties": 1,
+            "patternProperties": {
+              "^[a-zA-Z0-9_-]+$": {
+                "maximum": 9.223372036854776e+18,
+                "minimum": 0.0,
+                "type": "integer"
+              }
+            },
+            "propertyNames": {
+              "maxLength": 100,
+              "minLength": 1
+            },
+            "title": "Lot Versions",
+            "type": "object"
+          },
+          "quantity": {
+            "maximum": 500.0,
+            "minimum": 1.0,
+            "title": "Quantity",
+            "type": "integer"
+          },
+          "reason": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "quantity",
+          "allocations",
+          "request_id",
+          "lot_versions",
+          "reason"
+        ],
+        "title": "Reserve",
         "type": "object"
       },
       "RetailItem": {
@@ -1129,6 +1295,53 @@
           "outcome"
         ],
         "title": "TestPayment",
+        "type": "object"
+      },
+      "Transition": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_version": {
+            "maximum": 9.223372036854776e+18,
+            "minimum": 1.0,
+            "title": "Expected Version",
+            "type": "integer"
+          },
+          "lot_versions": {
+            "maxProperties": 100,
+            "minProperties": 1,
+            "patternProperties": {
+              "^[a-zA-Z0-9_-]+$": {
+                "maximum": 9.223372036854776e+18,
+                "minimum": 0.0,
+                "type": "integer"
+              }
+            },
+            "propertyNames": {
+              "maxLength": 100,
+              "minLength": 1
+            },
+            "title": "Lot Versions",
+            "type": "object"
+          },
+          "reason": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "expected_version",
+          "lot_versions",
+          "reason"
+        ],
+        "title": "Transition",
         "type": "object"
       },
       "ValidationError": {
@@ -1681,6 +1894,314 @@
         ]
       }
     },
+    "/v1/admin/retail-test/component-ledger/boms/{bom_id}/versions/{revision}": {
+      "get": {
+        "operationId": "read_bom_v1_admin_retail_test_component_ledger_boms__bom_id__versions__revision__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bom_id",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_-]+$",
+              "title": "Bom Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "revision",
+            "required": true,
+            "schema": {
+              "maximum": 1000000,
+              "minimum": 1,
+              "title": "Revision",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Read Bom",
+        "tags": [
+          "synthetic component reservations"
+        ]
+      },
+      "put": {
+        "operationId": "define_bom_v1_admin_retail_test_component_ledger_boms__bom_id__versions__revision__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bom_id",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_-]+$",
+              "title": "Bom Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "revision",
+            "required": true,
+            "schema": {
+              "maximum": 1000000,
+              "minimum": 1,
+              "title": "Revision",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Bill"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Define Bom",
+        "tags": [
+          "synthetic component reservations"
+        ]
+      }
+    },
+    "/v1/admin/retail-test/component-ledger/boms/{bom_id}/versions/{revision}/plan": {
+      "post": {
+        "operationId": "plan_bom_v1_admin_retail_test_component_ledger_boms__bom_id__versions__revision__plan_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bom_id",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_-]+$",
+              "title": "Bom Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "revision",
+            "required": true,
+            "schema": {
+              "maximum": 1000000,
+              "minimum": 1,
+              "title": "Revision",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Plan"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Plan Bom",
+        "tags": [
+          "synthetic component reservations"
+        ]
+      }
+    },
+    "/v1/admin/retail-test/component-ledger/boms/{bom_id}/versions/{revision}/reservations": {
+      "post": {
+        "operationId": "reserve_bom_v1_admin_retail_test_component_ledger_boms__bom_id__versions__revision__reservations_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bom_id",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_-]+$",
+              "title": "Bom Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "revision",
+            "required": true,
+            "schema": {
+              "maximum": 1000000,
+              "minimum": 1,
+              "title": "Revision",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Reserve"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reserve Bom",
+        "tags": [
+          "synthetic component reservations"
+        ]
+      }
+    },
     "/v1/admin/retail-test/component-ledger/components/{component_id}": {
       "put": {
         "operationId": "component_v1_admin_retail_test_component_ledger_components__component_id__put",
@@ -2116,6 +2637,286 @@
         "summary": "Movement",
         "tags": [
           "synthetic component ledger"
+        ]
+      }
+    },
+    "/v1/admin/retail-test/component-ledger/lots/{lot_id}/reservation-events": {
+      "get": {
+        "operationId": "reservation_events_v1_admin_retail_test_component_ledger_lots__lot_id__reservation_events_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lot_id",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_-]+$",
+              "title": "Lot Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "after",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "maximum": 9223372036854775807,
+              "minimum": 0,
+              "title": "After",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reservation Events",
+        "tags": [
+          "synthetic component reservations"
+        ]
+      }
+    },
+    "/v1/admin/retail-test/component-ledger/reservations/{hold_id}": {
+      "get": {
+        "operationId": "read_hold_v1_admin_retail_test_component_ledger_reservations__hold_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "hold_id",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_-]+$",
+              "title": "Hold Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Read Hold",
+        "tags": [
+          "synthetic component reservations"
+        ]
+      }
+    },
+    "/v1/admin/retail-test/component-ledger/reservations/{hold_id}/consume": {
+      "post": {
+        "operationId": "consume_hold_v1_admin_retail_test_component_ledger_reservations__hold_id__consume_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "hold_id",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_-]+$",
+              "title": "Hold Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Transition"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Consume Hold",
+        "tags": [
+          "synthetic component reservations"
+        ]
+      }
+    },
+    "/v1/admin/retail-test/component-ledger/reservations/{hold_id}/release": {
+      "post": {
+        "operationId": "release_hold_v1_admin_retail_test_component_ledger_reservations__hold_id__release_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "hold_id",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_-]+$",
+              "title": "Hold Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Transition"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Release Hold",
+        "tags": [
+          "synthetic component reservations"
         ]
       }
     },

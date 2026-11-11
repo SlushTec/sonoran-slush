@@ -226,3 +226,45 @@ retail stock occurs. Rollback: disable the test gate, preserve the database and 
 through review; do not delete test tables as a rollback shortcut. Individual production identities, bills of materials,
 lot-level reservations, inspected eligibility, real stock/costs, physical counts, purchasing, production policies,
 managed persistence and full SS-044/COM-02 qualification remain open. No provider, deployment or live activation.
+
+
+## Fixture BOMs and component reservations (continued partial SS-044/SS-047)
+
+Under the same staff-only component-ledger prefix, immutable BOM versions bind an existing reference product
+to defined component IDs and positive integer units per output. Component units are copied from authoritative
+fixture definitions, never caller-supplied. A BOM can contain different units for different components; a given
+component's frozen unit cannot change. This remains a synthetic planning model, not a sellable product definition.
+
+- PUT/GET /boms/{id}/versions/{revision}: body product_slug and components[{component_id,units_per_item}].
+  Revision1..1,000,000 is immutable. Reordered identical component definitions replay; changed contents conflict.
+- POST /boms/{id}/versions/{revision}/plan: quantity1..500 and allocations[{lot_id,location_id,units}].
+  Allocations must fulfill every component exactly, without duplicate lot/location buckets, unknown components,
+  damaged/sample/production stock, overflow or insufficient free units. Returns frozen BOM, allocation details,
+  physical/reserved/free units and current lot_versions. This call does not reserve anything.
+- POST /boms/{id}/versions/{revision}/reservations: same plan plus UUID request_id, exact lot_versions map and
+  reason. All components reserve atomically or none do. No lot selection, substitution, expiry or duration policy
+  is inferred. New fixture holds are active/version1 and preserve the exact BOM snapshot.
+- GET /reservations/{id}: staff-only current fixture hold.
+- POST /reservations/{id}/release or /consume: UUID request_id, expected_version, exact current lot_versions
+  and reason. Only current active holds transition. Release frees once without changing physical stock.
+  Consume atomically moves its units from available to in_production condition; this does NOT authorize real
+  manufacturing. Existing payment/proof/capacity and retail production-release gates remain untouched.
+
+Lot balances remain physical quantities. Use the plan's reserved/free fields for fixture availability, never
+assume a raw available-condition balance is unreserved stock. Every fixture movement that reduces available units
+now checks the active-reservation floor, including transfers and negative count corrections. Release/consume
+increments each affected lot once, even with allocations at multiple locations. Other active holds stay protected.
+Command identities are ledger-global across movements/reserve/release/consume: exact retries return the recorded
+receipt, including after later versions; changed payload or cross-operation reuse conflicts. All legs, lot/hold versions
+and audit writes are one database transaction. Incomplete active allocation records fail closed for reconciliation.
+
+No actual inventory, production hold duration, checkout integration, supplier/provider action, price, purchasing or
+live activation. The shared synthetic staff actor is not individual production identity. Inspection eligibility,
+real product BOMs, managed persistence, authorized production transitions, expiry policy and full SS-044/SS-047/COM-02
+qualification remain open. Disable the test gate and preserve history before a reviewed revert; do not revert to the
+earlier ledger against active holds while assuming it still protects reserved stock.
+
+Per-lot reservation audit is separate from the earlier physical movement stream: GET /lots/{id}/reservation-events
+uses bounded after/limit paging (maximum100) and records reserve/release/consume actor/reason/time, hold identity,
+allocations and resulting lot version. Read both streams when reconciling lot history. The event insert is part of
+the same transaction; exact command replay never appends another event. This does not create a production audit service.
