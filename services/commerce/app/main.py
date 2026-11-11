@@ -47,3 +47,6 @@ for route, method in [
                       name=method.lower()+"_"+route.replace("/", "_").replace("{", "").replace("}", ""))
 from services.commerce.app.commercial_comparison import router as commercial_comparison_router
 app.include_router(commercial_comparison_router)
+
+from services.commerce.app.proof_evidence import router as proof_evidence_router
+app.include_router(proof_evidence_router)

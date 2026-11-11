@@ -2,7 +2,7 @@
 
 No supplied database or asset path is accepted. All inputs originate in this
 pytest fixture. Current proof links and synthetic byte references are assessed;
-private assets, proof history, jobs, migrations and production recovery are not.
+Bound proof revision/decision evidence is included; private assets, legacy-history migration, jobs and production recovery are not.
 """
 from contextlib import closing
 from datetime import datetime, timedelta, timezone
@@ -35,7 +35,8 @@ SECRET = "restore-drill-only-" + "x" * 40
 STAFF = "restore-drill-staff-" + "y" * 40
 SLUG = "makertwist-40oz-tumbler"
 FORMAT = "synthetic-sqlite-drill-v1"  # NOT an application schema version.
-TABLES = ("metadata", "payment_events", "records", "requests", "retail_offers",
+TABLES = ("metadata", "payment_events", "proof_decision_evidence", "proof_legacy_observations",
+          "proof_material_contexts", "proof_revision_evidence", "records", "requests", "retail_offers",
           "retail_reservations", "retail_stock")
 SIDECARS = ("-wal", "-shm", "-journal")
 CASES = ("active", "paid", "consumed", "expired", "recovery", "cancelled")
@@ -243,6 +244,36 @@ class Drill:
         schema, rows = saved
         docs = {r[0]: json.loads(r[3]) for r in rows["records"]}
         assert len(docs) == 18 and len(rows["requests"]) == 6
+        assert len(rows["proof_material_contexts"]) == 6
+        assert len(rows["proof_revision_evidence"]) == 7
+        assert len(rows["proof_decision_evidence"]) == 5
+        assert rows["proof_legacy_observations"] == ()
+        contexts = {}
+        for digest, order_id, raw in rows["proof_material_contexts"]:
+            assert sha256(raw.encode("utf-8")).hexdigest() == digest
+            context = json.loads(raw)
+            source = docs[order_id]
+            assert context == {"order_id": order_id, "items": source["items"], "lines": source["lines"],
+                               "total_minor": source["total_minor"], "currency": source["currency"]}
+            contexts[digest] = context
+        revisions = {}
+        for proof_id, version, order_id, digest, at, raw in rows["proof_revision_evidence"]:
+            evidence = json.loads(raw)
+            assert evidence["proof_id"] == proof_id and evidence["version"] == version
+            assert evidence["order_id"] == order_id and evidence["context_hash"] == digest
+            assert evidence["prepared_at"] == at and contexts[digest]["order_id"] == order_id
+            assert evidence["actor_scope"] == "shared synthetic staff credential"
+            revisions[(proof_id, version)] = evidence
+        for proof_id, version, sequence, raw in rows["proof_decision_evidence"]:
+            decision = json.loads(raw)
+            assert sequence == 1 and decision["action"] == "approve"
+            assert decision["version"] == version and decision["proof_id"] == proof_id
+            assert decision["context_hash"] == revisions[(proof_id, version)]["context_hash"]
+            assert decision["actor_scope"] == "holder of this private proof capability"
+        first_active = revisions[(self.proofs["active"]["id"], 1)]
+        assert first_active["proof_text"] == "Synthetic proof active"
+        assert revisions[(self.proofs["active"]["id"], 2)]["proof_text"] == "Synthetic revised proof"
+
         assert len(rows["payment_events"]) == 3 and len(rows["retail_reservations"]) == 6
         assert rows["retail_stock"] == (("shared", 19, 2),)
         assert rows["metadata"] == (("access_secret_fingerprint", sha256(SECRET.encode()).hexdigest()),)
