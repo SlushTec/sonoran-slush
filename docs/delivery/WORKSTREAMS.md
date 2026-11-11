@@ -557,3 +557,46 @@ Current screenshots: artifacts/proof-desktop.png, artifacts/proof-mobile.png, ar
 They show readable current/history/configuration/decision layouts with loaded brand assets and no plaintext credentials.
 Useful external logs/config are retained under the existing D: delivery folder. Frozen independent review is still
 required; broad RPG-121/SS-032 and production qualification are not complete merely because this slice passes.
+
+### RPG-125 bounded Square sandbox order-portal alignment checkpoint
+
+Producer: second store worker; independent reviewer/integrator: store coordinator. Base is frozen PR17
+4dcdf820; no implementation until PR17 integration and independent design admission. Rebase docs onto
+actual merged equivalent source first. Same fixed 03:00 UTC cutoff, implementation stop 02:20 UTC.
+Only tracked public source; no held guided-design/frontend-rollup/bundle sources or derivatives.
+
+Observed mismatch: CustomerPortal.pay currently accepts Stripe while payments.py sandbox_checkout_url
+accepts only https://sandbox.square.link[:443]/u/[A-Za-z0-9_-]+ with whole raw-string matching.
+Replace the obsolete guard, not broaden it. Require raw string exact full match (JS dollar-anchor final
+newline must not pass), provider === square, test_mode === true and nonempty bounded string session_id.
+Do not normalize, trim, decode or repair URLs. Reject live Square, Stripe, userinfo, lookalike hosts,
+non-default/zero-padded ports, query/fragment, encoded paths, whitespace, controls and extra path segments.
+Backend remains payment authority; no new payment availability, paid status or production authorization.
+
+Use a separate order-only component via hook-free Portal routing so proof portal and quote body stay
+unchanged. Scope: CustomerPortal wrapper, new OrderReviewPortal component and focused tests/docs only;
+minimal explicit routine Node test wiring is allowed. No backend, shared client, provider or proof changes.
+Preserve order read display, existing local simulation and availability gates; backend tests remain final
+truth. Label processor action Open Square sandbox checkout, only for strict test_payment_available true.
+Do not interpret an accepted redirect as paid. Existing synthetic retail simulation remains separately
+labeled and never uses Square. Missing/malformed current id/version must disable mutation fail-closed.
+
+Loaded session binds immutable order id, trimmed capability, positive strict version and generation.
+Input edit, Close, Back/pagehide, persisted pageshow and unmount invalidate pending lookup/action results
+and navigation; ordinary pageshow does not clear typed input. Record id must match requested id.
+Use synchronous per-session action lock to prevent duplicate clicks before React state commits. Every
+success/error/finally checks session/request generation; stale old responses cannot alter a new session.
+Payment request remains exact {order_id,version} and captured bearer. Mutating responses must match loaded
+record identity; refresh after conflicts, not silently adopt an unrelated record. Private data stays in
+memory only, absent URL/local/session storage/logs. Close available while busy. No browser/provider opened
+by automated tests; test navigation is intercepted before any external request.
+
+QA: table-driven raw URL parity with backend allow/reject cases and final-newline edge; malformed provider,
+test_mode/session id, exact bearer/version, unavailable/malformed order gating, duplicate click, 409/retry,
+late lookup/action after Close/edit/Back/unmount and reopened session isolation. Retain order simulation
+and quote/proof regressions. Full Python/Node/typecheck/build/browser/accessibility/mobile/pixel checks.
+One separately labeled actual local ASGI checkout smoke may stub the provider adapter only within its
+isolated synthetic test process, exercising real endpoint/auth/order gates and browser response handling.
+No actual provider request, account credential, real customer or live payment; do not call this live Square
+verification. Owned hidden loopback test servers/headless browser only; verify cleanup and preserve evidence.
+Use existing locked dependencies without competing install. No production deploy, AWS or WSL.
