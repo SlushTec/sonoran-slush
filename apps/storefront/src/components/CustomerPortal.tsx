@@ -4,6 +4,7 @@ import Link from "next/link";
 import { commerce } from "@/lib/client";
 import { useStore } from "./Store";
 import Icon from "./Icon";
+import ProofReviewPortal from "./ProofReviewPortal";
 type RecordData = {
   id: string;
   status: string;
@@ -25,6 +26,9 @@ type RecordData = {
   shipment?: { carrier: string; tracking: string };
 };
 export function Portal({ kind }: { kind: "orders" | "proofs" | "quotes" }) {
+  return kind === "proofs" ? <ProofReviewPortal /> : <LegacyRecordPortal kind={kind} />;
+}
+function LegacyRecordPortal({ kind }: { kind: "orders" | "proofs" | "quotes" }) {
   const [id, setID] = useState(""),
     [token, setToken] = useState(""),
     [data, setData] = useState<RecordData | null>(null),

@@ -524,3 +524,36 @@ Keep this integrated smoke separately labeled from mocked lifecycle tests. If fr
 run and document it locally with exact source and outcomes rather than claiming mocked tests are full-stack evidence.
 Use only synthetic data, no live provider/payment or customer details. Start background helpers hidden, verify HTTP
 readiness and stop all owned Uvicorn/frontend/browser processes afterward without touching unrelated ports/processes.
+
+
+### Public proof portal implementation and author verification
+
+Implemented a separate proof-only consumer with hook-free Portal routing. Compared the complete legacy orders/quotes
+function body against base 53b5feb after its name change: byte-equivalent, including payment URL guard. Backend and
+shared client are unchanged. Routine Node CI now runs both explicit suites; only the storefront QA job gets the invalid
+test origin. No held source, real customer data, new business values, deployment or production activation was used.
+
+Reviewer findings fixed before freeze: actual secondary inscription/font fields, historical metadata hash matching,
+BFCache-only pageshow clearing, bounded Unicode code-point rendering and malformed lone-surrogate rejection.
+Decision evidence now requires exact schema/proof/order/version/hash identity; current status and approved version
+must agree with the last recorded decision. Partial or mismatched responses cannot display a false approval confirmation.
+Actual pixel QA found missing public logos in standalone preview; the separately admitted repair copies only Git-tracked
+public assets into validated owned standalone destinations. HTTP hash/image-load regression verifies it. Heading focus
+uses a sticky-header scroll margin. Screenshots were regenerated and inspected after the correction, not reused as proof.
+
+Author checks: 828 Python tests + 94 subtests; 68 Node tests (47 new); 38 headless Playwright tests (6 new), including
+desktop/mobile axe and real loaded asset hashes. TypeScript, optimized build, OpenAPI, archive 67/41 and document links pass.
+No test skips. Native npm nested-script stdin failure was avoided by executing the exact underlying locked commands;
+CI retains standard npm commands. Early unscoped browser locators collided with existing global announcements and were
+corrected to exact proof messages. Existing Next background-prefetch NoFallbackError noise was observed separately from
+passing route tests; it was not suppressed or claimed fixed.
+
+Separately labeled real-backend smoke passed against current ASGI code and isolated synthetic SQLite state: 10 actual
+relayed browser requests, one persisted approval, prior revision immutable after new revision, historical read-only and
+Close clearing credentials. Last owned backend/preview PIDs 29332/20044, ports 52277/52278 stopped/closed and temporary
+database removed. Headless Playwright-owned preview port 3137 is also closed. No user browser was touched.
+
+Current screenshots: artifacts/proof-desktop.png, artifacts/proof-mobile.png, artifacts/proof-real-backend.png.
+They show readable current/history/configuration/decision layouts with loaded brand assets and no plaintext credentials.
+Useful external logs/config are retained under the existing D: delivery folder. Frozen independent review is still
+required; broad RPG-121/SS-032 and production qualification are not complete merely because this slice passes.
