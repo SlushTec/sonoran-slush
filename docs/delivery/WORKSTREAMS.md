@@ -489,3 +489,22 @@ Native Windows headless/local test servers only: do not touch the user's open br
 Stop owned test servers/processes after QA. Report unrelated existing failures without expanding scope.
 No feature edits before independent checkpoint admission; no publication before frozen-source independent review.
 Same authorized cutoff: November 12 03:00 UTC, with implementation stop at 02:20 UTC; no further agents, AWS or WSL.
+
+
+### Proof portal checkpoint correction: routine verification wiring
+
+Additional narrowly scoped paths: root package.json, .github/workflows/verify.yml and the existing
+tests/frontend/storefront.test.cjs proof-success fixtures/assertions only. Nonproof tests remain unchanged.
+The root test:frontend command currently names only storefront.test.cjs; include both explicit test filenames
+so routine CI executes the new proof lifecycle cases rather than leaving them as an optional manual command.
+Existing proof-success fixtures must supply the real bound revision/evidence shape; retain and extend assertions,
+not weaken approval expectations or remove previous coverage.
+
+The storefront verification job builds without a commerce origin today. Add only its CI job environment
+NEXT_PUBLIC_COMMERCE_API_URL=https://commerce.qa.invalid so the compiled local QA build reaches Playwright's
+synthetic routes. New browser tests intercept only this reserved invalid host, assert requests and use no real service.
+Apply the same explicit environment to local QA build/start. No production default, fallback, special client branch,
+test backdoor, new credential, provider activation or modification of the shared commerce client is permitted.
+Do not skip browser flows when the origin is absent: fail the QA setup clearly. No change to deployment configuration
+or the separate containers job; its closed readiness behavior remains unchanged.
+Any owned background server helper must use hidden-window startup and be stopped after required headless QA.
