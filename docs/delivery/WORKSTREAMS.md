@@ -679,3 +679,30 @@ offer and private acceptance with stored/replayed exact accepted_version, includ
 No provider calls or actual customer data. Hidden owned localservers/headless browser only; cleanup
 verified. Existing locked dependencies reused, separate build. Frozen source and evidence go to peer
 review before any publication; this does not mark all RPG-121 or production delivery complete.
+
+
+### Quote consumer author implementation and evidence
+
+Implemented separate current-quote consumer with supported retail/bulk/event/contact reads, contact
+read-only, full multiline/codepoint limits, bounded item pages, immutable capability/version session,
+stale response isolation and synchronous duplicate lock. Success requires exact returned accepted
+identity/version and unchanged displayed commercial terms. No invented customer identity, booking,
+payment or production confirmation. LegacyRecordPortal body and complete proof/Square components
+verified byte-equivalent against49b0c142 after newline normalization; only dispatch/import changed.
+Backend and shared client unchanged. No held sources, provider calls or live data.
+
+Author regression:828 Python +94 subtests,153 Node (49new),49 browser (6new), TypeScript/optimized build,
+archive67/41,document links31,diff checks pass; no skips. Browser checks cover whole-page WCAG2A/AA
+and all axe rules scoped to new quote component. Existing global announcement landmark best-practice
+issue and background Next prefetch noise remain outside this scope, not claimed fixed.
+Final artifacts/quote-1440.png,quote-390.png,quote-real-backend.png individually inspected: full
+multiline terms, item inscriptions, explicit acceptance and separate-decision copy readable, no overflow
+or plaintext capability. Build and all evidence use the new consumer, not stale old portal assets.
+
+Separately labeled actual ASGI smoke passed on isolated synthetic SQLite: quote creation/offer, browser
+exact-version acceptance, persisted accepted_version2, identical replay and contact read-only. Three
+browser API requests relayed to real loopback server; no provider calls. Owned PIDs17244/2624 and
+ports55197/55198 stopped/closed, temporary database removed; Playwright port3139 also verified closed.
+No user browser, deployment, credentials, prices/policies or production state touched.
+This branch remains stacked on independently qualified49b0c142 and cannot publish/merge ahead of
+required predecessor CI. Exact frozen source still requires independent review before integration.
