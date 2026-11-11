@@ -414,3 +414,11 @@ reads, altered piece mapping and current restore-drill compatibility. Full Pytho
 independent source/adversarial review required. No fabricated image/export hashes, actual customer data, providers, machine
 profiles, real production qualification, held source, AWS/WSL or deployment. Full SS-032/COM-04 remains open. Two workers only;
 implementation stop02:20Z and hard cutoff03:00Z November12, no extension or publication implied by checkpoint admission.
+
+Storage refinement: persist each exact canonical material context once per SHA256 in a proof-specific immutable context
+store; hash includes order id. Revisions refer to that context hash rather than copying up to32MiB on each unchanged
+revision. On existing-hash insertion require identical canonical bytes and typed order identity, otherwise fail409; no
+silent collision overwrite. Reads verify stored bytes against hash and typed context; approval/release also compare the
+live order hash. Exact authorized revision resolution may fetch one bounded context; summary pagination never does.
+Context/revision/decision/current-proof/order writes share one transaction, including failure-injection coverage for each
+final write. No separate commercial authority or consumer registry; immutable contexts belong only to proof evidence.
