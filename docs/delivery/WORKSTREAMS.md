@@ -309,16 +309,19 @@ omission retains legacy behavior. Both modes reject nonempty legacy text/seconda
 existing known crystal-shape/Size/Orientation option keys, rejecting arbitrary options that could compete for names
 or set-size authority. Font remains common; notes/artwork metadata never supplies piece text or changes the mapping.
 
-Read exact current offer units_per_item and quantity, not a caller count. This existing field means stock consumption,
-so the new mapping is explicitly synthetic blank-position correspondence, not production set-size qualification or a
-claim that every consumable is an engraved piece. Bound explicit personalization to500 positions per line and2000
-across a cart, without reducing limits for legacy omitted-field carts. Require every pair in quantity x units_per_item
+Add optional staff-only test Offer.pieces_per_item (StrictInt1..100), distinct from stock-consumption units_per_item.
+Never infer it from stock units, shape or customer input. Offers lacking an explicit pieces_per_item reject structured
+personalization with409 while retaining exact legacy behavior. Bound explicit personalization to500 positions per line and2000
+across a cart, without reducing limits for legacy omitted-field carts. Require every pair in quantity x pieces_per_item
 exactly once for per_piece. Identical expands explicitly to the same bounded mapping. Never auto-fill missing names.
 
 Normalized output is a line-only personalization_snapshot: {schema_version:1, mode, line_index, quantity,
-units_per_item, pieces:[{set_index,piece_index,text}...]}, sorted by indices with stable original cart line order.
+pieces_per_item, pieces:[{set_index,piece_index,text}...]}, sorted by indices with stable original cart line order.
 Persist this exact mapping in existing cart lines and copied order lines; retain exact submitted item configuration.
-No separate endpoint/table, pricing effect, inventory authority, catalog sellability or manufacturing authorization.
+Persist explicit pieces_per_item in the existing staff test offer and bump its existing CAS version when changed.
+Stock_units remains quantity x units_per_item only. Omitted new offer field preserves the exact legacy offer document;
+reject explicit null for the new count. No separate endpoint/table, pricing effect, inventory authority, catalog
+sellability or manufacturing authorization. Physical product set qualification remains outside this fixture contract.
 
 Compatibility: omit the new key from serialized legacy request items when absent, preserving existing normalized
 payload/fingerprint bytes including old defaults/photo_brief null. Never globally exclude_none or exclude_unset.
