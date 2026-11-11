@@ -706,3 +706,48 @@ ports55197/55198 stopped/closed, temporary database removed; Playwright port3139
 No user browser, deployment, credentials, prices/policies or production state touched.
 This branch remains stacked on independently qualified49b0c142 and cannot publish/merge ahead of
 required predecessor CI. Exact frozen source still requires independent review before integration.
+
+
+### RPG-122 / SS-071 staff lock race checkpoint
+
+Producer second store worker; coordinator independent review. Isolated branch based frozenbf2200ec,
+stacked behind required predecessor CI. Docs only before admission. Implementation stop02:20UTC,
+finalcutoff03:00UTC. Only existing tracked public StaffWorkspace.tsx plus focused tests/docs/routine
+test wiring. No held source, new role/account/settings/provider/deploy/AWS/WSL or extra agents.
+
+Verified parent reproduction on public53b5feb: dispatch quote offer, Lock while pending, resolve result;
+old action sets private doc and calls overview with captured old token, reopening a locked workspace.
+Patch existing component narrowly rather than adding a new staff feature or changing backend authority.
+
+Introduce immutable staff session token/generation and a separate record-context/request generation.
+Login creates captured session; overview/open/action responses commit only to their original current
+session and matching operation/context. Every async success/error/finally checks validity. Invalidate
+on Lock, credential edit, Back/pagehide/persisted pageshow and unmount; ordinary pageshow preserves entry.
+Record reference edit/change invalidates pending record/action result, clears old record/receipt/drafts;
+no old mutation continuation may start summary refresh after its context/session is invalidated.
+Synchronous lock prevents duplicate login/open/action before React commits; Lock stays available while
+requests are pending, including login cancellation. A new session must not inherit prior private data.
+
+Central clearing resets token, summary, doc, reference, receipt, error/status, price/message/proof,
+inventory/capacity, tracking/carrier and operation flags. Record changes clear record-specific drafts
+and receipt before loading; opening a different record cannot retain a prior proof/shipping form.
+Capture actual record ID/version in mutations, retain existing endpoints/bodies/backend versions/gates.
+Guard returned record identity when operation mutates same record; receipt-producing operations keep
+their actual existing receipt semantics rather than requiring a false same-ID assumption.
+
+After verified write response, show honest write outcome even if subsequent summary refresh fails:
+report write confirmed but overview stale/retry needed, not falsely imply mutation failed or retry it
+automatically. If response malformed/uncertain, do not claim success; require reconciliation. Lock
+invalidates UI continuation, NOT an already-sent server mutation; state this clearly in interface/docs.
+Receipt is only retained in its matching current session/context and is cleared before a new operation;
+never download old private receipt after Lock or context change. No storage/URL/log credential leakage.
+
+Tests reproduce original race then prove no post-Lock summary request and no private resurrection.
+Cover login/open/action/overview delayed successes and failures, Lock/edit/Back/pagehide/BFCache/unmount,
+reopened new-session isolation, duplicate dispatch, record context switch, all draft clearing, valid
+receipt creation/download lifecycle, and write-success/summary-failure distinction. Retain existing staff
+capabilities and current price/proof/release/shipment gates without inventing new production approval.
+Full Python/Node/typecheck/build/browser regression, headless pixel/WCAG2A/AA and scoped axe; actual
+loopbackASGI synthetic staff offer/receipt flow plus lock/reopen verification, no real account/provider.
+Owned hidden processes/headless browsers only, verify cleanup and preserve exact frozen evidence for
+independent review. No publication ahead of green dependency chain.
