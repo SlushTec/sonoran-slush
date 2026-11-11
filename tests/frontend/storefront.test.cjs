@@ -257,3 +257,24 @@ test('crystal reference dimensions preserve old selections and distinguish engra
  for(const shape of shapes) assert.ok(infoFor(product(shape.slug)).details.some(([k,v])=>k==='Process' && v===shape.process+' subsurface photo engraving'));
  assert.match(infoFor(product('crystal-heart-ornament')).description,/surface engraved/);
 });
+
+test('portal dispatcher keeps exactly the three reviewed consumers and public account/admin exports',()=>{
+ const portalModule=require('../../apps/storefront/src/components/CustomerPortal.tsx');
+ for(const [kind,name] of [['proofs','ProofReviewPortal'],['orders','OrderReviewPortal'],['quotes','QuoteReviewPortal']]){
+  const expected=require('../../apps/storefront/src/components/'+name+'.tsx').default;
+  assert.equal(portalModule.Portal({kind}).type,expected);
+ }
+ assert.equal(typeof portalModule.Account,'function');
+ assert.equal(portalModule.Admin,require('../../apps/storefront/src/components/StaffWorkspace.tsx').default);
+ assert.deepEqual(Object.keys(portalModule).sort(),['Account','Admin','Portal']);
+});
+test('customer portal source has no unreachable legacy portal or legacy transport authority',()=>{
+ const filename=path.join(__dirname,'../../apps/storefront/src/components/CustomerPortal.tsx');
+ const source=ts.createSourceFile(filename,fs.readFileSync(filename,'utf8'),ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
+ const identifiers=[];const imports=[];
+ function visit(node){if(ts.isIdentifier(node))identifiers.push(node.text);if(ts.isImportDeclaration(node))imports.push(node.moduleSpecifier.text);ts.forEachChild(node,visit);}
+ visit(source);
+ for(const old of ['LegacyRecordPortal','RecordData','useState','commerce'])assert.equal(identifiers.includes(old),false,old);
+ assert.equal(imports.includes('@/lib/client'),false);
+ assert.equal(source.parseDiagnostics.length,0);
+});
