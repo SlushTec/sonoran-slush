@@ -9,9 +9,14 @@ from typing import Annotated, Literal
 from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, Header, HTTPException
-from pydantic import AwareDatetime, Field, StrictInt, StrictBool, field_validator
+from pydantic import AwareDatetime, Field, StrictInt, StrictBool, field_validator, model_validator, model_serializer
+from pydantic.json_schema import SkipJsonSchema
 from services.commerce.app.workflows import (
     Item, StrictModel, NOW, database, enabled, event, load, private, receipt, save, staff,
+)
+
+from services.commerce.app.piece_personalization import (
+    Personalization, CRYSTAL_KEYS, piece_snapshot, validate_persisted_items, validate_stored_snapshot,
 )
 
 router = APIRouter()
@@ -65,6 +70,14 @@ class Offer(StrictModel):
     unit_price_minor: Money
     stock_id: Key
     units_per_item: StrictInt = Field(ge=1, le=100)
+    pieces_per_item: Annotated[StrictInt, Field(ge=1, le=100)] | SkipJsonSchema[None] = Field(default=None, json_schema_extra=lambda schema: schema.pop("default", None))
+
+    @model_validator(mode="before")
+    @classmethod
+    def explicit_piece_count(cls, value):
+        if isinstance(value, dict) and "pieces_per_item" in value and value["pieces_per_item"] is None:
+            raise ValueError("Omit an unqualified piece count; do not supply null.")
+        return value
 
 
 @router.post("/v1/admin/retail-test/offers/{slug}", dependencies=[Depends(retail_enabled), Depends(staff)], tags=["local test retail"])
@@ -80,6 +93,15 @@ def set_offer(slug: Key, body: Offer):
         if not db.execute("SELECT 1 FROM retail_stock WHERE id=?", (body.stock_id,)).fetchone():
             raise HTTPException(409, "Create the synthetic blank stock first.")
         doc = {"product_slug": slug, "version": body.expected_version+1, "unit_price_minor": body.unit_price_minor, "currency": "USD", "stock_id": body.stock_id, "units_per_item": body.units_per_item, "test_mode": True}
+        if body.pieces_per_item is not None:
+            doc["pieces_per_item"] = body.pieces_per_item
+        elif old:
+            previous = json.loads(old[0])
+            if "pieces_per_item" in previous:
+                count = previous["pieces_per_item"]
+                if type(count) is not int or not 1 <= count <= 100:
+                    raise HTTPException(409, "Stored test piece count needs reconciliation.")
+                doc["pieces_per_item"] = count
         db.execute("INSERT INTO retail_offers VALUES(?,?) ON CONFLICT(slug) DO UPDATE SET document=excluded.document", (slug, json.dumps(doc)))
         return doc
 
@@ -95,6 +117,29 @@ def catalog():
 class RetailItem(Item):
     # Also validate omitted options: a crystal cannot bypass its keep-list requirements.
     options: dict[Annotated[str, Field(max_length=60)], Annotated[str, Field(max_length=200)]] = Field(default_factory=dict, max_length=16, validate_default=True)
+    personalization: Personalization | SkipJsonSchema[None] = Field(default=None, json_schema_extra=lambda schema: schema.pop("default", None))
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_shape(self, handler):
+        data = handler(self)
+        if "personalization" not in self.model_fields_set:
+            data.pop("personalization", None)
+        return data
+
+    @model_validator(mode="before")
+    @classmethod
+    def explicit_personalization(cls, value):
+        if isinstance(value, dict) and "personalization" in value and value["personalization"] is None:
+            raise ValueError("Omit legacy personalization; explicit null is not supported.")
+        return value
+
+    @model_validator(mode="after")
+    def no_competing_inscriptions(self):
+        if self.personalization is not None:
+            if self.text or self.secondary or set(self.options) - CRYSTAL_KEYS:
+                raise ValueError("Structured piece text cannot compete with legacy inscriptions or arbitrary options.")
+        return self
+
 
 
 class CartRequest(StrictModel):
@@ -105,7 +150,8 @@ class CartRequest(StrictModel):
 def priced(db, items):
     lines = []
     total = 0
-    for item in items:
+    mapped_pieces = 0
+    for line_index, item in enumerate(items):
         row = db.execute("SELECT document FROM retail_offers WHERE slug=?", (item["product_slug"],)).fetchone()
         if not row:
             raise HTTPException(409, "A selected listing has no synthetic test offer.")
@@ -115,12 +161,21 @@ def priced(db, items):
         if total > 99999999:
             raise HTTPException(422, "The cart exceeds the supported test total.")
         lines.append({"item": item, "offer_version": offer["version"], "unit_price_minor": offer["unit_price_minor"], "line_total_minor": amount, "stock_id": offer["stock_id"], "stock_units": item["quantity"]*offer["units_per_item"]})
+        mapping = piece_snapshot(item, offer, line_index)
+        if mapping is not None:
+            mapped_pieces += len(mapping["pieces"])
+            if mapped_pieces > 2000:
+                raise HTTPException(422, "Explicit personalization supports at most 2000 pieces per cart.")
+            lines[-1]["personalization_snapshot"] = mapping
     return lines, total
 
 
 @router.post("/v1/cart", dependencies=[Depends(retail_enabled)], tags=["local test retail"])
 def create_cart(body: CartRequest):
     payload = body.model_dump(mode="json")
+    for raw, item in zip(payload["items"], body.items):
+        if "personalization" not in item.model_fields_set:
+            raw.pop("personalization", None)
     key = "retail-cart:"+str(body.request_id)
     digest = fingerprint(payload)
     with database() as db:
@@ -156,7 +211,14 @@ def order_from_cart(record_id: str, body: Version, authorization: Annotated[str 
             raise HTTPException(409, "The current cart version is required.")
         if cart.get("order_id"):
             return receipt(load(db, cart["order_id"]))
-        lines, total = priced(db, cart["items"])
+        validate_persisted_items(cart.get("items"), RetailItem)
+        validate_stored_snapshot(cart.get("lines"), cart["items"])
+        try:
+            lines, total = priced(db, cart["items"])
+        except HTTPException as exc:
+            if exc.status_code == 422:
+                raise HTTPException(409, "Stored cart configuration or offer changed; review a new cart.") from None
+            raise
         if lines != cart["lines"] or total != cart["total_minor"]:
             raise HTTPException(409, "Offers changed; create and review a new cart with a new request identity.")
         needs = Counter()

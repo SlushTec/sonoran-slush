@@ -293,3 +293,72 @@ Tests cover both comparisons, strict inputs, lifecycles, hashes, invalid state, 
 absent DB/parent noncreation and a consistent read while another connection retires a reference. SQLite may create transient
 WAL/shared-memory reader coordination sidecars beside an existing database; zero filesystem activity is NOT claimed.
 No publication, actual approval, price decision, customer/order change, deployment or production activation occurred.
+
+### Existing RPG-124 SS-031.AC4: bounded piece-personalization design checkpoint
+
+Design only, based on reviewed comparison9ba01770dbbfa03c42ac90715e99d451ce34d075. Before implementation,
+rebase this checkpoint onto the integrated identical-tree main and obtain independent design admission.
+One producer plus one reviewer only; no new task or second inventory/configuration registry.
+
+Add an optional RetailItem-only personalization discriminated union to existing synthetic cart/order flow:
+identical: {mode: identical, text: nonblank string}; per_piece: {mode: per_piece, pieces: [{set_index: integer,
+piece_index: integer, text: nonblank string}]}. Indices are zero-based. Strict text is1..120 characters, no NUL or
+control characters; do not silently trim/case-fold customer wording. Repeated text is valid; repeated indices are not.
+No caller set_size, stock_units, item index, offer version or money fields in this object. Explicit null is rejected;
+omission retains legacy behavior. Both modes reject nonempty legacy text/secondary. In explicit mode allow only the
+existing known crystal-shape/Size/Orientation option keys, rejecting arbitrary options that could compete for names
+or set-size authority. Font remains common; notes/artwork metadata never supplies piece text or changes the mapping.
+
+Add optional staff-only test Offer.pieces_per_item (StrictInt1..100), distinct from stock-consumption units_per_item.
+Never infer it from stock units, shape or customer input. Offers lacking an explicit pieces_per_item reject structured
+personalization with409 while retaining exact legacy behavior. Bound explicit personalization to500 positions per line and2000
+across a cart, without reducing limits for legacy omitted-field carts. Require every pair in quantity x pieces_per_item
+exactly once for per_piece. Identical expands explicitly to the same bounded mapping. Never auto-fill missing names.
+
+Normalized output is a line-only personalization_snapshot: {schema_version:1, mode, line_index, quantity,
+pieces_per_item, pieces:[{set_index,piece_index,text}...]}, sorted by indices with stable original cart line order.
+Persist this exact mapping in existing cart lines and copied order lines; retain exact submitted item configuration.
+Persist explicit pieces_per_item in the existing staff test offer and bump its existing CAS version when changed.
+Stock_units remains quantity x units_per_item only. Omitted new offer field preserves the exact legacy offer document;
+reject explicit null for the new count. No separate endpoint/table, pricing effect, inventory authority, catalog
+sellability or manufacturing authorization. Physical product set qualification remains outside this fixture contract.
+
+Compatibility: omit the new key from serialized legacy request items when absent, preserving existing normalized
+payload/fingerprint bytes including old defaults/photo_brief null. Never globally exclude_none or exclude_unset.
+Old carts missing the field retain identical priced-line shape, exact replay and cart-to-order behavior. Explicit-mode
+raw payload remains fingerprinted; reordered or changed input on the same UUID conflicts rather than mutating history.
+Repricing recomputes the same mapping; changed offer versions/counts fail409 before reservation. Validate persisted
+explicit item shape and snapshot equivalence before order creation; corrupt mapping cannot be copied or silently fixed.
+
+Proof revisions continue their independent text/version workflow and cannot rewrite ordered piece assignments. This
+slice does not interpret proof prose or establish per-piece manufacturing proof approval; those remain open criteria.
+Tests cover singleton/set/multi-line, missing/extra/duplicate/negative/bool indices, reordered deterministic mapping,
+Unicode text, collisions, cardinality bounds, altered offer, exact replay/restart, legacy fingerprints and old carts,
+rollback/no reservation on validation failure, copied order immutability and proof revision independence. Full tests,
+OpenAPI/archive/link/diff checks and exact frozen independent review required. No real names/prices/policies, providers,
+held sources, AWS/WSL or deployment. Stop implementation02:20Z, hard cutoff03:00Z November12; publication separate.
+
+### Piece personalization author freeze: 2026-11-11
+
+The existing synthetic cart/order flow now accepts explicit identical/per-piece assignments with separately configured
+staff pieces_per_item, never inferred from inventory units.45 focused cases and full780 tests+94 subtests pass on Windows;
+OpenAPI/archive67/41/doc31/diff checks pass. Actual prechange model serialization was run from frozen9ba0177 and matched
+against current normalized output at fixed UUID digest1616f47111c82279e29a754b4c7b049790d31007300a9efc19ff6a6d11521834.
+Initial full regression exposed restore-drill consumers observing a new null field; the corrected model serializer omits
+only the newly absent field everywhere, preserving legacy defaults/digests without weakening existing drill assertions.
+
+Omitting pieces_per_item on an update preserves an existing explicit value; entirely legacy offers retain their shape.
+Strict cardinality, index/text controls, conflicting inscription fields, malformed persisted mappings, replay/restart,
+changed offers, no partial reservations, exact cart/order copying and proof-revision independence are covered. Valid
+Unicode and surrounding whitespace remain exact; controls and surrogates are rejected only in the new text contract.
+No actual names/prices, manufacturing proof qualification, held-source access, deployment or live activation occurred.
+Frozen source awaits independent review and coordinated publication. Full SS-031/COM-02 remains open.
+
+### Independent contract correction: optional does not mean nullable
+
+Independent review found OpenAPI advertised null for new optional personalization/piece-count fields even though the
+runtime deliberately rejects explicit null. SkipJsonSchema omits that unsupported branch and removes default-null
+metadata while keeping fields optional. Two regressions inspect endpoint-linked schemas and actual422 behavior. The
+first test lookup used ambiguous Offer schema naming and was corrected to follow the actual endpoint reference.
+Final full regression passes782 tests+94 subtests; OpenAPI/archive67/41/doc31/diff checks pass. Runtime/legacy shape
+behavior is unchanged. Prior e30d4a8 bundle is superseded; corrected source requires independent exact-freeze review.
