@@ -324,6 +324,28 @@
         "title": "HealthResponse",
         "type": "object"
       },
+      "Identical": {
+        "additionalProperties": false,
+        "properties": {
+          "mode": {
+            "const": "identical",
+            "title": "Mode",
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "mode",
+          "text"
+        ],
+        "title": "Identical",
+        "type": "object"
+      },
       "Inquiry": {
         "additionalProperties": false,
         "properties": {
@@ -754,6 +776,31 @@
         "title": "OrderRequest",
         "type": "object"
       },
+      "PerPiece": {
+        "additionalProperties": false,
+        "properties": {
+          "mode": {
+            "const": "per_piece",
+            "title": "Mode",
+            "type": "string"
+          },
+          "pieces": {
+            "items": {
+              "$ref": "#/components/schemas/Piece"
+            },
+            "maxItems": 500,
+            "minItems": 1,
+            "title": "Pieces",
+            "type": "array"
+          }
+        },
+        "required": [
+          "mode",
+          "pieces"
+        ],
+        "title": "PerPiece",
+        "type": "object"
+      },
       "PhotoBrief": {
         "additionalProperties": false,
         "properties": {
@@ -811,6 +858,36 @@
           "filename"
         ],
         "title": "PhotoReference",
+        "type": "object"
+      },
+      "Piece": {
+        "additionalProperties": false,
+        "properties": {
+          "piece_index": {
+            "maximum": 99.0,
+            "minimum": 0.0,
+            "title": "Piece Index",
+            "type": "integer"
+          },
+          "set_index": {
+            "maximum": 499.0,
+            "minimum": 0.0,
+            "title": "Set Index",
+            "type": "integer"
+          },
+          "text": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "set_index",
+          "piece_index",
+          "text"
+        ],
+        "title": "Piece",
         "type": "object"
       },
       "Plan": {
@@ -1343,6 +1420,31 @@
             "title": "Options",
             "type": "object"
           },
+          "personalization": {
+            "anyOf": [
+              {
+                "discriminator": {
+                  "mapping": {
+                    "identical": "#/components/schemas/Identical",
+                    "per_piece": "#/components/schemas/PerPiece"
+                  },
+                  "propertyName": "mode"
+                },
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/Identical"
+                  },
+                  {
+                    "$ref": "#/components/schemas/PerPiece"
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Personalization"
+          },
           "photo_brief": {
             "anyOf": [
               {
@@ -1805,6 +1907,19 @@
             "minimum": 0.0,
             "title": "Expected Version",
             "type": "integer"
+          },
+          "pieces_per_item": {
+            "anyOf": [
+              {
+                "maximum": 100.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pieces Per Item"
           },
           "stock_id": {
             "maxLength": 100,

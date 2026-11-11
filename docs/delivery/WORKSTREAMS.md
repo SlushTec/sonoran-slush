@@ -337,3 +337,19 @@ Unicode text, collisions, cardinality bounds, altered offer, exact replay/restar
 rollback/no reservation on validation failure, copied order immutability and proof revision independence. Full tests,
 OpenAPI/archive/link/diff checks and exact frozen independent review required. No real names/prices/policies, providers,
 held sources, AWS/WSL or deployment. Stop implementation02:20Z, hard cutoff03:00Z November12; publication separate.
+
+### Piece personalization author freeze: 2026-11-11
+
+The existing synthetic cart/order flow now accepts explicit identical/per-piece assignments with separately configured
+staff pieces_per_item, never inferred from inventory units.45 focused cases and full780 tests+94 subtests pass on Windows;
+OpenAPI/archive67/41/doc31/diff checks pass. Actual prechange model serialization was run from frozen9ba0177 and matched
+against current normalized output at fixed UUID digest1616f47111c82279e29a754b4c7b049790d31007300a9efc19ff6a6d11521834.
+Initial full regression exposed restore-drill consumers observing a new null field; the corrected model serializer omits
+only the newly absent field everywhere, preserving legacy defaults/digests without weakening existing drill assertions.
+
+Omitting pieces_per_item on an update preserves an existing explicit value; entirely legacy offers retain their shape.
+Strict cardinality, index/text controls, conflicting inscription fields, malformed persisted mappings, replay/restart,
+changed offers, no partial reservations, exact cart/order copying and proof-revision independence are covered. Valid
+Unicode and surrounding whitespace remain exact; controls and surrogates are rejected only in the new text contract.
+No actual names/prices, manufacturing proof qualification, held-source access, deployment or live activation occurred.
+Frozen source awaits independent review and coordinated publication. Full SS-031/COM-02 remains open.
