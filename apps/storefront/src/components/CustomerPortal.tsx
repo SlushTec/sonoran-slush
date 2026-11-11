@@ -6,6 +6,7 @@ import { useStore } from "./Store";
 import Icon from "./Icon";
 import ProofReviewPortal from "./ProofReviewPortal";
 import OrderReviewPortal from "./OrderReviewPortal";
+import QuoteReviewPortal from "./QuoteReviewPortal";
 type RecordData = {
   id: string;
   status: string;
@@ -27,7 +28,7 @@ type RecordData = {
   shipment?: { carrier: string; tracking: string };
 };
 export function Portal({ kind }: { kind: "orders" | "proofs" | "quotes" }) {
-  return kind === "proofs" ? <ProofReviewPortal /> : kind === "orders" ? <OrderReviewPortal /> : <LegacyRecordPortal kind={kind} />;
+  return kind === "proofs" ? <ProofReviewPortal /> : kind === "orders" ? <OrderReviewPortal /> : <QuoteReviewPortal />;
 }
 function LegacyRecordPortal({ kind }: { kind: "orders" | "proofs" | "quotes" }) {
   const [id, setID] = useState(""),

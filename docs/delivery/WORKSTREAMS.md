@@ -630,6 +630,83 @@ Only headless owned browsers used. No user browser, actual provider credential, 
 PR17 remains a stacked dependency until coordinator integrates its exact green source; no successor
 publication or merge is authorized ahead of that dependency. Frozen independent review is still required.
 
+
+### RPG-121 bounded private quote consumer checkpoint
+
+Producer: second store worker; independent reviewer/integrator: store coordinator. Stack base49b0c142,
+independently qualified Square slice; publication remains dependent on preceding green integrations.
+This checkpoint is documentation only. No feature edits before independent admission. Implementation
+stops02:20UTC, finalcutoff03:00UTC. No helpers, held guided frontend/design/rollup/bundle source, AWS/WSL.
+
+Observed public source: GET /v1/quotes/{id} reads retail/bulk/event/contact; accept permits only
+retail/bulk/event with exact current version, offered status and reviewed total. Current UI trusts
+mutable entered token and returned identity and lacks request-generation guards. Preserve backend truth.
+Create a separate QuoteReviewPortal and hook-free dispatch; keep complete legacy body, proof and Square
+components unchanged. No backend/shared client/payment/policy changes, new price or inferred identity.
+
+Read response must match requested ID, supported kind, positive safe-integer version and bounded status.
+Submitted requests remain readable with total_minor null; reviewed totals are integer1..99999999/USD.
+Message supports full3000 Unicode codepoints and valid multiline CR/LF/tab as accepted by public Offer;
+render escaped text with whitespace preserved, not HTML. Reject lone surrogates and malformed rendered
+containers safely. Do not blanket restrict unrendered legacy fields. Current quote accepted status must
+have accepted_version exactly equal to its version; inconsistent accepted metadata fails closed, not
+a success banner. Offered state must not imply accepted current version. Contact remains read-only
+even if malformed data labels it offered. Missing reviewed message/total disables acceptance honestly.
+
+Display actual status, total, full offered message and next step, with no invented people/timestamps.
+Show bounded recorded item summaries if supplied: actual max100 items, quantity1..500, product100 chars,
+text/secondary120 and known font; paginate10. Preserve full valid multiline/Unicode at backend bounds.
+If optional timeline is shown, metadata validates ISO timestamps/strings and paginates25; do not invent
+or reconstruct unavailable history. No historical quote versions are claimed by this current-only UI.
+
+Bind loaded record ID/kind/version and trimmed capability in immutable session plus request generation.
+Close/input edit/Back/pagehide/persisted pageshow/unmount clear confirmation and invalidate all pending
+lookup/action/error/finally responses; ordinary pageshow preserves input. Synchronous action lock blocks
+duplicate clicks before React commit. Checkbox explicitly acknowledges displayed exact version. POST
+uses captured bearer and {version,decision:accept}; returned success requires same ID/kind/version,
+status accepted, accepted_version equal requested version, and unchanged displayed commercial details
+(total/currency/message/items when shown). Never confirm a different quote/version or silent price change.
+Failures clear actionable record/checkbox and require reopening; late failures cannot clobber new session.
+Acceptance means holder of this private capability accepted this quote version, not verified personal
+identity, payment, booking, inventory or production confirmation. No credentials in storage/URL/logs.
+
+QA: full regression plus malformed identity/version/accepted metadata, contact read-only, null totals,
+exact multiline/emoji boundaries, maximum item pagination, changed price/message in success, repeated
+accept/replay, duplicate click,409/reopen and delayed lookup/action after each lifecycle invalidation.
+Browser tests include keyboard/mobile/current success/failure/interruption, WCAG2A/AA whole page and all
+axe rules scoped to new component, actual pixel views. Real loopback ASGI synthetic quote creation,
+offer and private acceptance with stored/replayed exact accepted_version, including contact read-only.
+No provider calls or actual customer data. Hidden owned localservers/headless browser only; cleanup
+verified. Existing locked dependencies reused, separate build. Frozen source and evidence go to peer
+review before any publication; this does not mark all RPG-121 or production delivery complete.
+
+
+### Quote consumer author implementation and evidence
+
+Implemented separate current-quote consumer with supported retail/bulk/event/contact reads, contact
+read-only, full multiline/codepoint limits, bounded item pages, immutable capability/version session,
+stale response isolation and synchronous duplicate lock. Success requires exact returned accepted
+identity/version and unchanged displayed commercial terms. No invented customer identity, booking,
+payment or production confirmation. LegacyRecordPortal body and complete proof/Square components
+verified byte-equivalent against49b0c142 after newline normalization; only dispatch/import changed.
+Backend and shared client unchanged. No held sources, provider calls or live data.
+
+Author regression:828 Python +94 subtests,153 Node (49new),49 browser (6new), TypeScript/optimized build,
+archive67/41,document links31,diff checks pass; no skips. Browser checks cover whole-page WCAG2A/AA
+and all axe rules scoped to new quote component. Existing global announcement landmark best-practice
+issue and background Next prefetch noise remain outside this scope, not claimed fixed.
+Final artifacts/quote-1440.png,quote-390.png,quote-real-backend.png individually inspected: full
+multiline terms, item inscriptions, explicit acceptance and separate-decision copy readable, no overflow
+or plaintext capability. Build and all evidence use the new consumer, not stale old portal assets.
+
+Separately labeled actual ASGI smoke passed on isolated synthetic SQLite: quote creation/offer, browser
+exact-version acceptance, persisted accepted_version2, identical replay and contact read-only. Three
+browser API requests relayed to real loopback server; no provider calls. Owned PIDs17244/2624 and
+ports55197/55198 stopped/closed, temporary database removed; Playwright port3139 also verified closed.
+No user browser, deployment, credentials, prices/policies or production state touched.
+This branch remains stacked on independently qualified49b0c142 and cannot publish/merge ahead of
+required predecessor CI. Exact frozen source still requires independent review before integration.
+
 ## RPG-138 / SS-070: bounded component-ledger recovery qualification checkpoint
 
 Base: public main 53b5feba866f0845af474cb96f510728bcaefe93. This independent test-only branch does not depend on or edit the frozen UI stack. Producer: second store lane; independent reviewer/integrator: first store lane. Implementation remains stopped until checkpoint admission.
