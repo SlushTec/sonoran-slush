@@ -330,3 +330,12 @@ def test_bool_is_not_revision_authority(connected,monkeypatch,target):
             doc=load(db,p['id'] if target=='approved' else o['id'])
             doc['approved_version' if target=='approved' else 'current_proof_version']=True;save(db,doc)
     assert decide(connected,p).status_code==409
+
+@pytest.mark.parametrize('value',[True,None,'1',2])
+def test_history_binding_schema_exact_or_absent(connected,monkeypatch,value):
+    o,p=prepared(connected,monkeypatch)
+    with database() as db:
+        doc=load(db,p['id']);doc['binding_schema']=value;save(db,doc)
+    assert history(connected,p).status_code==409
+    assert history(connected,p,1).status_code==409
+    assert connected.post('/v1/admin/proofs',headers=staff(),json={'order_id':o['id'],'expected_proof_version':1,'proof_text':'must not relabel corruption as legacy'}).status_code==409

@@ -226,7 +226,7 @@ def prepare(db, order, old, proof, text):
     if old:
         if old.get("kind") != "proof" or type(old.get("version")) is not int or old["version"] < 1:
             raise fail()
-        if old.get("binding_schema") is not None:
+        if "binding_schema" in old:
             verify(db, old, order, live=False)
         else:
             # Preserve exactly the one legacy document retained, not fabricated prior history.
@@ -283,6 +283,9 @@ def valid_timestamp(value):
 
 
 def checked_private_proof(proof, record_id):
+    if isinstance(proof, dict) and "binding_schema" in proof:
+        if type(proof["binding_schema"]) is not int or proof["binding_schema"] != 1:
+            raise fail()
     if not isinstance(proof, dict) or proof.get("id") != record_id or proof.get("kind") != "proof" or not isinstance(proof.get("order_id"), str):
         raise fail()
     return proof

@@ -425,7 +425,7 @@ final write. No separate commercial authority or consumer registry; immutable co
 
 ### Proof evidence author freeze: 2026-11-11
 
-Author full Windows regression passes824 tests+94 subtests, with42 new cases and no skips. OpenAPI/archive67/41/doc31/diff
+Author full Windows regression passes 828 tests + 94 subtests, with 46 new cases and no skips. OpenAPI/archive67/41/doc31/diff
 checks pass. Restore drill now explicitly verifies all four added evidence tables and independent seeded counts/context
 hashes/order fields/revision wording/decision links; it does not ignore new tables. Tested current max configured material
 exceeds19MiB and fits the conservative<24MiB envelope under the32MiB cap. Empty legacy bulk orders remain readable but
@@ -437,3 +437,5 @@ context type/byte-length metadata is checked before fetching/parsing the materia
 approved versions reject booleans. Exact revision/decision timestamps use the same ISO checks. Four originally reported
 probes were rerun successfully; final frozen independent full/adversarial review remains required before publication.
 No actual identity/legacy history/export hashes, prices, machine qualification, providers, deployment or live action.
+
+Final correction rejects present malformed binding markers (boolean, null, string or unsupported integer) on both history reads and fresh preparation; legacy means absent marker only. Four additional regressions passed in the final 828-test run. Independent frozen-source review remains required.
