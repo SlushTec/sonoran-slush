@@ -129,7 +129,11 @@ def balance(db, lot_id, bucket):
 
 
 def apply_leg(db, lot_id, bucket, delta):
+    from services.commerce.app.component_reservations import reserved_units
     units = balance(db, lot_id, bucket) + delta
+    floor = reserved_units(db, lot_id, bucket.location_id) if bucket.condition == "available" else 0
+    if units < floor:
+        raise HTTPException(409, "Active fixture reservations protect these components.")
     if not 0 <= units <= MAX_UNITS:
         raise HTTPException(409, "Insufficient fixture balance or supported quantity limit exceeded.")
     db.execute("INSERT INTO fixture_balances VALUES(?,?,?,?) ON CONFLICT(lot_id,location_id,condition) DO UPDATE SET units=excluded.units",
@@ -142,6 +146,9 @@ def movement(lot_id: Key, body: Movement):
     digest = fingerprint(payload)
     with database() as db:
         schema(db)
+        from services.commerce.app.component_reservations import hold_identity_exists
+        if hold_identity_exists(db, str(body.request_id)):
+            raise HTTPException(409, "Command identity already belongs to a fixture reservation.")
         replay = db.execute("SELECT fingerprint,document FROM fixture_movements WHERE request_id=?", (str(body.request_id),)).fetchone()
         if replay:
             if replay[0] != digest:

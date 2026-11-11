@@ -202,3 +202,13 @@ producer/reviewer only; exact frozen source and all corrections require independ
 credentials, providers, customer data, AWS/WSL, held source, deployment or activation. Full SS-044/SS-047/COM-02 remains open.
 The same implementation stop02:20Z and hard cutoff03:00Z on November12 apply. Publication/conditional merge is a separate
 coordinated exact-target step; prior approvals do not cover changed payload automatically.
+
+### BOM/reservation author freeze: 2026-11-11
+
+The fixture BOM and all-component hold slice adds44 focused cases. Final Windows author regression passed612 tests
+and94 subtests with no skips; OpenAPI consistency, archive67/41,31 document links and diff checks passed. The existing
+Starlette/httpx warning is unchanged. Tests cover immutable BOMs, exact allocations, strict bodies, command replay,
+active floors on old outflows, competing reservations, release/consume race, other-hold preservation, independent
+interpreter restart, missing-allocation holds, and final-component/per-lot-audit rollback. No source outside the admitted
+scope changed. Independent frozen-source/adversarial review and hosted verification remain pending. No actual inventory,
+providers, production policy, deployment or live activation. Full feature acceptance remains open.

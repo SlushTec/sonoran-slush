@@ -16,6 +16,8 @@ from services.commerce.app.retail import router as retail_router
 app.include_router(retail_router)
 from services.commerce.app.stock_ledger import router as stock_ledger_router
 app.include_router(stock_ledger_router)
+from services.commerce.app.component_reservations import router as component_reservation_router
+app.include_router(component_reservation_router)
 
 @app.get("/v1/catalog", response_model=ReferenceCatalog, tags=["reference"])
 def catalog():
