@@ -256,3 +256,28 @@ return controlled409 before mutation rather than blanket-catching business logic
 reported failures and adjacent malformed rows, authority metadata, pointer values and history mismatch. Corrected author
 full regression passed678 tests and94 subtests; OpenAPI/archive67/41/doc31/diff checks pass. Corrected exact source requires
 independent re-review; the old654-test review does not transfer automatically. No publication or live action occurred.
+
+### Existing RPG-123 SS-006.AC3: read-only fixture comparison checkpoint
+
+Baseline babf911bb2ecf3d3c779445d0dbbab74a0871215, tree a327baa326129f22216df01856eb97974e313846.
+Isolated branch work/rpg123-commercial-diff-20261111; independent reviewer admits this checkpoint before feature edits.
+Implement staff-only, retail-test-gated comparison of exact immutable snapshot revisions of the same kind and exact
+release-set identities. Deterministic added/removed/changed rows cover catalog eligibility, per-product/variant integer
+USD fixture prices with explicit deltas, and policy fixture text. Include exact identities, lifecycle state and explicitly
+unqualified options/tax/machine domains. No production prices, actual approval, historical-order rewriting or checkout.
+All success responses retain test_mode true, owner_approved false and production_approved false.
+
+Use existing typed persisted validators, strict exact reference inputs and controlled missing/corrupt-state failures.
+Release-set comparison validates referenced hashes, compatible products and approved_test lifecycle; retired references
+fail closed. Standalone snapshot comparison may show draft/approved_test/retired_test state but confers no readiness.
+Use one consistent SQLite read transaction through a read-only connection. Do not invoke schema creation or the existing
+write transaction helper. Missing database or tables return bounded404/409 without creating database files or tables.
+Comparison cannot change pointer, history, audits, commands, snapshots, sets or other domain state; no replay command.
+
+Tests cover gates, strict request shapes, kind mismatch, exact revisions, deterministic row ordering, unchanged pairs,
+added/removed variants, eligibility changes, strict money deltas, policy text, lifecycle/retired refs, malformed persisted
+state and byte/schema/domain-write absence including fresh databases. Verify consistent reads under concurrent writes.
+Run full regression, OpenAPI/archive/link/diff checks, freeze exact source and independent adversarial review before any
+publication. This is only AC3 fixture review-diff groundwork; completed orders and real commercial acceptance stay open.
+Two store workers only; no held source, costs, customer data, credentials, providers, GPU, AWS/WSL or live activation.
+Implementation stops November12 02:20Z; hard cutoff03:00Z. Publication is a separate exact-target coordinated decision.
