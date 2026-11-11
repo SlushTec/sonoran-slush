@@ -600,3 +600,32 @@ isolated synthetic test process, exercising real endpoint/auth/order gates and b
 No actual provider request, account credential, real customer or live payment; do not call this live Square
 verification. Owned hidden loopback test servers/headless browser only; verify cleanup and preserve evidence.
 Use existing locked dependencies without competing install. No production deploy, AWS or WSL.
+
+### Square order portal author implementation and verification
+
+Implemented the admitted order-only consumer with exact raw Square sandbox URL/provider metadata,
+captured capability/order/version, synchronous duplicate lock, stale-response/navigation invalidation,
+strict checkout availability and bounded record rendering. The complete LegacyRecordPortal function
+and ProofReviewPortal source were compared against 4dcdf820 and remain byte-equivalent after newline
+normalization. No local simulation action existed in that order surface; none was invented. Backend,
+shared client, production settings and held sources remain untouched.
+
+Author checks: 828 Python tests + 94 subtests, 104 Node tests (36 new), 43 browser tests (5 new),
+TypeScript and optimized build pass. Archive 67/41, document links 31 and diff checks pass. No skips.
+Whole-page WCAG2A/AA and all axe rules scoped to the new .lookup-layout pass at desktop/mobile sizes.
+An initial all-rules whole-page run found existing axe region best-practice violation on .announcement,
+Header.tsx:47 (unchanged against baseline). This is recorded, not suppressed as fixed or claimed
+all-page-all-rules clean. Existing background-prefetch Next NoFallbackError log noise remains separate.
+Pixel QA caught undefined new form-panel/text-link classes and corrected them to existing lookup-card,
+order-result and link-button styles before final build/browser/smoke reruns. Final artifacts/order-1440.png,
+order-390.png and order-real-backend.png were individually visually inspected: readable, no overflow,
+loaded brand assets and no plaintext access codes.
+
+Separately labeled actual loopback ASGI smoke passed: supported quote/offer/accept/order creation,
+real checkout endpoint/auth/gates, one intercepted sandbox navigation, persisted session replay and
+payment still unpaid. Provider adapter is stubbed only in isolated test process; urllib provider access
+is forbidden. This is not a live Square sandbox connection. Final owned PIDs18796/29444 and ports
+60150/60152 were stopped/closed, temporary synthetic DB removed; browser QA port3138 also closed.
+Only headless owned browsers used. No user browser, actual provider credential, payment or deployment.
+PR17 remains a stacked dependency until coordinator integrates its exact green source; no successor
+publication or merge is authorized ahead of that dependency. Frozen independent review is still required.

@@ -14,7 +14,7 @@
     "typecheck": "npm run typecheck --workspace @sonoran/storefront",
     "test:e2e": "playwright test",
     "test:archive": "python3 scripts/verify_archive.py",
-    "test:frontend": "node --test tests/frontend/storefront.test.cjs tests/frontend/proof-review.test.cjs",
+    "test:frontend": "node --test tests/frontend/storefront.test.cjs tests/frontend/proof-review.test.cjs tests/frontend/order-review.test.cjs",
     "build:review": "node scripts/build-review.mjs",
     "check:review": "node scripts/check-storefront-export.mjs"
   },
