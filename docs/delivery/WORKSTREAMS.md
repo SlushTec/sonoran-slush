@@ -440,6 +440,124 @@ No actual identity/legacy history/export hashes, prices, machine qualification, 
 
 Final correction rejects present malformed binding markers (boolean, null, string or unsupported integer) on both history reads and fresh preparation; legacy means absent marker only. Four additional regressions passed in the final 828-test run. Independent frozen-source review remains required.
 
+
+## November 11: RPG-121 public proof portal checkpoint (admission pending)
+
+Producer: review_stock_ledger; independent reviewer/integration: plan_execute_store_cards.
+Base: merged PR16 53b5feba866f0845af474cb96f510728bcaefe93, tree 24ab9cbc6755bfd54c8b6fa1c195111311ab85c2.
+Existing scope: customer-facing consumer of bound proof history under RPG-121, partial SS-032.
+This is not another registry, actual customer import, deployment, production approval or completion of the broad card.
+Only tracked public-main CustomerPortal/client contracts and relevant public styles/tests may be inspected.
+Held guided-design/frontend-rollup/bundle sources and derivatives remain prohibited; no reconstruction from them.
+
+Planned paths: apps/storefront/src/components/CustomerPortal.tsx (thin Portal dispatcher and renamed legacy function),
+new ProofReviewPortal.tsx, new tests/frontend/proof-review.test.cjs, new tests/e2e/proof-review.spec.ts,
+and proof documentation/checkpoint. Public CSS may be reused, not redesigned. No shared client or backend changes.
+Portal dispatcher has no hooks: proofs render new ProofReviewPortal; orders/quotes render LegacyRecordPortal.
+The original legacy body, payment behavior, Stripe URL guard and quote behavior remain unchanged.
+No conditional early return before existing hooks and no changes to held/customization surfaces.
+
+Private session: credentials only in component/ref memory, never URL, storage, analytics or logs.
+Loaded credentials are an immutable pair tied to record identity and a monotonically invalidated generation.
+Synchronous action locks prevent duplicate submissions before React state updates.
+Every lookup/history/detail/action result, error and finally block checks its generation/request identity.
+Close, credential edits, unmount, browser Back/popstate and pagehide invalidate all pending responses and clear private state.
+BFCache restoration clears again; reopening requires fresh credentials. Close remains available during requests.
+Network timeout remains the existing client's 12 seconds; no false claim that ignored requests were canceled server-side.
+
+Current proof and historical version views are explicitly separate. Historical views contain no action controls.
+Current approval requires current exact integer version, binding_schema 1 and matching fetched revision identity/order/text/hash.
+Returning to current refetches current proof and its bound evidence, clears confirmation/comment and never reuses stale authority.
+A stale/malformed/missing context or 409 blocks approval with a refresh/reconciliation action, not optimistic success.
+Unbound legacy wording stays readable with a clear request for a newly prepared bound revision; unknown history is not invented.
+Approval records this exact proof only; payment, inventory and production readiness are separate gates.
+No historical image guarantee: evidence binds wording/configuration, not immutable historical image bytes.
+
+History uses bounded metadata pages of 25 and explicit cursor navigation, not automatic crawling or fetching 25 contexts.
+Only one selected detail/context is loaded at a time; a context can reach 32 MiB, so no raw JSON or unbounded DOM rendering.
+Render concise configuration summaries and at most 25 per-piece entries per local page; never mount 2000 names at once.
+Validate response shape/identity and bounded monotonic cursor values; errors/retries must preserve session isolation.
+Treat response text as text, not HTML. Show recorded capability-holder labels, not invented real identities.
+Accessible labels, keyboard controls, status/error announcements and focus restoration accompany mobile overflow checks.
+
+Planned verification: existing full Python and Node regressions, separate new Node component tests, typecheck/build,
+headless Playwright synthetic API fixtures, axe and actual screenshot inspection at desktop/mobile sizes.
+Deferred-response tests cover Close, edits, Back, unmount/reopen, cross-session lookup/action and stale finally blocks.
+Other tests cover duplicate clicks, error/retry, pagination, current-versus-historical actions, exact action versions,
+legacy unbound/malformed binding, 409 refresh and no credential persistence. Existing payment guard remains unchanged.
+Native Windows headless/local test servers only: do not touch the user's open browsers or spawn visible background windows.
+Stop owned test servers/processes after QA. Report unrelated existing failures without expanding scope.
+No feature edits before independent checkpoint admission; no publication before frozen-source independent review.
+Same authorized cutoff: November 12 03:00 UTC, with implementation stop at 02:20 UTC; no further agents, AWS or WSL.
+
+
+### Proof portal checkpoint correction: routine verification wiring
+
+Additional narrowly scoped paths: root package.json, .github/workflows/verify.yml and the existing
+tests/frontend/storefront.test.cjs proof-success fixtures/assertions only. Nonproof tests remain unchanged.
+The root test:frontend command currently names only storefront.test.cjs; include both explicit test filenames
+so routine CI executes the new proof lifecycle cases rather than leaving them as an optional manual command.
+Existing proof-success fixtures must supply the real bound revision/evidence shape; retain and extend assertions,
+not weaken approval expectations or remove previous coverage.
+
+The storefront verification job builds without a commerce origin today. Add only its CI job environment
+NEXT_PUBLIC_COMMERCE_API_URL=https://commerce.qa.invalid so the compiled local QA build reaches Playwright's
+synthetic routes. New browser tests intercept only this reserved invalid host, assert requests and use no real service.
+Apply the same explicit environment to local QA build/start. No production default, fallback, special client branch,
+test backdoor, new credential, provider activation or modification of the shared commerce client is permitted.
+Do not skip browser flows when the origin is absent: fail the QA setup clearly. No change to deployment configuration
+or the separate containers job; its closed readiness behavior remains unchanged.
+Any owned background server helper must use hidden-window startup and be stopped after required headless QA.
+
+
+### Integrated local proof smoke acceptance
+
+Before publication, run at least one headless browser flow against the actual current Python ASGI commerce app,
+not only mocked browser responses. Start an owned Uvicorn process on an unused loopback port with an isolated
+temporary fixture database and disposable synthetic fixture credentials. Seed a synthetic offer/cart/order/proof
+through supported fixture/staff APIs, then open the new portal, retrieve bound evidence, record an exact-version
+decision and verify the actual persisted history through the app. Include a later revision and read-only prior view.
+The test harness may relay requests for the compiled https://commerce.qa.invalid origin to this owned loopback app,
+preserving request method, body and authorization and returning actual backend responses. This relay exists solely
+in the headless test runner, never in application/runtime code. No production fallback or runtime test backdoor.
+Keep this integrated smoke separately labeled from mocked lifecycle tests. If frontend CI lacks Python dependencies,
+run and document it locally with exact source and outcomes rather than claiming mocked tests are full-stack evidence.
+Use only synthetic data, no live provider/payment or customer details. Start background helpers hidden, verify HTTP
+readiness and stop all owned Uvicorn/frontend/browser processes afterward without touching unrelated ports/processes.
+
+
+### Public proof portal implementation and author verification
+
+Implemented a separate proof-only consumer with hook-free Portal routing. Compared the complete legacy orders/quotes
+function body against base 53b5feb after its name change: byte-equivalent, including payment URL guard. Backend and
+shared client are unchanged. Routine Node CI now runs both explicit suites; only the storefront QA job gets the invalid
+test origin. No held source, real customer data, new business values, deployment or production activation was used.
+
+Reviewer findings fixed before freeze: actual secondary inscription/font fields, historical metadata hash matching,
+BFCache-only pageshow clearing, bounded Unicode code-point rendering and malformed lone-surrogate rejection.
+Decision evidence now requires exact schema/proof/order/version/hash identity; current status and approved version
+must agree with the last recorded decision. Partial or mismatched responses cannot display a false approval confirmation.
+Actual pixel QA found missing public logos in standalone preview; the separately admitted repair copies only Git-tracked
+public assets into validated owned standalone destinations. HTTP hash/image-load regression verifies it. Heading focus
+uses a sticky-header scroll margin. Screenshots were regenerated and inspected after the correction, not reused as proof.
+
+Author checks: 828 Python tests + 94 subtests; 68 Node tests (47 new); 38 headless Playwright tests (6 new), including
+desktop/mobile axe and real loaded asset hashes. TypeScript, optimized build, OpenAPI, archive 67/41 and document links pass.
+No test skips. Native npm nested-script stdin failure was avoided by executing the exact underlying locked commands;
+CI retains standard npm commands. Early unscoped browser locators collided with existing global announcements and were
+corrected to exact proof messages. Existing Next background-prefetch NoFallbackError noise was observed separately from
+passing route tests; it was not suppressed or claimed fixed.
+
+Separately labeled real-backend smoke passed against current ASGI code and isolated synthetic SQLite state: 10 actual
+relayed browser requests, one persisted approval, prior revision immutable after new revision, historical read-only and
+Close clearing credentials. Last owned backend/preview PIDs 29332/20044, ports 52277/52278 stopped/closed and temporary
+database removed. Headless Playwright-owned preview port 3137 is also closed. No user browser was touched.
+
+Current screenshots: artifacts/proof-desktop.png, artifacts/proof-mobile.png, artifacts/proof-real-backend.png.
+They show readable current/history/configuration/decision layouts with loaded brand assets and no plaintext credentials.
+Useful external logs/config are retained under the existing D: delivery folder. Frozen independent review is still
+required; broad RPG-121/SS-032 and production qualification are not complete merely because this slice passes.
+
 ## RPG-138 / SS-070: bounded component-ledger recovery qualification checkpoint
 
 Base: public main 53b5feba866f0845af474cb96f510728bcaefe93. This independent test-only branch does not depend on or edit the frozen UI stack. Producer: second store lane; independent reviewer/integrator: first store lane. Implementation remains stopped until checkpoint admission.
