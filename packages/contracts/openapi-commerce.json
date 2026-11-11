@@ -1515,6 +1515,31 @@
         "title": "SessionRequest",
         "type": "object"
       },
+      "SetComparison": {
+        "additionalProperties": false,
+        "properties": {
+          "after": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "After",
+            "type": "string"
+          },
+          "before": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Before",
+            "type": "string"
+          }
+        },
+        "required": [
+          "before",
+          "after"
+        ],
+        "title": "SetComparison",
+        "type": "object"
+      },
       "Shipment": {
         "additionalProperties": false,
         "properties": {
@@ -1542,6 +1567,23 @@
           "tracking"
         ],
         "title": "Shipment",
+        "type": "object"
+      },
+      "SnapshotComparison": {
+        "additionalProperties": false,
+        "properties": {
+          "after": {
+            "$ref": "#/components/schemas/SnapshotRef"
+          },
+          "before": {
+            "$ref": "#/components/schemas/SnapshotRef"
+          }
+        },
+        "required": [
+          "before",
+          "after"
+        ],
+        "title": "SnapshotComparison",
         "type": "object"
       },
       "SnapshotRef": {
@@ -2248,6 +2290,120 @@
         "summary": "Staff Record",
         "tags": [
           "staff"
+        ]
+      }
+    },
+    "/v1/admin/retail-test/commercial/compare/sets": {
+      "post": {
+        "operationId": "compare_sets_v1_admin_retail_test_commercial_compare_sets_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetComparison"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Compare Sets",
+        "tags": [
+          "commercial test fixtures"
+        ]
+      }
+    },
+    "/v1/admin/retail-test/commercial/compare/snapshots": {
+      "post": {
+        "operationId": "compare_snapshots_v1_admin_retail_test_commercial_compare_snapshots_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SnapshotComparison"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Compare Snapshots",
+        "tags": [
+          "commercial test fixtures"
         ]
       }
     },

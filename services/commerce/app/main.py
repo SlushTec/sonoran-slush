@@ -45,3 +45,5 @@ for route, method in [
     app.add_api_route(route, pending_capability, methods=[method], status_code=503,
                       response_model=ProblemResponse, tags=["not implemented"],
                       name=method.lower()+"_"+route.replace("/", "_").replace("{", "").replace("}", ""))
+from services.commerce.app.commercial_comparison import router as commercial_comparison_router
+app.include_router(commercial_comparison_router)
