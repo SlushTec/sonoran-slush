@@ -571,3 +571,63 @@ test("Python inscription whitespace parity preserves BOM rather than JavaScript 
   assert.ok(document.body.textContent.includes("\\u{FEFF}"));
   assert.ok(document.body.textContent.includes("do not engrave these display codes"));
 });
+
+const HistoryDisplay = require("../../apps/storefront/src/components/RecordedHistory.tsx");
+const historyEntry = (label="Recorded fixture",at="2030-01-01T12:34:56.123456+00:00")=>({label,at});
+test("staff history preserves original order, duplicates and exact timestamp without unknown fields",()=>{
+ const entries=[historyEntry("Later","2030-01-02T00:00:00+00:00"),historyEntry("Earlier"),historyEntry("Earlier")];
+ const result=HistoryDisplay.recordedHistory({timeline:entries.map(x=>({...x,secret:"not rendered"}))});
+ assert.deepEqual(result,{kind:"recorded",entries});
+});
+test("staff history distinguishes legacy absence from empty",()=>{
+ assert.equal(HistoryDisplay.recordedHistory({}).kind,"absent");
+ assert.equal(HistoryDisplay.recordedHistory({timeline:[]}).kind,"recorded");
+ render(React.createElement(HistoryDisplay.default,{record:{}}));
+ assert.ok(screen.getByText(/No history field/));
+ cleanup();
+ render(React.createElement(HistoryDisplay.default,{record:{timeline:[]}}));
+ assert.ok(screen.getByText(/recorded history is empty/));
+});
+for(const at of ["2030-02-30T00:00:00Z","1900-02-29T00:00:00Z","2030-04-31T00:00:00Z","0000-01-01T00:00:00Z","2030-00-01T00:00:00Z","2030-13-01T00:00:00Z","2030-01-00T00:00:00Z","2030-01-01T24:00:00Z","2030-01-01T00:60:00Z","2030-01-01T00:00:60Z","2030-01-01T00:00:00+24:00","2030-01-01T00:00:00+00:60","2030-01-01T00:00:00","2030-01-01","1234",null,true,1,"2030-01-01T00:00:00.1234567Z"]) {
+ test("history rejects invalid timestamp "+String(at),()=>assert.equal(HistoryDisplay.validHistoryTimestamp(at),false));
+}
+for(const at of ["2000-02-29T00:00:00Z","2028-02-29T23:59:59.123456-23:59","0001-01-01T00:00:00+00:00","9999-12-31T00:00:00+14:00"]) {
+ test("history preserves valid exact timestamp "+at,()=>assert.equal(HistoryDisplay.recordedHistory({timeline:[historyEntry("Valid",at)]}).entries[0].at,at));
+}
+for(const timeline of [null,{},true,"bad",[null],[{}],[{label:"x",at:1}],[historyEntry("")],[historyEntry("a".repeat(501))],[historyEntry("\ud800")],Array(1001).fill(historyEntry())]) {
+ test("history malformed bounded input rejects "+JSON.stringify(timeline).slice(0,50),()=>assert.throws(()=>HistoryDisplay.recordedHistory({timeline}),/reconciliation/));
+}
+test("history max boundaries and Unicode codepoints are preserved",()=>{
+ const label="🌵".repeat(500);
+ const result=HistoryDisplay.recordedHistory({timeline:Array(1000).fill(historyEntry(label))});
+ assert.equal(result.entries.length,1000);assert.equal(result.entries[0].label,label);
+});
+test("history safely displays markup, multiline and format legend, no unknown secrets",()=>{
+ const label="<img src=x>\nJosé 🌵\u202e";
+ render(React.createElement(HistoryDisplay.default,{record:{timeline:[{...historyEntry(label),token:"hidden-capability"}]}}));
+ assert.ok(document.querySelector("img")===null);
+ assert.ok(document.body.textContent.includes("José 🌵"));
+ assert.ok(document.body.textContent.includes("\\u{202E}"));
+ assert.ok(!document.body.textContent.includes("hidden-capability"));
+});
+test("history pagination is bounded and resets on document change",async()=>{
+ const mounted=render(React.createElement(HistoryDisplay.default,{record:{timeline:Array.from({length:51},(_,i)=>historyEntry("Event "+i))}}));
+ assert.equal(screen.getAllByRole("listitem").length,25);
+ fireEvent.click(screen.getByRole("button",{name:"Next history page"}));
+ assert.ok(screen.getByText("Event 25"));
+ fireEvent.click(screen.getByRole("button",{name:"Next history page"}));
+ assert.equal(screen.getAllByRole("listitem").length,1);
+ mounted.rerender(React.createElement(HistoryDisplay.default,{record:{timeline:[historyEntry("New record")]}}));
+ await waitFor(()=>assert.ok(screen.getByText("History page 1 of 1")));
+});
+test("malformed history never renders partial entries",()=>{
+ render(React.createElement(HistoryDisplay.default,{record:{timeline:[historyEntry("partial-private"),historyEntry("bad","2030-02-30T00:00:00Z")]}}));
+ assert.ok(screen.getByRole("alert"));
+ assert.ok(!document.body.textContent.includes("partial-private"));
+});
+test("staff Lock clears recorded history",async()=>{
+ doc={...doc,timeline:[historyEntry("Private recorded event")]}; await open();
+ assert.ok(screen.getByText("Private recorded event"));
+ fireEvent.click(screen.getByRole("button",{name:"Lock workspace"}));
+ assert.ok(screen.queryByRole("region",{name:"Recorded history"})===null);
+});

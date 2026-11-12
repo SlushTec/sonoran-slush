@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { commerce, downloadJSON } from "@/lib/client";
 import Icon from "./Icon";
 import RecordedPersonalization from "./RecordedPersonalization";
+import RecordedHistory from "./RecordedHistory";
 type Doc = {
   id: string;
   kind: string;
@@ -511,6 +512,7 @@ export default function StaffWorkspace() {
                 </p>
               )}
               <RecordedPersonalization key={doc.id} record={doc} />
+              <RecordedHistory key={"history-" + doc.id} record={doc} />
               {["retail", "bulk", "event"].includes(doc.kind) && (
                 <>
                   <div className="form-divider">
