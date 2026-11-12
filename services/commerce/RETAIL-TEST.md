@@ -333,3 +333,26 @@ Qualification remains limited to bounded synthetic local SQLite state. Commercia
 The synthetic SQLite drill now has an explicitly selected eleven-table proof profile alongside the unchanged legacy and ledger/BOM profiles. It covers small identical/per-piece mappings, distinct piece counts and stock consumption, exact material hashes, bound revisions and decisions, and one explicitly shaped legacy observation followed by a supported newly bound revision. Direct legacy shaping is confined to that owned fixture before modern histories exist; it is not a production migration procedure.
 
 Restored authenticated history and exact decision replay preserve state, and rehashed mapping/context/observation/reference/decision corruptions are rejected before a target is created. The observation does not manufacture version-one evidence or approval. The one-MiB drill cap and table allowlist are unchanged. Large personalized contexts, commercial/Square recovery, general legacy migrations, actual private assets and production recovery targets remain unqualified.
+
+## Synthetic commercial fixture recovery profile (partial SS-070)
+The explicit commercial drill profile adds only the five existing commercial fixture
+tables to the base 11-table profile. It checks their exact table/index schemas and
+independently constructed rows, command fingerprints/receipts, revision lifecycle
+audit, release-set references/content hashes, and current-pointer/publication history.
+It is not a general-purpose backup tool and cannot accept a supplied database.
+
+Supported fixture APIs seed two small catalog/price/policy revisions and release sets,
+then publish A, publish B and roll back to A. Separate normal and retired-reference
+cases verify restored replay versus current authority: an old receipt can replay
+without making a retired set usable. A new valid publication advances the restored
+pointer and preserves prior history. An uncommitted WAL pointer update is excluded.
+Unknown tables/index changes and re-sealed content, reference, audit, command and
+pointer/history corruption are rejected before a restore target is created.
+
+All original 111 drill cases, the 1 MiB snapshot cap and path/link/sidecar/source
+nonmutation guards are preserved. Fixed synthetic amounts and public product
+identifiers are test data, not approved prices, eligibility or business policy.
+No owner/production approval is granted, and no real database, asset, provider,
+account or production recovery action is used. Square, large contexts, private
+assets, durable jobs/outbox, production schema compatibility and owner recovery
+targets/cost/retention remain unqualified.
