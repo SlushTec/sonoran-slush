@@ -257,6 +257,57 @@
         "title": "Component",
         "type": "object"
       },
+      "ConditionUnits": {
+        "additionalProperties": false,
+        "properties": {
+          "available": {
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Available",
+            "type": "integer"
+          },
+          "completed": {
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Completed",
+            "type": "integer"
+          },
+          "damaged": {
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Damaged",
+            "type": "integer"
+          },
+          "in_production": {
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "In Production",
+            "type": "integer"
+          },
+          "sample": {
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Sample",
+            "type": "integer"
+          },
+          "shipped": {
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Shipped",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "available",
+          "damaged",
+          "sample",
+          "in_production",
+          "completed",
+          "shipped"
+        ],
+        "title": "ConditionUnits",
+        "type": "object"
+      },
       "CustomerEvent": {
         "additionalProperties": false,
         "properties": {
@@ -1024,6 +1075,41 @@
         "title": "Location",
         "type": "object"
       },
+      "LocationAvailability": {
+        "additionalProperties": false,
+        "properties": {
+          "condition_units": {
+            "$ref": "#/components/schemas/ConditionUnits"
+          },
+          "free_units": {
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Free Units",
+            "type": "integer"
+          },
+          "location_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Location Id",
+            "type": "string"
+          },
+          "reserved_units": {
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Reserved Units",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "location_id",
+          "condition_units",
+          "reserved_units",
+          "free_units"
+        ],
+        "title": "LocationAvailability",
+        "type": "object"
+      },
       "Lot": {
         "additionalProperties": false,
         "properties": {
@@ -1055,6 +1141,70 @@
           "lot_reference"
         ],
         "title": "Lot",
+        "type": "object"
+      },
+      "LotAvailability": {
+        "additionalProperties": false,
+        "properties": {
+          "checkout_authoritative": {
+            "const": false,
+            "title": "Checkout Authoritative",
+            "type": "boolean"
+          },
+          "component_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Component Id",
+            "type": "string"
+          },
+          "locations": {
+            "items": {
+              "$ref": "#/components/schemas/LocationAvailability"
+            },
+            "maxItems": 100,
+            "title": "Locations",
+            "type": "array"
+          },
+          "lot_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Lot Id",
+            "type": "string"
+          },
+          "test_mode": {
+            "const": true,
+            "title": "Test Mode",
+            "type": "boolean"
+          },
+          "unit": {
+            "enum": [
+              "piece",
+              "millilitre",
+              "gram",
+              "millimetre"
+            ],
+            "title": "Unit",
+            "type": "string"
+          },
+          "version": {
+            "maximum": 9.223372036854776e+18,
+            "minimum": 0.0,
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "lot_id",
+          "component_id",
+          "unit",
+          "version",
+          "locations",
+          "test_mode",
+          "checkout_authoritative"
+        ],
+        "title": "LotAvailability",
         "type": "object"
       },
       "Movement": {
@@ -3990,6 +4140,85 @@
           }
         },
         "summary": "Lot",
+        "tags": [
+          "synthetic component ledger"
+        ]
+      }
+    },
+    "/v1/admin/retail-test/component-ledger/lots/{lot_id}/availability": {
+      "get": {
+        "operationId": "lot_availability_v1_admin_retail_test_component_ledger_lots__lot_id__availability_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lot_id",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_-]+$",
+              "title": "Lot Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "expected_version",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 9223372036854775806,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Expected Version"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LotAvailability"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Lot Availability",
         "tags": [
           "synthetic component ledger"
         ]
