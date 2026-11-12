@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { commerce, downloadJSON } from "@/lib/client";
 import Icon from "./Icon";
+import RecordedPersonalization from "./RecordedPersonalization";
 type Doc = {
   id: string;
   kind: string;
@@ -509,16 +510,7 @@ export default function StaffWorkspace() {
                   {doc.quantity ? " · " + doc.quantity + " pieces" : ""}
                 </p>
               )}
-              {doc.items?.map((i, index) => (
-                <div key={index} className="summary-row">
-                  <span>
-                    {i.product_slug}
-                    <br />
-                    {i.text}
-                  </span>
-                  <span>× {i.quantity}</span>
-                </div>
-              ))}
+              <RecordedPersonalization key={doc.id} record={doc} />
               {["retail", "bulk", "event"].includes(doc.kind) && (
                 <>
                   <div className="form-divider">
