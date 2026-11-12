@@ -875,3 +875,26 @@ Final Windows author gate passed 882 Python tests plus 94 subtests, 219 Node tes
 An initial browser assertion matched both the new status notice and the pre-existing global toast; it was scoped correctly. A synchronous-dismissal Node assertion stalled while formatting an intermediate React/JSDOM element; explicit async act and boolean absence assertions fixed the harness. The post-click active-session guard and ES2017-compatible BigInt constructor formatting passed final reruns. Earlier failed/incomplete logs remain distinct from final evidence. Test screenshot capture now scrolls instantly before capture to avoid smooth-scroll sticky-header artifacts; runtime styling is unchanged.
 
 Final desktop and 390px mobile screenshots were inspected. Owned final helper PIDs 22548/19956/35460/28616/35768/20196/9360/16300/9044/31536 and ports 3146/50623/50624/50888/50889/57553/57554/60422/60423/51929/51930 were verified stopped/closed; guarded smoke cleanup removed synthetic databases and private temporary downloads. All active non-order components, backend/shared client/contracts and checkout gates remain unchanged. Source is frozen for independent review, not yet published or production-qualified.
+
+
+## 2026-11-11 RPG-121 cross-portal synthetic integration checkpoint
+
+- Producer: second store worker; independent reviewer/integrator: store coordinator. Existing-card qualification, not a new customer feature.
+- Base: frozen order-summary bd8fbde3; preserve it unchanged. Transplant this docs-only checkpoint onto verified same-content merged main before implementation; independent admission required.
+- Scope: one new local real-ASGI/headless-browser integration smoke and focused test/documentation wiring only. Preserve existing four smokes, all application components, backend, shared client/contracts and provider gates unchanged.
+- One owned temporary SQLite database and loopback ASGI app; seed a synthetic initial request through the existing qualified API, never held guided-design/rollup UI or real accounts/customer data.
+- Browser staff session opens the seeded request and offers a bounded synthetic quote; private customer quote session reads and accepts those exact terms/version.
+- Staff browser creates the linked order and obtains the existing private receipt; use that capability only in memory for customer order lookup and refreshed order-summary download.
+- Assert downloaded allowlisted contents match the server order and remain explicitly unpaid/not a paid receipt/not a tax invoice; no token, capability, private staff fields or unknown properties in file.
+- Staff browser prepares a bound proof and receives its private capability; customer browser reads the current bound evidence and approves that exact revision and context.
+- Verify the same database/order links, material configuration, quote accepted version, order identity, proof identity/version/context and resulting decision through the supported APIs.
+- Proof acceptance is not payment, booking or production permission: assert unpaid production hold persists, and a production-release attempt remains denied without changing state.
+- Negative coverage: wrong-token and cross-order/proof capability combinations deny access and do not mutate state; no identity handoff inferred from a prior portal session.
+- Exercise private Close/navigation between stages, assert prior records/receipts/forms disappear and cannot supply authority to another stage; capability handoff is explicit and in-memory only.
+- Never log fixture secrets/capabilities or capture private receipt panels in retained screenshots. Only safe aggregate assertions/results and sanitized synthetic screenshots retained.
+- No provider calls. The integrated unpaid path needs no checkout; if existing Square smoke is rerun it keeps its isolated process-only adapter stub/navigation interception.
+- Own all helpers, ports, browser contexts and temporary paths; hidden Windows processes, headless browser, short owned temp root, safe path checks and final PID/port/temp cleanup verification.
+- No production/customer/account/role changes, no live purchases, deployment, AWS/WSL, held sources or further workers.
+- Verification after implementation: full Python/Node regressions, optimized frontend build/typecheck, current browser suite, four original actual-ASGI smokes unchanged, new cross-portal smoke, archive/OpenAPI/doc links/diff checks and fresh safe pixel inspection.
+- This qualifies a synthetic local connected path, not real provider fulfillment, real household login, hosted browser deployment, inventory qualification or launch readiness. Report any uncovered boundary honestly.
+- Stop implementation at 02:20 UTC; final cutoff 03:00 UTC. Freeze exact clean source and verified bundle for independent review before any publication.
