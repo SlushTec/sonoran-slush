@@ -768,7 +768,9 @@ test("same SKU lines remain separate and maximum bounded projection paginates",a
   p.lines=Array.from({length:4},(_,n)=>({...structuredClone(p.lines[0]),
     personalization_snapshot:{...structuredClone(p.lines[0].personalization_snapshot),line_index:n}}));
   assert.equal(customerInscriptions(p).entries.length,2000);
+  // Finish the async mount and child reset effect before testing a user page click.
   await open();
+  await act(async () => {});
   const region=screen.getByRole("region",{name:"Your recorded inscriptions"});
   assert.equal(region.querySelectorAll("li").length,25);
   fireEvent.click(screen.getByRole("button",{name:"Next inscription page"}));
