@@ -391,3 +391,165 @@ test("late new-record receipt after Lock is discarded without summary", async ()
 });
 
 test("real Inquiry nullable date and quantity remain readable",async()=>{doc.date=null;doc.quantity=null;await open();assert.ok(screen.getByRole("button",{name:"Offer a new quote version"}));});
+
+
+const PieceDisplay = require("../../apps/storefront/src/components/RecordedPersonalization.tsx");
+function pieceOrder({ mode = "per_piece", quantity = 2, count = 2, lines = 1 } = {}) {
+  const items = [], priced = [];
+  for (let line = 0; line < lines; line++) {
+    const pieces = Array.from({ length: quantity * count }, (_, n) => ({
+      set_index: Math.floor(n / count), piece_index: n % count,
+      text: mode === "identical" ? "  José 🌵  " : "Line " + line + " name " + n,
+    }));
+    const item = { product_slug: "makertwist-40oz-tumbler", quantity, text: "", secondary: "",
+      font: "Classic serif", options: {},
+      personalization: mode === "identical" ? { mode, text: "  José 🌵  " } :
+        { mode, pieces: [...pieces].reverse() } };
+    items.push(item);
+    priced.push({ item: structuredClone(item), stock_units: quantity * 7,
+      personalization_snapshot: { schema_version: 1, mode, line_index: line,
+        quantity, pieces_per_item: count, pieces } });
+  }
+  return { id: "ord_mapping", kind: "order", status: "awaiting_payment", version: 1,
+    payment_status: "unpaid", proof_status: "awaiting_proof", items, lines: priced };
+}
+test("recorded mapping separates same-SKU lines and normalizes arbitrary input order", () => {
+  const value = pieceOrder({ lines: 2 });
+  const parsed = PieceDisplay.recordedPersonalization(value);
+  assert.equal(parsed.rows.length, 8);
+  assert.deepEqual(parsed.rows.map(p => [p.line,p.set,p.piece]), [
+    [0,0,0],[0,0,1],[0,1,0],[0,1,1],[1,0,0],[1,0,1],[1,1,0],[1,1,1],
+  ]);
+  assert.equal(parsed.rows[4].text, "Line 1 name 0");
+  assert.equal(value.lines[0].stock_units, 14);
+});
+test("identical mapping retains all valid whitespace and Unicode code points", () => {
+  const value = pieceOrder({ mode: "identical" });
+  value.items[0].personalization.text = "🌵".repeat(120);
+  value.lines[0].item = structuredClone(value.items[0]);
+  for (const p of value.lines[0].personalization_snapshot.pieces) p.text = "🌵".repeat(120);
+  assert.equal(PieceDisplay.recordedPersonalization(value).rows[0].text, "🌵".repeat(120));
+  assert.equal(PieceDisplay.recordedPersonalization(pieceOrder({mode:"identical"})).rows[0].text, "  José 🌵  ");
+});
+test("exact 500-per-line and 2000-order mapping bounds remain readable", () => {
+  const parsed = PieceDisplay.recordedPersonalization(pieceOrder({quantity:5,count:100,lines:4}));
+  assert.equal(parsed.rows.length, 2000);
+  assert.equal(parsed.rows[1999].piece, 99);
+});
+const badMappings = [
+  ["missing snapshot", v => delete v.lines[0].personalization_snapshot],
+  ["explicit null", v => v.items[0].personalization = null],
+  ["unknown snapshot field", v => v.lines[0].personalization_snapshot.extra = true],
+  ["boolean schema", v => v.lines[0].personalization_snapshot.schema_version = true],
+  ["string schema", v => v.lines[0].personalization_snapshot.schema_version = "1"],
+  ["wrong line", v => v.lines[0].personalization_snapshot.line_index = 1],
+  ["boolean line", v => v.lines[0].personalization_snapshot.line_index = false],
+  ["wrong quantity", v => v.lines[0].personalization_snapshot.quantity = 1],
+  ["boolean count", v => v.lines[0].personalization_snapshot.pieces_per_item = true],
+  ["string count", v => v.lines[0].personalization_snapshot.pieces_per_item = "2"],
+  ["zero count", v => v.lines[0].personalization_snapshot.pieces_per_item = 0],
+  ["large count", v => v.lines[0].personalization_snapshot.pieces_per_item = 101],
+  ["missing piece", v => v.lines[0].personalization_snapshot.pieces.pop()],
+  ["duplicate piece", v => v.lines[0].personalization_snapshot.pieces[1] = {...v.lines[0].personalization_snapshot.pieces[0]}],
+  ["unsorted snapshot", v => v.lines[0].personalization_snapshot.pieces.reverse()],
+  ["wrong text", v => v.lines[0].personalization_snapshot.pieces[0].text = "Different"],
+  ["wrong item identity", v => v.lines[0].item.product_slug = "other-product"],
+  ["wrong item quantity", v => v.lines[0].item.quantity = 1],
+  ["wrong item assignment", v => v.lines[0].item.personalization.pieces[0].text = "Different"],
+  ["competing inscription", v => v.items[0].text = "Other"],
+  ["competing secondary", v => v.items[0].secondary = "Other"],
+  ["competing option", v => v.items[0].options.Name = "Other"],
+  ["too many lines", v => v.items = Array(101).fill(v.items[0])],
+  ["missing lines", v => delete v.lines],
+  ["extra line", v => v.lines.push(structuredClone(v.lines[0]))],
+  ["control inscription", v => v.lines[0].personalization_snapshot.pieces[0].text = "Bad\u0085text"],
+  ["surrogate inscription", v => v.lines[0].personalization_snapshot.pieces[0].text = "\ud800"],
+  ["overlong inscription", v => v.lines[0].personalization_snapshot.pieces[0].text = "🌵".repeat(121)],
+  ["out-of-range set", v => v.lines[0].personalization_snapshot.pieces[0].set_index = 499],
+  ["boolean piece index", v => v.lines[0].personalization_snapshot.pieces[0].piece_index = false],
+];
+for (const [name, mutate] of badMappings) test("recorded mapping fails closed: " + name, () => {
+  const value = pieceOrder(); mutate(value);
+  assert.throws(() => PieceDisplay.recordedPersonalization(value), /reconciliation/);
+});
+test("mapping rejects too many pieces at line and order boundaries", () => {
+  assert.throws(() => PieceDisplay.recordedPersonalization(pieceOrder({quantity:167,count:3})), /reconciliation/);
+  assert.throws(() => PieceDisplay.recordedPersonalization(pieceOrder({quantity:5,count:100,lines:5})), /reconciliation/);
+});
+test("legacy allocation stays explicitly absent and hidden fields never render", () => {
+  const value = {items:[{product_slug:"pet-tags",quantity:1,text:"Old engraving",secondary:"Back text",
+    font:"Modern sans",options:{"Surface":"Wood"},notes:"PRIVATE_NOTES",internal_cost:"PRIVATE_COST"}]};
+  render(React.createElement(PieceDisplay.default,{record:value}));
+  assert.ok(screen.getByText(/Legacy configuration/));
+  assert.ok(screen.getByText("Back text"));
+  assert.ok(!document.body.textContent.includes("PRIVATE_NOTES"));
+  assert.ok(!document.body.textContent.includes("PRIVATE_COST"));
+  assert.ok(screen.queryByRole("list") === null);
+});
+test("orphan snapshot on legacy item fails rather than inventing allocation", () => {
+  const value = pieceOrder(); delete value.items[0].personalization;
+  assert.throws(() => PieceDisplay.recordedPersonalization(value), /reconciliation/);
+});
+test("recorded mapping pagination is bounded and resets on record replacement", async () => {
+  const value = pieceOrder({quantity:30,count:1});
+  const mounted = render(React.createElement(PieceDisplay.default,{record:value}));
+  assert.equal(screen.getAllByRole("listitem").length,25);
+  fireEvent.click(screen.getByRole("button",{name:"Next piece page"}));
+  assert.equal(screen.getAllByRole("listitem").length,5);
+  mounted.rerender(React.createElement(PieceDisplay.default,{record:pieceOrder()}));
+  await waitFor(() => assert.ok(screen.getByText("Piece page 1 of 1")));
+});
+test("markup is escaped and format characters cannot forge piece labels", () => {
+  const value = pieceOrder({mode:"identical"});
+  const inscription = '<img src=x onerror=alert(1)>\u202e';
+  value.items[0].personalization.text = inscription;
+  value.lines[0].item = structuredClone(value.items[0]);
+  for(const p of value.lines[0].personalization_snapshot.pieces) p.text = inscription;
+  render(React.createElement(PieceDisplay.default,{record:value}));
+  assert.ok(document.querySelector("img") === null);
+  assert.ok(document.body.textContent.includes("\\u{202E}"));
+});
+test("malformed recorded mapping shows reconciliation without partial names", () => {
+  const value = pieceOrder(); value.lines[0].personalization_snapshot.pieces[3].text = "Bad";
+  render(React.createElement(PieceDisplay.default,{record:value}));
+  assert.ok(screen.getByRole("alert").textContent.includes("could not be verified"));
+  assert.ok(!document.body.textContent.includes("Line 0 name"));
+});
+test("staff order mapping disappears with Lock and does not persist", async () => {
+  doc = pieceOrder();
+  await open();
+  assert.ok(screen.getByRole("region",{name:"Recorded personalization"}));
+  assert.ok(screen.getByText("Line 0 name 0"));
+  fireEvent.click(screen.getByRole("button",{name:"Lock workspace"}));
+  assert.ok(screen.queryByRole("region",{name:"Recorded personalization"}) === null);
+  assert.ok(screen.queryByText("Line 0 name 0") === null);
+});
+
+test("missing items cannot silently discard orphan normalized assignments", () => {
+  const value = pieceOrder(); delete value.items;
+  assert.throws(() => PieceDisplay.recordedPersonalization(value), /reconciliation/);
+});
+test("explicit null legacy fields in structured line item do not equal omission", () => {
+  for (const key of ["text", "secondary", "font"]) {
+    const value = pieceOrder(); value.lines[0].item[key] = null;
+    assert.throws(() => PieceDisplay.recordedPersonalization(value), /reconciliation/);
+  }
+});
+
+test("present malformed or oversized lines are not silently treated as legacy omission", () => {
+  for (const lines of [null, {}, "invalid", Array(101).fill({})]) {
+    assert.throws(() => PieceDisplay.recordedPersonalization({items:[],lines}), /reconciliation/);
+  }
+});
+
+test("legacy multiline inscriptions and options remain readable without structured control restrictions", () => {
+  const item = {product_slug:"fixture",quantity:1,text:"José\nsecond line",secondary:"🌵\r\nthird",font:"Classic serif",options:{"Label\nkey":"First\nSecond"}};
+  const view = PieceDisplay.recordedPersonalization({items:[item]});
+  assert.equal(view.legacy[0].text, item.text);
+  assert.equal(view.legacy[0].secondary, item.secondary);
+  assert.deepEqual(view.legacy[0].options, Object.entries(item.options));
+  render(React.createElement(PieceDisplay.default,{record:{items:[item]}}));
+  assert.ok(document.body.textContent.includes(item.text));
+  assert.ok(document.body.textContent.includes(item.secondary));
+  assert.ok(screen.queryByRole("alert") === null);
+});
