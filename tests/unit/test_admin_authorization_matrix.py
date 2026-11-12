@@ -6,6 +6,7 @@ import sqlite3
 from pathlib import Path
 
 import pytest
+from fastapi import APIRouter, FastAPI
 
 from services.commerce.app.main import app
 from test_commerce_workflows import connected, staff, auth, order
@@ -28,11 +29,40 @@ def target(path, record_id):
                   "1" if m[1] == "revision" else "synthetic-boundary", path)
 
 
+def admin_routes(routes, prefix=""):
+    result = []
+    for route in routes:
+        if hasattr(route, "original_router"):
+            result.extend(admin_routes(route.original_router.routes,
+                                       prefix + route.include_context.prefix))
+        elif hasattr(route, "path") and hasattr(route, "methods"):
+            path = prefix + route.path
+            if path.startswith("/v1/admin/"):
+                result.extend((method.upper(), path) for method in route.methods)
+        else:
+            raise AssertionError("Unclassified route type requires authorization inventory review")
+    return sorted(result)
+
+
 def test_admin_inventory_is_complete_and_reviewed():
-    actual = sorted((method.upper(), path) for path, methods in app.openapi()["paths"].items()
-                    if path.startswith("/v1/admin/") for method in methods)
-    assert actual == sorted(ROUTES)
+    assert admin_routes(app.routes) == sorted(ROUTES)
     assert len(ROUTES) == len(set(ROUTES)) == 40
+
+
+def test_inventory_sees_schema_hidden_routes_and_nested_prefixes():
+    probe = FastAPI()
+    child = APIRouter()
+    child.add_api_route("/hidden", lambda: {}, methods=["GET"], include_in_schema=False)
+    outer = APIRouter()
+    outer.include_router(child, prefix="/nested")
+    probe.include_router(outer, prefix="/v1/admin")
+    assert admin_routes(probe.routes) == [("GET", "/v1/admin/nested/hidden")]
+    assert "/v1/admin/nested/hidden" not in probe.openapi()["paths"]
+
+
+def test_inventory_rejects_unclassified_route_types():
+    with pytest.raises(AssertionError, match="Unclassified route"):
+        admin_routes([object()])
 
 
 @pytest.mark.parametrize("method,path", ROUTES)
