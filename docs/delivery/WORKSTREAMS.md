@@ -898,3 +898,11 @@ Final desktop and 390px mobile screenshots were inspected. Owned final helper PI
 - Verification after implementation: full Python/Node regressions, optimized frontend build/typecheck, current browser suite, four original actual-ASGI smokes unchanged, new cross-portal smoke, archive/OpenAPI/doc links/diff checks and fresh safe pixel inspection.
 - This qualifies a synthetic local connected path, not real provider fulfillment, real household login, hosted browser deployment, inventory qualification or launch readiness. Report any uncovered boundary honestly.
 - Stop implementation at 02:20 UTC; final cutoff 03:00 UTC. Freeze exact clean source and verified bundle for independent review before any publication.
+
+### Cross-portal connected-state witness refinement
+
+- Retain one explicitly authenticated customer order tab after its first unpaid/awaiting-proof summary as an intentional stale-state witness. Use a separate explicitly authenticated proof tab with its own supplied capability, never inherited order authority.
+- After the proof tab approves the exact bound revision, return to the retained order tab. Assert the actual order version remains unchanged while its proof status changes.
+- The first subsequent summary click must refresh and reveal the changed proof status, produce zero downloads and require a new explicit click. The second click must export the approved-proof status while still explicitly unpaid/not a paid receipt/not a tax invoice.
+- Close quote/proof sessions and staff private receipt panels at stage boundaries; the order witness is the sole intentional retained session and is closed at the end.
+- Assertions involving capabilities, tokens or private receipts must compare booleans or redacted safe projections. Never pass raw private values/objects to equality/deep-equality assertions whose failure formatting could disclose them. Retained screenshots occur only after private receipts are dismissed.
