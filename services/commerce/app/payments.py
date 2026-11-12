@@ -107,9 +107,14 @@ def verify_signature(raw: bytes, signature: str, secret: str, notification_url: 
 
 @router.post("/v1/webhooks/payments", dependencies=[Depends(configured)], tags=["test payments"])
 async def payment_webhook(request: Request, x_square_hmacsha256_signature: Annotated[str | None, Header()] = None):
-    raw = await request.body()
-    if len(raw) > 65536:
-        raise HTTPException(413, "The event exceeds the supported size.")
+    # Bound accumulated bytes before authentication, including chunked requests.
+    # The ASGI server still owns allocation of each incoming chunk.
+    buffer = bytearray()
+    async for chunk in request.stream():
+        if len(chunk) > 65536 - len(buffer):
+            raise HTTPException(413, "The event exceeds the supported size.")
+        buffer.extend(chunk)
+    raw = bytes(buffer)
     payload = verify_signature(raw, x_square_hmacsha256_signature or "", os.environ["SQUARE_SANDBOX_WEBHOOK_KEY"], os.environ["SQUARE_WEBHOOK_NOTIFICATION_URL"])
     if payload.get("merchant_id") != os.environ["SQUARE_SANDBOX_MERCHANT_ID"]:
         raise HTTPException(400, "The event merchant does not match the configured sandbox merchant.")
