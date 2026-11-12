@@ -906,3 +906,10 @@ Final desktop and 390px mobile screenshots were inspected. Owned final helper PI
 - The first subsequent summary click must refresh and reveal the changed proof status, produce zero downloads and require a new explicit click. The second click must export the approved-proof status while still explicitly unpaid/not a paid receipt/not a tax invoice.
 - Close quote/proof sessions and staff private receipt panels at stage boundaries; the order witness is the sole intentional retained session and is closed at the end.
 - Assertions involving capabilities, tokens or private receipts must compare booleans or redacted safe projections. Never pass raw private values/objects to equality/deep-equality assertions whose failure formatting could disclose them. Retained screenshots occur only after private receipts are dismissed.
+
+### Cross-portal routine CI wiring admission
+
+- Additional scoped paths: root package.json adds test:cross-portal invoking the new tests/frontend/cross-portal-real-smoke.cjs; .github/workflows/verify.yml storefront job runs it after existing build/browser installation and e2e checks.
+- Use the same pinned actions/setup-python SHA and Python 3.12 as the preservation job, install the existing unchanged requirements-dev.lock, and set CROSS_SMOKE_PYTHON to that job's resolved python executable plus an owned runner-temp root.
+- Existing storefront invalid QA origin and all existing checks, timeouts, permissions, secrets and provider-disabled fixture gates remain unchanged. No new provider/service credentials, package dependencies, runtime test backdoor or weaker checks.
+- Independent admission is required before editing workflow/package wiring. Native equivalent command qualifies locally; hosted CI remains a separate exact-head publication gate, never presumed passed.
