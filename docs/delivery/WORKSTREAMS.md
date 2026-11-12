@@ -875,3 +875,59 @@ Final Windows author gate passed 882 Python tests plus 94 subtests, 219 Node tes
 An initial browser assertion matched both the new status notice and the pre-existing global toast; it was scoped correctly. A synchronous-dismissal Node assertion stalled while formatting an intermediate React/JSDOM element; explicit async act and boolean absence assertions fixed the harness. The post-click active-session guard and ES2017-compatible BigInt constructor formatting passed final reruns. Earlier failed/incomplete logs remain distinct from final evidence. Test screenshot capture now scrolls instantly before capture to avoid smooth-scroll sticky-header artifacts; runtime styling is unchanged.
 
 Final desktop and 390px mobile screenshots were inspected. Owned final helper PIDs 22548/19956/35460/28616/35768/20196/9360/16300/9044/31536 and ports 3146/50623/50624/50888/50889/57553/57554/60422/60423/51929/51930 were verified stopped/closed; guarded smoke cleanup removed synthetic databases and private temporary downloads. All active non-order components, backend/shared client/contracts and checkout gates remain unchanged. Source is frozen for independent review, not yet published or production-qualified.
+
+
+## 2026-11-11 RPG-121 cross-portal synthetic integration checkpoint
+
+- Producer: second store worker; independent reviewer/integrator: store coordinator. Existing-card qualification, not a new customer feature.
+- Base: frozen order-summary bd8fbde3; preserve it unchanged. Transplant this docs-only checkpoint onto verified same-content merged main before implementation; independent admission required.
+- Scope: one new local real-ASGI/headless-browser integration smoke and focused test/documentation wiring only. Preserve existing four smokes, all application components, backend, shared client/contracts and provider gates unchanged.
+- One owned temporary SQLite database and loopback ASGI app; seed a synthetic initial request through the existing qualified API, never held guided-design/rollup UI or real accounts/customer data.
+- Browser staff session opens the seeded request and offers a bounded synthetic quote; private customer quote session reads and accepts those exact terms/version.
+- Staff browser creates the linked order and obtains the existing private receipt; use that capability only in memory for customer order lookup and refreshed order-summary download.
+- Assert downloaded allowlisted contents match the server order and remain explicitly unpaid/not a paid receipt/not a tax invoice; no token, capability, private staff fields or unknown properties in file.
+- Staff browser prepares a bound proof and receives its private capability; customer browser reads the current bound evidence and approves that exact revision and context.
+- Verify the same database/order links, material configuration, quote accepted version, order identity, proof identity/version/context and resulting decision through the supported APIs.
+- Proof acceptance is not payment, booking or production permission: assert unpaid production hold persists, and a production-release attempt remains denied without changing state.
+- Negative coverage: wrong-token and cross-order/proof capability combinations deny access and do not mutate state; no identity handoff inferred from a prior portal session.
+- Exercise private Close/navigation between stages, assert prior records/receipts/forms disappear and cannot supply authority to another stage; capability handoff is explicit and in-memory only.
+- Never log fixture secrets/capabilities or capture private receipt panels in retained screenshots. Only safe aggregate assertions/results and sanitized synthetic screenshots retained.
+- No provider calls. The integrated unpaid path needs no checkout; if existing Square smoke is rerun it keeps its isolated process-only adapter stub/navigation interception.
+- Own all helpers, ports, browser contexts and temporary paths; hidden Windows processes, headless browser, short owned temp root, safe path checks and final PID/port/temp cleanup verification.
+- No production/customer/account/role changes, no live purchases, deployment, AWS/WSL, held sources or further workers.
+- Verification after implementation: full Python/Node regressions, optimized frontend build/typecheck, current browser suite, four original actual-ASGI smokes unchanged, new cross-portal smoke, archive/OpenAPI/doc links/diff checks and fresh safe pixel inspection.
+- This qualifies a synthetic local connected path, not real provider fulfillment, real household login, hosted browser deployment, inventory qualification or launch readiness. Report any uncovered boundary honestly.
+- Stop implementation at 02:20 UTC; final cutoff 03:00 UTC. Freeze exact clean source and verified bundle for independent review before any publication.
+
+### Cross-portal connected-state witness refinement
+
+- Retain one explicitly authenticated customer order tab after its first unpaid/awaiting-proof summary as an intentional stale-state witness. Use a separate explicitly authenticated proof tab with its own supplied capability, never inherited order authority.
+- After the proof tab approves the exact bound revision, return to the retained order tab. Assert the actual order version remains unchanged while its proof status changes.
+- The first subsequent summary click must refresh and reveal the changed proof status, produce zero downloads and require a new explicit click. The second click must export the approved-proof status while still explicitly unpaid/not a paid receipt/not a tax invoice.
+- Close quote/proof sessions and staff private receipt panels at stage boundaries; the order witness is the sole intentional retained session and is closed at the end.
+- Assertions involving capabilities, tokens or private receipts must compare booleans or redacted safe projections. Never pass raw private values/objects to equality/deep-equality assertions whose failure formatting could disclose them. Retained screenshots occur only after private receipts are dismissed.
+
+### Cross-portal routine CI wiring admission
+
+- Additional scoped paths: root package.json adds test:cross-portal invoking the new tests/frontend/cross-portal-real-smoke.cjs; .github/workflows/verify.yml storefront job runs it after existing build/browser installation and e2e checks.
+- Use the same pinned actions/setup-python SHA and Python 3.12 as the preservation job, install the existing unchanged requirements-dev.lock, and set CROSS_SMOKE_PYTHON to that job's resolved python executable plus an owned runner-temp root.
+- Existing storefront invalid QA origin and all existing checks, timeouts, permissions, secrets and provider-disabled fixture gates remain unchanged. No new provider/service credentials, package dependencies, runtime test backdoor or weaker checks.
+- Independent admission is required before editing workflow/package wiring. Native equivalent command qualifies locally; hosted CI remains a separate exact-head publication gate, never presumed passed.
+
+### Cross-portal implemented qualification and remaining limits
+
+- Added tests/frontend/cross-portal-real-smoke.cjs and test:cross-portal command. Set CROSS_SMOKE_PYTHON to the locked interpreter and CROSS_SMOKE_TEMP to an owned short temporary root; build with the existing invalid QA API origin first. Routine storefront CI installs the unchanged locked Python requirements and runs this command after browser checks.
+- One loopback ASGI DB now connects real browser staff quote offering, customer exact acceptance, staff order receipt, customer order-summary download, staff bound-proof receipt and customer approval. Private receipts are read from download streams in memory, not printed; download artifacts are explicitly deleted.
+- The retained order tab witnesses a real proof-status change at unchanged order.version: first refresh produces no file and requires review, second explicit download includes approved proof and still-unpaid payment status.
+- Exact wrong/cross-order capabilities receive the existing private-record 404 without observed order mutation. A legacy quote order's release returns its existing durable inventory/capacity migration 409, with unchanged order state. This does NOT isolate payment as the sole denial cause or qualify legacy production release.
+- Private assertions use booleans/redacted projections and failures report only a bounded static stage/HTTP status, never raw exception details, private bodies or capabilities. Final screenshots are taken after private panels are closed. Storage checks assert absence of private capabilities/record identities, not absence of unrelated public UI state.
+- Original four actual-ASGI smokes and all application/backend/client/contract sources remain unchanged. No checkout/provider call is part of the new path, and no real household, account, customer or production data is involved.
+
+- Final isolation guard authenticates an exact empty /v1/admin/summary with a fresh random staff nonce and checks owned backend liveness before seed POSTs. Ambient provider variables are removed only from child-process environment, never saved credentials/settings.
+- Wrong-capability and rejected-release batches additionally compare an internal read-only logical hash of the entire owned SQLite fixture; neither rows nor hashes are logged. Supported order-view assertions remain.
+- Author verification: 882 Python tests plus 94 subtests, 219 Node tests, 56 browser tests, optimized build/typecheck, archive 67/41, OpenAPI and 31 documentation links passed. All four unchanged real-ASGI smokes passed; final new cross-portal smoke passed 22 real relayed requests, same-version no-download/second-click behavior, exact migration denial and whole-fixture nonmutation, followed by owned cleanup.
+- Fresh closed-session desktop pixels inspected with no private fields/receipts present. Local YAML parser package was unavailable; workflow was inspected against the existing pinned action/step structure, and hosted exact-head CI remains required, not yet claimed.
+
+- Final network hardening: the new browser context blocks service workers and aborts/counts every origin outside the owned UI and relayed invalid QA origin, requiring zero outside attempts. Node HTTP requests reject redirects. Cleanup verifies socket refusal (ECONNREFUSED) rather than treating arbitrary HTTP/fetch errors as closed ports. Final cross-smoke passed with 22 relays and zero outside-origin attempts; prior f1ed68c bundle is preserved as superseded pre-hardening evidence.
+
+- Cleanup correction: skip exited/signaled children; never terminate a missing/noninteger PID. Browser-close failure does not prevent attempts to stop every owned server. Unknown/open ports or unverified server termination preserve the temporary fixture and fail qualification; cleanup failures are reported only as static categories. PASS is emitted only after all cleanup succeeds. Corrected smoke again passed 22 relays/zero outside attempts with closed owned ports and removed fixture; d807e6c evidence is superseded and preserved.
