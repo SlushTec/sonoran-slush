@@ -277,3 +277,58 @@ test("summary refresh completing after Close cannot start download", async ({
   await page.waitForTimeout(100);
   expect(downloads).toBe(0);
 });
+
+function personalizedFixture() {
+  const o = fixture();
+  const pieces=Array.from({length:30},(_,n)=>({set_index:Math.floor(n/2),piece_index:n%2,text:"Customer "+n+" \u{1f41f}"}));
+  const item={product_slug:"synthetic-crystal",quantity:15,font:"Modern sans",
+    personalization:{mode:"per_piece",pieces:[...pieces].reverse()}};
+  return {...o,items:[item],lines:[{item:structuredClone(item),stock_units:105,
+    personalization_snapshot:{schema_version:1,line_index:0,quantity:15,pieces_per_item:2,mode:"per_piece",pieces}}]};
+}
+test("customer recorded assignments paginate privately with mobile accessibility",async({page})=>{
+  const o=personalizedFixture();
+  await page.route("https://commerce.qa.invalid/**",r=>r.fulfill({json:o}));
+  await open(page);
+  const region=page.getByRole("region",{name:"Your recorded inscriptions"});
+  await expect(region.getByRole("listitem")).toHaveCount(25);
+  await page.setViewportSize({width:390,height:844});
+  await region.getByRole("button",{name:"Next inscription page"}).focus();
+  await page.keyboard.press("Enter");
+  await expect(region.getByText("Inscription page 2 of 2")).toBeVisible();
+  await expect(region.getByRole("listitem")).toHaveCount(5);
+  await expect(region.getByText("Customer 29 \u{1f41f}",{exact:true})).toBeVisible();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  expect((await new AxeBuilder({page}).include('section[aria-label="Your recorded inscriptions"]').analyze()).violations).toEqual([]);
+  await page.getByRole("button",{name:"Close private record"}).click();
+  await expect(region).toHaveCount(0);
+});
+test("same-version customer inscription change requires renewed review before download",async({page})=>{
+  let o=personalizedFixture(),downloads=0;
+  await page.route("https://commerce.qa.invalid/**",r=>r.fulfill({json:o}));
+  page.on("download",()=>downloads++);
+  await open(page);
+  o=structuredClone(o);o.items[0].font="Handwritten";o.lines[0].item.font="Handwritten";
+  await page.getByRole("button",{name:"Download order summary"}).click();
+  await expect(page.getByText(/The order changed/)).toBeVisible();
+  expect(downloads).toBe(0);
+  const waiting=page.waitForEvent("download");
+  await page.getByRole("button",{name:"Download order summary"}).click();
+  const file=await waiting;
+  const stream=await file.createReadStream();let text="";
+  for await(const chunk of stream!) text+=chunk.toString("utf8");
+  expect(text).toContain('Font: "Handwritten"');
+  expect(text).toContain('Customer 29');
+  expect(text).not.toContain("synthetic-code");
+  expect(downloads).toBe(1);
+});
+test("malformed canonical customer snapshot fails closed without showing inscription",async({page})=>{
+  const o=personalizedFixture();o.lines[0].personalization_snapshot.line_index=9;
+  await page.route("https://commerce.qa.invalid/**",r=>r.fulfill({json:o}));
+  await page.goto("/orders");await page.getByLabel("Order reference").fill("ord_browser");
+  await page.getByLabel("Private access code").fill("synthetic-code");
+  await page.getByRole("button",{name:"Open securely"}).click();
+  await expect(page.getByRole("alert")).toBeVisible();
+  await expect(page.getByRole("region",{name:"Your recorded inscriptions"})).toHaveCount(0);
+  await expect(page.getByRole("button",{name:"Download order summary"})).toHaveCount(0);
+});
