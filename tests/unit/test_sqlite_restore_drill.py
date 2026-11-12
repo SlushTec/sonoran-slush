@@ -1535,7 +1535,12 @@ class CommercialDrill(Drill):
         self.refresh_expectation()
 
     def verify_commercial_replay(self, target):
-        super().verify_replay(target)
+        self.restored = None
+        try:
+            super().verify_replay(target)
+        finally:
+            # Base replay success is not completion of this larger profile.
+            self.restored = None
         for url, body, _, expected in self.commercial_commands:
             assert self.post(url, body, staff=True) == expected
             altered = json.loads(json.dumps(body))
@@ -1567,6 +1572,7 @@ class CommercialDrill(Drill):
             saved = state(reader, self.tables)
         assert saved == self.expected
         self.assert_commercial_contract(saved)
+        self.restored = target
 
 
 @pytest.mark.parametrize("drill", ["commercial"], indirect=True)
@@ -1645,3 +1651,48 @@ def test_commercial_wal_snapshot_excludes_uncommitted_pointer_change(drill):
         writer.rollback()
         writer.close()
     assert drill.source_bytes() == original
+@pytest.mark.parametrize("drill", ["commercial"], indirect=True)
+@pytest.mark.parametrize("failure_stage", ["first-command", "final-contract"])
+def test_commercial_interruption_never_marks_profile_complete(drill, monkeypatch, failure_stage):
+    drill.make_snapshot()
+    target = drill.restore()
+    drill.verify_commercial_replay(target)
+    assert drill.restored == target
+    target = drill.restore("interrupted-target")
+    original_post = drill.post
+    original_contract = drill.assert_commercial_contract
+
+    def interrupted_post(url, *args, **kwargs):
+        if url.startswith(COMMERCIAL):
+            assert drill.restored is None
+            raise RuntimeError("Synthetic commercial interruption")
+        return original_post(url, *args, **kwargs)
+
+    def interrupted_contract(saved):
+        assert drill.restored is None
+        raise RuntimeError("Synthetic commercial interruption")
+
+    if failure_stage == "first-command":
+        monkeypatch.setattr(drill, "post", interrupted_post)
+    else:
+        monkeypatch.setattr(drill, "assert_commercial_contract", interrupted_contract)
+    with pytest.raises(RuntimeError, match="Synthetic commercial interruption"):
+        drill.verify_commercial_replay(target)
+    assert drill.restored is None
+    monkeypatch.setattr(drill, "post", original_post)
+    monkeypatch.setattr(drill, "assert_commercial_contract", original_contract)
+    target = drill.restore("retry-target")
+    drill.verify_commercial_replay(target)
+    assert drill.restored == target
+
+
+@pytest.mark.parametrize("drill", ["commercial"], indirect=True)
+def test_commercial_rechecking_used_target_clears_prior_success(drill):
+    drill.make_snapshot()
+    target = drill.restore()
+    drill.verify_commercial_replay(target)
+    assert drill.restored == target
+    # Replaying the app may leave WAL sidecars: existing bundle guards still apply.
+    with pytest.raises(UnsafeDrill):
+        drill.verify_commercial_replay(target)
+    assert drill.restored is None
