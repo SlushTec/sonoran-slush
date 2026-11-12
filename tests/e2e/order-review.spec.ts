@@ -328,7 +328,7 @@ test("malformed canonical customer snapshot fails closed without showing inscrip
   await page.goto("/orders");await page.getByLabel("Order reference").fill("ord_browser");
   await page.getByLabel("Private access code").fill("synthetic-code");
   await page.getByRole("button",{name:"Open securely"}).click();
-  await expect(page.getByRole("alert")).toBeVisible();
+  await expect(page.getByRole("alert").filter({hasText:"This order could not be verified. Check your reference and private access code, then retry."})).toBeVisible();
   await expect(page.getByRole("region",{name:"Your recorded inscriptions"})).toHaveCount(0);
   await expect(page.getByRole("button",{name:"Download order summary"})).toHaveCount(0);
 });
