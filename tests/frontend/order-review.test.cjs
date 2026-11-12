@@ -180,8 +180,8 @@ for (const patch of [
       Object.assign(p, patch);
       await open();
       assert.equal(
-        screen.queryByRole("button", { name: "Open Square sandbox checkout" }),
-        null,
+        screen.queryByRole("button", { name: "Open Square sandbox checkout" }) === null,
+        true,
       );
       assert.equal(calls.length, 1);
     },
@@ -206,8 +206,8 @@ for (const patch of [
     enter();
     await screen.findByRole("alert");
     assert.equal(
-      screen.queryByRole("heading", { name: "Current order" }),
-      null,
+      screen.queryByRole("heading", { name: "Current order" }) === null,
+      true,
     );
   });
 for (const event of [
@@ -239,8 +239,8 @@ for (const event of [
     else window.dispatchEvent(new window.Event(event));
     await act(async () => resolve(reply(p)));
     assert.equal(
-      screen.queryByRole("heading", { name: "Current order" }),
-      null,
+      screen.queryByRole("heading", { name: "Current order" }) === null,
+      true,
     );
   });
 test("ordinary pageshow preserves entry", () => {
@@ -295,8 +295,8 @@ for (const result of [
       );
       await screen.findByRole("alert");
       assert.equal(
-        screen.queryByRole("heading", { name: "Current order" }),
-        null,
+        screen.queryByRole("heading", { name: "Current order" }) === null,
+        true,
       );
     },
   );
@@ -320,8 +320,8 @@ test("exact order bearer/version, duplicate guard and conflict requires reopen",
   await act(async () => resolve(reply({ detail: "conflict" }, 409)));
   await screen.findByRole("alert");
   assert.equal(
-    screen.queryByRole("button", { name: "Open Square sandbox checkout" }),
-    null,
+    screen.queryByRole("button", { name: "Open Square sandbox checkout" }) === null,
+    true,
   );
 });
 test("late checkout failure cannot overwrite reopened session", async () => {
@@ -336,7 +336,7 @@ test("late checkout failure cannot overwrite reopened session", async () => {
   enter();
   await screen.findByRole("heading", { name: "Current order" });
   await act(async () => resolve(reply({}, 409)));
-  assert.equal(screen.queryByRole("alert"), null);
+  assert.equal(screen.queryByRole("alert") === null, true);
   assert.ok(
     screen.getByRole("button", { name: "Open Square sandbox checkout" }),
   );
@@ -351,8 +351,8 @@ test("bounded item and event DOM pagination", async () => {
     at: "2026-11-11T12:00:00Z",
   }));
   await open();
-  assert.equal(screen.queryByText("piece-10 · quantity 1"), null);
-  assert.equal(screen.queryByText("event-25"), null);
+  assert.equal(screen.queryByText("piece-10 · quantity 1") === null, true);
+  assert.equal(screen.queryByText("event-25") === null, true);
   fireEvent.click(screen.getByRole("button", { name: "Next items" }));
   assert.ok(screen.getByText("piece-10 · quantity 1"));
   fireEvent.click(screen.getByRole("button", { name: "Next events" }));
@@ -410,7 +410,7 @@ test("summary refreshes with captured capability and positive allowlist, never r
   assert.equal(calls.length, 2);
   assert.equal(calls[1].opts.headers.Authorization, "Bearer synthetic-code");
   assert.equal(d.clicks[0].name, "sonoran-order-ord_test.txt");
-  assert.equal(document.querySelector("a[download]"), null);
+  assert.equal(document.querySelector("a[download]") === null, true);
   fireEvent.click(screen.getByRole("button", { name: "Close private record" }));
   assert.deepEqual(d.revoked, ["blob:owned-1"]);
 });
@@ -563,7 +563,7 @@ test("download anchor failure revokes owned URL and removes anchor", async (t) =
   await download();
   await screen.findByText(/summary could not be verified/);
   assert.equal(d.revoked.length, 1);
-  assert.equal(document.querySelector("a[download]"), null);
+  assert.equal(document.querySelector("a[download]") === null, true);
 });
 
 test("synchronous dismissal during download click cannot restore stale notice", async (t) => {
@@ -601,4 +601,95 @@ for (const [amount, currency, expected] of [
       );
     },
   );
+}
+
+
+// Fixed inventory from the independently reviewed 798f841 source: original query
+// and message text hashes, not values generated from the transformed expectation.
+test("DOM absence diagnostics retain all 54 original strict-null intentions", () => {
+  const { createHash } = require("node:crypto");
+  const inventory = {
+    "storefront.test.cjs": [4, "7b656cab77c151c627c52a70225cbe46be00f87e34216082aa3c190a1f35f286"],
+    "proof-review.test.cjs": [15, "10a181bb84e018638224d38979eb036a32543d9d9679ccd07a128a485d1658dd"],
+    "order-review.test.cjs": [10, "82e1cdbe1b477bbbfd5c4d2e58b8285f0d6b743f82d295fcbd75ca528f238105"],
+    "quote-review.test.cjs": [13, "9167948a92279850f8482e9fa8817fa3d9c7facd5224878f7b906e15f4234aca"],
+    "staff-session.test.cjs": [12, "c5c8d49998dc00b0c6e366283ff6ece2d646e90a3055377a99a522e804195206"],
+  };
+  let total = 0, untouched = [];
+  for (const [name, [expectedCount, expectedHash]] of Object.entries(inventory)) {
+    const source = fs.readFileSync(path.join(__dirname, name), "utf8");
+    const ast = ts.createSourceFile(name, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+    const rows = [];
+    function domQuery(node) {
+      return ts.isCallExpression(node) &&
+        /^(screen\.queryBy|document\.querySelector)/.test(node.expression.getText(ast));
+    }
+    function visit(node) {
+      if (ts.isCallExpression(node) && node.expression.getText(ast) === "assert.equal" && node.arguments.length >= 2) {
+        const [actual, expected, message] = node.arguments;
+        if (expected.kind === ts.SyntaxKind.NullKeyword) {
+          assert.equal(domQuery(actual), false, "DOM nodes must not reach failure formatting");
+          untouched.push([actual.getText(ast), message?.getText(ast) || ""]);
+        }
+        if (expected.kind === ts.SyntaxKind.TrueKeyword && ts.isBinaryExpression(actual) &&
+            actual.operatorToken.kind === ts.SyntaxKind.EqualsEqualsEqualsToken &&
+            actual.right.kind === ts.SyntaxKind.NullKeyword && domQuery(actual.left)) {
+          rows.push([actual.left.getText(ast), message?.getText(ast) || ""]);
+        }
+      }
+      ts.forEachChild(node, visit);
+    }
+    visit(ast);
+    assert.equal(rows.length, expectedCount);
+    assert.equal(createHash("sha256").update(JSON.stringify(rows)).digest("hex"), expectedHash);
+    total += rows.length;
+  }
+  assert.equal(total, 54);
+  assert.equal(untouched.length, 5);
+  assert.equal(createHash("sha256").update(JSON.stringify(untouched)).digest("hex"),
+    "d5be9f844c0968bbbda00479cae83e3a9cc4571cd8d8ecb504794843a1cdae41");
+});
+
+for (const mode of ["missing", "undefined", "false", "element"]) {
+  test("strict-null diagnostics subprocess is bounded and secret-safe: " + mode, () => {
+    const { spawnSync } = require("node:child_process");
+    const { randomBytes } = require("node:crypto");
+    const sentinel = "private-fixture-" + randomBytes(24).toString("hex");
+    const child = String.raw`
+const test = require("node:test"), assert = require("node:assert/strict");
+const { JSDOM } = require("jsdom"), React = require("react");
+const dom = new JSDOM("<!doctype html><html><body></body></html>", {url:"https://fixture.invalid"});
+for (const k of ["window","document","HTMLElement","Node","MutationObserver"])
+  Object.defineProperty(global,k,{value:dom.window[k],configurable:true});
+Object.defineProperty(global,"navigator",{value:dom.window.navigator,configurable:true});
+global.IS_REACT_ACT_ENVIRONMENT = true;
+const { render, screen, cleanup } = require("@testing-library/react");
+test("strict-null assertion", () => {
+  try {
+    render(React.createElement("button", {"data-private":process.env.DOM_SECRET_SENTINEL}, "Fixture"));
+    const mode = process.env.DOM_DIAGNOSTIC_MODE;
+    const query = mode === "element" ? screen.queryByRole("button") :
+      mode === "missing" ? screen.queryByRole("checkbox") :
+      mode === "false" ? false : undefined;
+    assert.equal(query === null, true);
+  } finally { cleanup(); dom.window.close(); }
+});
+`;
+    const started = Date.now();
+    const result = spawnSync(process.execPath, ["--eval", child], {
+      cwd: path.resolve(__dirname, "../.."),
+      env: { ...process.env, DOM_SECRET_SENTINEL: sentinel, DOM_DIAGNOSTIC_MODE: mode },
+      encoding: "utf8", timeout: 5000, killSignal: "SIGKILL",
+      maxBuffer: 256 * 1024, windowsHide: true,
+    });
+    // Never echo child diagnostics, the sentinel, or live objects on failure.
+    assert.equal(result.error === undefined, true, "Child must finish without timeout or spawn error");
+    assert.equal(result.signal === null, true, "Child must exit normally, not be killed");
+    assert.equal(Date.now() - started < 5000, true, "Failure diagnostics must be prompt");
+    assert.equal(result.status === (mode === "missing" ? 0 : 1), true, "Strict null result");
+    assert.equal(typeof result.stdout === "string" && typeof result.stderr === "string", true);
+    const output = result.stdout + result.stderr;
+    assert.equal(output.includes(sentinel), false, "Private DOM props must not leak");
+    assert.equal(output.includes("AssertionError"), mode !== "missing", "Expected assertion failure, not infrastructure error");
+  });
 }

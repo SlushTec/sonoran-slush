@@ -141,7 +141,7 @@ test("exact quote acceptance confirms captured terms and capability holder only"
   };
   accept();
   await screen.findByRole("status");
-  assert.equal(screen.queryByRole("checkbox"), null);
+  assert.equal(screen.queryByRole("checkbox") === null, true);
   assert.equal(calls.length, 2);
   assert.equal(localStorage.length, 0);
   assert.equal(window.sessionStorage.length, 0);
@@ -157,13 +157,13 @@ for (const kind of ["retail", "bulk", "event", "contact"])
     };
     await open();
     assert.ok(screen.getByText("The studio has not priced this request yet."));
-    assert.equal(screen.queryByRole("checkbox"), null);
+    assert.equal(screen.queryByRole("checkbox") === null, true);
   });
 test("contact offered remains read only", async () => {
   p.kind = "contact";
   await open();
   assert.ok(screen.getByText("This contact request is read only."));
-  assert.equal(screen.queryByRole("checkbox"), null);
+  assert.equal(screen.queryByRole("checkbox") === null, true);
 });
 for (const patch of [
   { id: "wrong" },
@@ -189,8 +189,8 @@ for (const patch of [
     enter();
     await screen.findByRole("alert");
     assert.equal(
-      screen.queryByRole("heading", { name: "Current request" }),
-      null,
+      screen.queryByRole("heading", { name: "Current request" }) === null,
+      true,
     );
   });
 test("full3000 Unicode codepoint multiline message and120 inscription preserved", async () => {
@@ -210,7 +210,7 @@ test("escaped markup is never HTML", async () => {
   p.message = "<img src=x onerror=alert(1)>\nOffer";
   await open();
   assert.ok(document.body.textContent.includes(p.message));
-  assert.equal(document.querySelector("img"), null);
+  assert.equal(document.querySelector("img") === null, true);
 });
 for (const patch of [
   { id: "wrong" },
@@ -231,8 +231,8 @@ for (const patch of [
         reply({ ...p, status: "accepted", accepted_version: 2, ...patch });
       accept();
       await screen.findByRole("alert");
-      assert.equal(screen.queryByRole("status"), null);
-      assert.equal(screen.queryByRole("checkbox"), null);
+      assert.equal(screen.queryByRole("status") === null, true);
+      assert.equal(screen.queryByRole("checkbox") === null, true);
     },
   );
 for (const event of [
@@ -282,10 +282,10 @@ for (const event of [
           ),
         );
         assert.equal(
-          screen.queryByRole("heading", { name: "Current request" }),
-          null,
+          screen.queryByRole("heading", { name: "Current request" }) === null,
+          true,
         );
-        assert.equal(screen.queryByRole("status"), null);
+        assert.equal(screen.queryByRole("status") === null, true);
       },
     );
 test("duplicate lock and conflict require fresh reopen", async () => {
@@ -314,15 +314,15 @@ test("late old failure cannot overwrite newer session", async () => {
   enter();
   await screen.findByRole("heading", { name: "Current request" });
   await act(async () => resolve(reply({}, 409)));
-  assert.equal(screen.queryByRole("alert"), null);
+  assert.equal(screen.queryByRole("alert") === null, true);
   assert.ok(screen.getByRole("checkbox"));
 });
 test("accepted replay readable without inviting repeat acceptance", async () => {
   p = { ...p, status: "accepted", accepted_version: 2 };
   await open();
-  assert.equal(screen.queryByRole("checkbox"), null);
+  assert.equal(screen.queryByRole("checkbox") === null, true);
   assert.ok(screen.getByText(/studio record shows acceptance/));
-  assert.equal(screen.queryByRole("status"), null);
+  assert.equal(screen.queryByRole("status") === null, true);
 });
 test("max100 item list pages without truncating fields", async () => {
   p.items = Array.from({ length: 100 }, (_, i) => ({
@@ -333,7 +333,7 @@ test("max100 item list pages without truncating fields", async () => {
     font: "Modern sans",
   }));
   await open();
-  assert.equal(screen.queryByText("item-10"), null);
+  assert.equal(screen.queryByText("item-10") === null, true);
   fireEvent.click(screen.getByRole("button", { name: "Next items" }));
   assert.ok(screen.getByText("item-10"));
 });
