@@ -147,6 +147,9 @@ def movement(lot_id: Key, body: Movement):
     with database() as db:
         schema(db)
         from services.commerce.app.component_reservations import hold_identity_exists
+        from services.commerce.app.incoming_inspection import identity_exists
+        if identity_exists(db, str(body.request_id)):
+            raise HTTPException(409, "Command identity already belongs to an intake operation.")
         if hold_identity_exists(db, str(body.request_id)):
             raise HTTPException(409, "Command identity already belongs to a fixture reservation.")
         replay = db.execute("SELECT fingerprint,document FROM fixture_movements WHERE request_id=?", (str(body.request_id),)).fetchone()

@@ -968,6 +968,196 @@
         "title": "Inquiry",
         "type": "object"
       },
+      "Inspection": {
+        "additionalProperties": false,
+        "properties": {
+          "accepted_units": {
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Accepted Units",
+            "type": "integer"
+          },
+          "defect": {
+            "enum": [
+              "none",
+              "chipped",
+              "scratched",
+              "incorrect_item",
+              "other_fixture_defect"
+            ],
+            "title": "Defect",
+            "type": "string"
+          },
+          "expected_lot_version": {
+            "maximum": 9.223372036854776e+18,
+            "minimum": 0.0,
+            "title": "Expected Lot Version",
+            "type": "integer"
+          },
+          "rejected_units": {
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Rejected Units",
+            "type": "integer"
+          },
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "expected_lot_version",
+          "accepted_units",
+          "rejected_units",
+          "defect"
+        ],
+        "title": "Inspection",
+        "type": "object"
+      },
+      "IntakeRecord": {
+        "additionalProperties": false,
+        "properties": {
+          "accepted_units": {
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Accepted Units",
+            "type": "integer"
+          },
+          "actor": {
+            "const": "synthetic_staff",
+            "title": "Actor",
+            "type": "string"
+          },
+          "actor_scope": {
+            "const": "shared staff test credential; not individual identity",
+            "title": "Actor Scope",
+            "type": "string"
+          },
+          "checkout_authoritative": {
+            "const": false,
+            "title": "Checkout Authoritative",
+            "type": "boolean"
+          },
+          "defect": {
+            "enum": [
+              "none",
+              "chipped",
+              "scratched",
+              "incorrect_item",
+              "other_fixture_defect"
+            ],
+            "title": "Defect",
+            "type": "string"
+          },
+          "id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Id",
+            "type": "string"
+          },
+          "inspected_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inspected At"
+          },
+          "inspection_request_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inspection Request Id"
+          },
+          "location_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Location Id",
+            "type": "string"
+          },
+          "lot_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Lot Id",
+            "type": "string"
+          },
+          "lot_version": {
+            "maximum": 9.223372036854776e+18,
+            "minimum": 1.0,
+            "title": "Lot Version",
+            "type": "integer"
+          },
+          "quantity": {
+            "maximum": 1000000.0,
+            "minimum": 1.0,
+            "title": "Quantity",
+            "type": "integer"
+          },
+          "receipt_request_id": {
+            "format": "uuid",
+            "title": "Receipt Request Id",
+            "type": "string"
+          },
+          "received_at": {
+            "title": "Received At",
+            "type": "string"
+          },
+          "rejected_units": {
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Rejected Units",
+            "type": "integer"
+          },
+          "state": {
+            "enum": [
+              "pending",
+              "inspected"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "test_mode": {
+            "const": true,
+            "title": "Test Mode",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "lot_id",
+          "location_id",
+          "quantity",
+          "state",
+          "accepted_units",
+          "rejected_units",
+          "defect",
+          "receipt_request_id",
+          "inspection_request_id",
+          "received_at",
+          "inspected_at",
+          "lot_version",
+          "actor",
+          "actor_scope",
+          "test_mode",
+          "checkout_authoritative"
+        ],
+        "title": "IntakeRecord",
+        "type": "object"
+      },
       "Item": {
         "additionalProperties": false,
         "properties": {
@@ -1718,6 +1908,51 @@
           }
         },
         "title": "ReadinessResponse",
+        "type": "object"
+      },
+      "Receipt": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_lot_version": {
+            "maximum": 9.223372036854776e+18,
+            "minimum": 0.0,
+            "title": "Expected Lot Version",
+            "type": "integer"
+          },
+          "location_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Location Id",
+            "type": "string"
+          },
+          "lot_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Lot Id",
+            "type": "string"
+          },
+          "quantity": {
+            "maximum": 1000000.0,
+            "minimum": 1.0,
+            "title": "Quantity",
+            "type": "integer"
+          },
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "expected_lot_version",
+          "lot_id",
+          "location_id",
+          "quantity"
+        ],
+        "title": "Receipt",
         "type": "object"
       },
       "ReferenceCatalog": {
@@ -3923,6 +4158,207 @@
         "summary": "Component",
         "tags": [
           "synthetic component ledger"
+        ]
+      }
+    },
+    "/v1/admin/retail-test/component-ledger/intakes/{intake_id}": {
+      "get": {
+        "operationId": "read_intake_v1_admin_retail_test_component_ledger_intakes__intake_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "intake_id",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_-]+$",
+              "title": "Intake Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntakeRecord"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Read Intake",
+        "tags": [
+          "synthetic incoming inspection"
+        ]
+      },
+      "post": {
+        "operationId": "receive_v1_admin_retail_test_component_ledger_intakes__intake_id__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "intake_id",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_-]+$",
+              "title": "Intake Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Receipt"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntakeRecord"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Receive",
+        "tags": [
+          "synthetic incoming inspection"
+        ]
+      }
+    },
+    "/v1/admin/retail-test/component-ledger/intakes/{intake_id}/inspection": {
+      "post": {
+        "operationId": "inspect_v1_admin_retail_test_component_ledger_intakes__intake_id__inspection_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "intake_id",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_-]+$",
+              "title": "Intake Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Inspection"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntakeRecord"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Inspect",
+        "tags": [
+          "synthetic incoming inspection"
         ]
       }
     },
