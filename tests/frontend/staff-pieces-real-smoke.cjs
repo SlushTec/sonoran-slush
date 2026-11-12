@@ -291,7 +291,36 @@ async function stop(c) {
       (await region.textContent()).includes("Identical text"),
       "Identical mode visible",
     );
+    const history = page.getByRole("region", { name: "Recorded history" });
+    assert.ok(
+      Array.isArray(before.timeline) &&
+        before.timeline.length > 0 &&
+        before.timeline.length <= 25,
+      "Owned fixture recorded history exists",
+    );
+    await history.getByRole("listitem").last().waitFor();
+    const observedHistory = await history
+      .getByRole("listitem")
+      .evaluateAll((rows) =>
+        rows.map((row) => ({
+          label: row.querySelector("div bdi").textContent,
+          at: row.querySelector("time").textContent,
+        })),
+      );
+    assert.ok(
+      JSON.stringify(observedHistory) ===
+        JSON.stringify(before.timeline.map(({ label, at }) => ({ label, at }))),
+      "Exact recorded history and order preserved",
+    );
     const AXE = require("@axe-core/playwright").default;
+    assert.ok(
+      (
+        await new AXE({ page })
+          .include('section[aria-label="Recorded history"]')
+          .analyze()
+      ).violations.length === 0,
+      "Desktop history accessibility",
+    );
     const desktopAudit = await new AXE({ page })
       .include('section[aria-label="Recorded personalization"]')
       .analyze();
@@ -338,6 +367,14 @@ async function stop(c) {
       document.activeElement?.blur();
       window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     });
+    assert.ok(
+      (
+        await new AXE({ page })
+          .include('section[aria-label="Recorded history"]')
+          .analyze()
+      ).violations.length === 0,
+      "Mobile history accessibility",
+    );
     await page.screenshot({
       path: path.join(root, "artifacts/staff-pieces-real-mobile.png"),
       fullPage: true,
@@ -352,6 +389,11 @@ async function stop(c) {
     assert.ok(
       (await page.getByLabel("Staff access code").inputValue()) === "",
       "Lock clears code",
+    );
+    assert.ok(
+      (await page.getByRole("region", { name: "Recorded history" }).count()) ===
+        0,
+      "Lock clears history",
     );
     const after = await request(
       "/v1/orders/" + receipt.id,
@@ -371,6 +413,7 @@ async function stop(c) {
       recorded_pieces: 60,
       stock_units: 210,
       readonly_order: true,
+      exact_recorded_history: true,
       desktop_mobile_axe: true,
       relayed_requests: relayed,
       outside_origin_attempts: externalAttempts,
