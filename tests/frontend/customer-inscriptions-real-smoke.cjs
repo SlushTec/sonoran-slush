@@ -212,17 +212,23 @@ async function stop(c) {
       { version: 1 },
       cart.access_token,
     );
+    const storedBefore = await request(
+      "/v1/admin/records/" + receipt.id, undefined, staff,
+    );
     const before = await request(
       "/v1/orders/" + receipt.id,
       undefined,
       receipt.access_token,
     );
     assert.ok(
-      before.lines.length === 2 &&
-        before.lines[0].stock_units === 105 &&
-        before.lines[1].stock_units === 105,
+      storedBefore.lines.length === 2 &&
+        storedBefore.lines[0].stock_units === 105 &&
+        storedBefore.lines[1].stock_units === 105,
       "Stock units remain distinct from piece count",
     );
+    assert.ok(before.lines.every(line => !Object.hasOwn(line, "stock_units") &&
+      !Object.hasOwn(line, "stock_id") && !Object.hasOwn(line, "offer_version")),
+      "Customer network response omits internal inventory fields");
     assert.ok(
       before.lines.every(
         (l) =>
@@ -324,6 +330,33 @@ async function stop(c) {
       JSON.stringify(after) === JSON.stringify(before),
       "Read-only display preserves order",
     );
+    const storedAfter = await request(
+      "/v1/admin/records/" + receipt.id, undefined, staff,
+    );
+    assert.ok(JSON.stringify(storedAfter) === JSON.stringify(storedBefore),
+      "Read-only display preserves the entire stored order");
+    stage = "synthetic cancellation response and replay";
+    const cancelled = await request("/v1/orders/" + receipt.id + "/cancel-test",
+      {version: before.version}, receipt.access_token);
+    assert.ok(cancelled.status === "cancelled" && cancelled.reservation_status === "released",
+      "Explicit synthetic cancellation succeeds");
+    assert.ok(!Object.hasOwn(cancelled, "inventory_reserved") &&
+      cancelled.lines.every(line => !Object.hasOwn(line, "stock_units")),
+      "Cancellation network response uses the same public projection");
+    const cancelledStored = await request("/v1/admin/records/" + receipt.id, undefined, staff);
+    assert.ok(cancelledStored.inventory_reserved === false &&
+      cancelledStored.timeline.filter(row =>
+        row.label === "Test order cancelled and reservation released").length === 1,
+      "Original full-state cancellation oracle remains exact");
+    assert.ok(JSON.stringify(cancelledStored.items) === JSON.stringify(storedBefore.items) &&
+      JSON.stringify(cancelledStored.lines) === JSON.stringify(storedBefore.lines),
+      "Cancellation does not rewrite private configuration");
+    const replay = await request("/v1/orders/" + receipt.id + "/cancel-test",
+      {version: before.version}, receipt.access_token);
+    const replayStored = await request("/v1/admin/records/" + receipt.id, undefined, staff);
+    assert.ok(JSON.stringify(replay) === JSON.stringify(cancelled) &&
+      JSON.stringify(replayStored) === JSON.stringify(cancelledStored),
+      "Cancellation replay neither writes nor leaks internal fields");
     assert.ok(externalAttempts === 0, "No outside-origin attempts");
     outcome = {
       result: "PASS",
@@ -332,7 +365,9 @@ async function stop(c) {
       same_sku_lines: 2,
       recorded_pieces: 60,
       stock_units: 210,
-      readonly_order: true,
+      readonly_order_before_cancel: true,
+      synthetic_cancelled_once: true,
+      cancellation_replay_nonmutating: true,
       desktop_mobile_axe: true,
       relayed_requests: relayed,
       outside_origin_attempts: externalAttempts,

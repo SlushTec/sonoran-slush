@@ -176,8 +176,9 @@ class Drill:
 
     def order_doc(self, name):
         receipt = self.orders[name]
-        result = self.client.get("/v1/orders/" + receipt["id"],
-                                 headers={"Authorization": "Bearer " + receipt["access_token"]})
+        # Preserve the exact persisted-document restore oracle through staff access.
+        result = self.client.get("/v1/admin/records/" + receipt["id"],
+                                 headers={"Authorization": "Bearer " + STAFF})
         assert result.status_code == 200, result.text
         doc = result.json()
         doc.pop("test_payment_available", None)

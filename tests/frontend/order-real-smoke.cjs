@@ -266,7 +266,10 @@ async function stop(c) {
       order.access_token,
     );
     assert.equal(after.payment_status, "unpaid");
-    assert.equal(after.checkout_session_id, "fixture-link");
+    const storedAfter = await request("/v1/admin/records/" + order.id, undefined, staff);
+    assert.equal(storedAfter.checkout_session_id, "fixture-link");
+    assert.equal(Object.hasOwn(after, "checkout_session_id"), false);
+    assert.equal(Object.hasOwn(after, "payment_provider"), false);
     const replay = await request(
       "/v1/checkout/sessions",
       { order_id: order.id, version: 1 },

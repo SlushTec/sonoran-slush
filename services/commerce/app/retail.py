@@ -15,6 +15,7 @@ from services.commerce.app.workflows import (
     Item, StrictModel, NOW, database, enabled, event, load, private, receipt, save, staff,
 )
 
+from services.commerce.app.customer_orders import CustomerOrder, customer_order
 from services.commerce.app.piece_personalization import (
     Personalization, CRYSTAL_KEYS, piece_snapshot, validate_persisted_items, validate_stored_snapshot,
 )
@@ -372,7 +373,7 @@ def expire_test_hold(record_id: str, body: Version, clock: Clock):
         return doc
 
 
-@router.post("/v1/orders/{record_id}/cancel-test", dependencies=[Depends(retail_enabled)], tags=["local test retail"])
+@router.post("/v1/orders/{record_id}/cancel-test", response_model=CustomerOrder, dependencies=[Depends(retail_enabled)], tags=["local test retail"])
 def cancel(record_id: str, body: Version, authorization: Annotated[str | None, Header()] = None):
     with database() as db:
         schema(db)
@@ -380,14 +381,16 @@ def cancel(record_id: str, body: Version, authorization: Annotated[str | None, H
         if not doc.get("retail_test") or doc["version"] != body.version:
             raise HTTPException(409, "A current local retail test order is required.")
         if doc["status"] == "cancelled" or doc.get("reservation_status") == "expired":
-            return doc
+            return customer_order(doc, record_id)
         if doc["payment_status"] != "unpaid" or provider_linked(db, doc) or doc["reservation_status"] != "active":
             raise HTTPException(409, "Only unpaid, unsubmitted test orders can be cancelled.")
+        customer_order(doc, record_id)  # Validate source before any release or persistence.
         db.execute("UPDATE retail_reservations SET state='released' WHERE order_id=? AND state='active'", (doc["id"],))
         doc.update(status="cancelled", reservation_status="released", inventory_reserved=False, next_step="Test order cancelled; stock released. Create a new cart to start again.")
         event(doc, "Test order cancelled and reservation released")
         save(db, doc)
-        return doc
+        # Validation is inside database(): an error rolls back the complete transition.
+        return customer_order(doc, record_id)
 
 
 class TestPayment(StrictModel):
