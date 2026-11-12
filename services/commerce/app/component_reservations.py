@@ -180,7 +180,10 @@ class Transition(StrictModel):
 def command_replay(db, request_id, payload):
     digest = fingerprint(payload)
     key = str(request_id)
-    # Movement identities and hold commands share one command namespace.
+    # All fixture operations share one command namespace.
+    from services.commerce.app.incoming_inspection import identity_exists
+    if identity_exists(db, key):
+        raise HTTPException(409, "Command identity already belongs to an intake operation.")
     if db.execute("SELECT 1 FROM fixture_movements WHERE request_id=?", (key,)).fetchone():
         raise HTTPException(409, "Command identity already belongs to a stock movement.")
     row = db.execute("SELECT fingerprint,document FROM fixture_hold_commands WHERE request_id=?", (key,)).fetchone()

@@ -50,3 +50,6 @@ app.include_router(commercial_comparison_router)
 
 from services.commerce.app.proof_evidence import router as proof_evidence_router
 app.include_router(proof_evidence_router)
+
+from services.commerce.app.incoming_inspection import router as incoming_inspection_router
+app.include_router(incoming_inspection_router)
