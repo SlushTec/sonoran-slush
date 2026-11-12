@@ -631,3 +631,207 @@ test("staff Lock clears recorded history",async()=>{
  fireEvent.click(screen.getByRole("button",{name:"Lock workspace"}));
  assert.ok(screen.queryByRole("region",{name:"Recorded history"})===null);
 });
+
+
+// Bounded SS-044.AC2 read-only fixture display; all earlier session tests unchanged.
+const projectFixture =
+  require("../../apps/storefront/src/components/FixtureAvailability.tsx").fixtureAvailability;
+function availabilityFixture() {
+  return {lot_id:"lot_test",component_id:"blank",unit:"piece",version:2,
+    locations:[{location_id:"shop",condition_units:{available:10,damaged:3,sample:2,
+      in_production:4,completed:5,shipped:6},reserved_units:2,free_units:8}],
+    test_mode:true,checkout_authoritative:false};
+}
+const availabilityPath="/v1/admin/retail-test/component-ledger/lots/lot_test/availability";
+async function availabilityWorkspace() {
+  await workspace();
+  await act(async () => {});
+}
+function requestAvailability(reference="lot_test") {
+  fireEvent.change(screen.getByLabelText("Test lot reference"),{target:{value:reference}});
+  fireEvent.submit(screen.getByLabelText("Test lot reference").closest("form"));
+}
+test("fixture availability uses a positive independent projection, not original metadata",()=>{
+  const raw=availabilityFixture();
+  raw.private={order_id:"PRIVATE"};raw.locations[0].private="PRIVATE";
+  raw.locations[0].condition_units.__unused=0;
+  assert.ok(projectFixture(raw,"lot_test")===null,"exact condition keys required");
+  delete raw.locations[0].condition_units.__unused;
+  const actual=projectFixture(raw,"lot_test");
+  assert.deepEqual(actual,availabilityFixture());
+  assert.notEqual(actual,raw);assert.notEqual(actual.locations,raw.locations);
+  assert.notEqual(actual.locations[0].condition_units,raw.locations[0].condition_units);
+  assert.equal(JSON.stringify(actual).includes("PRIVATE"),false);
+  raw.locations[0].free_units=7;
+  assert.equal(actual.locations[0].free_units,8,"projected state does not alias source");
+});
+for(const [name,damage] of [
+  ["wrong lot",d=>d.lot_id="other"],["missing component",d=>delete d.component_id],
+  ["unsafe component",d=>d.component_id="bad\n"],["wrong unit",d=>d.unit="crate"],
+  ["bool version",d=>d.version=true],["negative version",d=>d.version=-1],
+  ["unsafe version",d=>d.version=9007199254740992],["float version",d=>d.version=1.5],
+  ["string version",d=>d.version="2"],["null locations",d=>d.locations=null],
+  ["missing locations",d=>delete d.locations],["101 locations",d=>d.locations=Array(101).fill(d.locations[0])],
+  ["duplicate location",d=>d.locations.push(structuredClone(d.locations[0]))],
+  ["bad location",d=>d.locations[0].location_id="<script>"],
+  ["null bucket",d=>d.locations[0]=null],["null conditions",d=>d.locations[0].condition_units=null],
+  ["missing condition",d=>delete d.locations[0].condition_units.shipped],
+  ["extra condition",d=>d.locations[0].condition_units.rejected=0],
+  ["bool physical",d=>d.locations[0].condition_units.available=true],
+  ["float damaged",d=>d.locations[0].condition_units.damaged=0.5],
+  ["negative sample",d=>d.locations[0].condition_units.sample=-1],
+  ["text production",d=>d.locations[0].condition_units.in_production="4"],
+  ["oversized completed",d=>d.locations[0].condition_units.completed=1000001],
+  ["nonfinite shipped",d=>d.locations[0].condition_units.shipped=Infinity],
+  ["bool reserved",d=>d.locations[0].reserved_units=false],
+  ["negative reserved",d=>d.locations[0].reserved_units=-1],
+  ["missing free",d=>delete d.locations[0].free_units],
+  ["arithmetic mismatch",d=>d.locations[0].free_units=9],
+  ["reserved exceeds physical",d=>{d.locations[0].reserved_units=11;d.locations[0].free_units=0}],
+  ["numeric test mode",d=>d.test_mode=1],["false test mode",d=>d.test_mode=false],
+  ["string test mode",d=>d.test_mode="true"],["numeric authority",d=>d.checkout_authoritative=0],
+  ["true authority",d=>d.checkout_authoritative=true],["missing authority",d=>delete d.checkout_authoritative],
+]){
+ test("fixture availability rejects "+name,()=>{
+   const raw=availabilityFixture();damage(raw);
+   assert.ok(projectFixture(raw,"lot_test")===null);
+ });
+}
+for(const value of [null,[],1,"raw",true]){
+ test("fixture availability rejects primitive "+JSON.stringify(value),()=>assert.ok(projectFixture(value,"lot_test")===null));
+}
+test("fixture limits accept exactly100 unique locations and version zero",()=>{
+ const raw=availabilityFixture();raw.version=0;
+ raw.locations=Array.from({length:100},(_,i)=>({...structuredClone(raw.locations[0]),location_id:"place_"+i}));
+ assert.deepEqual(projectFixture(raw,"lot_test"),raw);
+ raw.locations=[];assert.deepEqual(projectFixture(raw,"lot_test"),raw);
+});
+test("fixture display never fetches before staff verification or without explicit lookup",async()=>{
+ render(React.createElement(Staff));
+ assert.ok(screen.queryByLabelText("Test lot reference")===null);
+ assert.equal(calls.length,0);
+ login();await screen.findByLabelText("Test lot reference");
+ assert.equal(calls.length,1);assert.ok(calls[0].url.endsWith("/summary"));
+});
+test("fixture display renders exact escaped conditions, read-only scope and memory-only auth",async()=>{
+ handler=(url)=>url.endsWith("/availability")?reply({...availabilityFixture(),private:"PRIVATE"}):null;
+ await availabilityWorkspace();requestAvailability();
+ await screen.findByLabelText("Verified test lot readout");
+ assert.match(screen.getByLabelText("Verified test lot readout").textContent,/Free \(unreserved\)8/);
+ assert.match(document.body.textContent,/Reserved \(active\)2/);
+ assert.match(document.body.textContent,/Observed lot version 2/);
+ assert.equal(document.body.textContent.includes("PRIVATE"),false);
+ const call=calls.find(c=>c.url.endsWith("/availability"));
+ assert.equal(call.url,"https://commerce.qa.invalid"+availabilityPath);
+ assert.equal(call.opts.method,"GET");assert.equal(call.opts.body,undefined);
+ assert.equal(call.opts.headers.Authorization,"Bearer synthetic-staff");
+ assert.equal(new URL(call.url).search,"");assert.equal(new URL(call.url).hash,"");
+ assert.equal(localStorage.length,0);
+ assert.equal(calls.some(c=>c.opts.method!=="GET"),false);
+});
+test("fixture empty registered lot is different from missing and malformed state",async()=>{
+ handler=url=>url.endsWith("/availability")?reply({...availabilityFixture(),locations:[]}):null;
+ await availabilityWorkspace();requestAvailability();
+ await screen.findByText("This registered test lot has no recorded locations or quantities.");
+ handler=url=>url.endsWith("/availability")?reply({private:"PRIVATE"}):null;
+ requestAvailability();
+ await screen.findByText("The test availability response could not be verified. No quantities are shown.");
+ assert.ok(screen.queryByLabelText("Verified test lot readout")===null);
+ assert.equal(document.body.textContent.includes("PRIVATE"),false);
+});
+for(const [status,message]of [
+ [401,"Staff access could not be verified. Lock the workspace and sign in again."],
+ [403,"Staff access could not be verified. Lock the workspace and sign in again."],
+ [404,"No registered test lot was found for that reference."],
+ [409,"Test availability needs reconciliation. No quantities can be shown safely."],
+ [503,"Test inventory is not available in this workspace. Normal work is unchanged."],
+ [500,"Test availability could not be read. Try again; no stock was changed."],
+]){
+ test("fixture status "+status+" clears old data without echoing provider text",async()=>{
+  handler=url=>url.endsWith("/availability")?reply(availabilityFixture()):null;
+  await availabilityWorkspace();requestAvailability();await screen.findByLabelText("Verified test lot readout");
+  handler=url=>url.endsWith("/availability")?reply({detail:"PRIVATE RAW ERROR"},status):null;
+  fireEvent.submit(screen.getByLabelText("Test lot reference").closest("form"));
+  assert.ok(screen.queryByLabelText("Verified test lot readout")===null);
+  await screen.findByText(message);
+  assert.equal(document.body.textContent.includes("PRIVATE"),false);
+ });
+}
+test("fixture invalid reference never starts network read",async()=>{
+ await availabilityWorkspace();requestAvailability("bad/reference");
+ await screen.findByText("Use a test lot reference with 1–100 letters, numbers, hyphens or underscores.");
+ assert.equal(calls.length,1);
+});
+test("fixture repeated pending submit is admitted once",async()=>{
+ let release;
+ handler=url=>url.endsWith("/availability")?new Promise(r=>release=r):null;
+ await availabilityWorkspace();requestAvailability();
+ const form=screen.getByLabelText("Test lot reference").closest("form");
+ fireEvent.submit(form);fireEvent.submit(form);
+ assert.equal(calls.filter(c=>c.url.endsWith("/availability")).length,1);
+ await act(async()=>release(reply(availabilityFixture())));
+ await screen.findByLabelText("Verified test lot readout");
+});
+for(const action of ["edit","clear","lock","back","pagehide","restore"]){
+ test("fixture pending "+action+" cannot restore stale quantities or errors",async()=>{
+  let release;
+  handler=url=>url.endsWith("/availability")?new Promise(r=>release=r):null;
+  await availabilityWorkspace();requestAvailability();
+  if(action==="edit")fireEvent.change(screen.getByLabelText("Test lot reference"),{target:{value:"other"}});
+  else if(action==="clear")fireEvent.click(screen.getByRole("button",{name:"Clear inventory view"}));
+  else if(action==="lock")fireEvent.click(screen.getByRole("button",{name:"Lock workspace"}));
+  else if(action==="back")act(()=>window.dispatchEvent(new window.PopStateEvent("popstate")));
+  else if(action==="pagehide")act(()=>window.dispatchEvent(new window.Event("pagehide")));
+  else act(()=>window.dispatchEvent(new window.PageTransitionEvent("pageshow",{persisted:true})));
+  await act(async()=>release(reply(availabilityFixture())));
+  assert.ok(screen.queryByLabelText("Verified test lot readout")===null);
+  assert.equal(document.body.textContent.includes("Observed lot version"),false);
+  if(["lock","back","pagehide","restore"].includes(action)){
+    assert.ok(screen.queryByLabelText("Test lot reference")===null);
+    assert.equal(screen.getByLabelText("Staff access code").value,"");
+  }
+ });
+}
+test("fixture newer lookup wins and an older error cannot replace it",async()=>{
+ let old;handler=url=>{
+  if(url.includes("/lots/lot_test/"))return new Promise(r=>old=r);
+  if(url.includes("/lots/other/"))return reply({...availabilityFixture(),lot_id:"other"});
+  return null;
+ };
+ await availabilityWorkspace();requestAvailability();requestAvailability("other");
+ await screen.findByLabelText("Verified test lot readout");
+ assert.match(document.body.textContent,/Test lot other/);
+ await act(async()=>old(reply({detail:"PRIVATE"},409)));
+ assert.match(document.body.textContent,/Test lot other/);
+ assert.ok(screen.queryByText(/needs reconciliation/)===null);
+ assert.equal(document.body.textContent.includes("PRIVATE"),false);
+});
+test("fixture generic transport failure shows a safe empty state",async()=>{
+ handler=url=>{if(url.endsWith("/availability"))throw Error("PRIVATE");return null;};
+ await availabilityWorkspace();requestAvailability();
+ await screen.findByText("Test availability could not be read. Try again; no stock was changed.");
+ assert.ok(screen.queryByLabelText("Verified test lot readout")===null);
+ assert.equal(document.body.textContent.includes("PRIVATE"),false);
+});
+
+test("fixture exact condition keys cannot come from inherited properties",()=>{
+ const raw=availabilityFixture(),source=raw.locations[0].condition_units;
+ raw.locations[0].condition_units=Object.assign(Object.create(source),
+   {one:0,two:0,three:0,four:0,five:0,six:0});
+ assert.ok(projectFixture(raw,"lot_test")===null);
+});
+test("fixture old session result cannot overwrite a new verified session",async()=>{
+ let old;handler=url=>{
+  if(url.includes("/lots/lot_test/"))return new Promise(r=>old=r);
+  if(url.includes("/lots/other/"))return reply({...availabilityFixture(),lot_id:"other"});
+  return null;
+ };
+ await availabilityWorkspace();requestAvailability();
+ fireEvent.click(screen.getByRole("button",{name:"Lock workspace"}));
+ login();await screen.findByLabelText("Test lot reference");await act(async()=>{});requestAvailability("other");
+ await screen.findByLabelText("Verified test lot readout");
+ await act(async()=>old(reply(availabilityFixture())));
+ assert.match(document.body.textContent,/Test lot other/);
+ assert.equal(document.body.textContent.includes("Test lot lot_test"),false);
+ assert.equal(localStorage.length,0);
+});

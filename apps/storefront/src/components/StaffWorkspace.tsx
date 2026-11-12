@@ -4,6 +4,7 @@ import { commerce, downloadJSON } from "@/lib/client";
 import Icon from "./Icon";
 import RecordedPersonalization from "./RecordedPersonalization";
 import RecordedHistory from "./RecordedHistory";
+import FixtureAvailability from "./FixtureAvailability";
 type Doc = {
   id: string;
   kind: string;
@@ -385,6 +386,12 @@ export default function StaffWorkspace() {
           </article>
         ))}
       </div>
+      {session.current && (
+        <FixtureAvailability
+          key={session.current.generation}
+          token={session.current.token}
+        />
+      )}
       <div className="lookup-layout" style={{ marginTop: 35 }}>
         <div>
           <form
