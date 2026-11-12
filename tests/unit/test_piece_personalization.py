@@ -225,3 +225,12 @@ def test_optional_not_nullable_contract_matches_runtime(connected,monkeypatch,mo
     setup(connected,monkeypatch)
     response=offer(connected,None) if model=='Offer' else create(connected,[item(personalization=None)])
     assert response.status_code==422
+
+def test_staff_display_inscription_whitespace_parity():
+    from services.commerce.app.piece_personalization import Identical
+    from pydantic import ValidationError
+    for text in [" \uFEFF ", "\u200B", " é 🌵 "]:
+        assert Identical(mode="identical", text=text).text == text
+    for text in [" ", "\u00a0\u1680\u2000\u2028\u2029\u202f\u205f\u3000", "\u0085", "\ud800"]:
+        with pytest.raises(ValidationError):
+            Identical(mode="identical", text=text)

@@ -553,3 +553,21 @@ test("legacy multiline inscriptions and options remain readable without structur
   assert.ok(document.body.textContent.includes(item.secondary));
   assert.ok(screen.queryByRole("alert") === null);
 });
+
+test("Python inscription whitespace parity preserves BOM rather than JavaScript trim", () => {
+  const accepted = [" \uFEFF ", "\u200B", " é 🌵 "];
+  for (const text of accepted) {
+    const value = pieceOrder({mode:"identical"});
+    value.items[0].personalization.text = text;
+    value.lines[0].item = structuredClone(value.items[0]);
+    for (const piece of value.lines[0].personalization_snapshot.pieces) piece.text = text;
+    assert.equal(PieceDisplay.recordedPersonalization(value).rows[0].text, text);
+  }
+  const value = pieceOrder({mode:"identical"});
+  value.items[0].personalization.text = " \uFEFF ";
+  value.lines[0].item = structuredClone(value.items[0]);
+  for (const piece of value.lines[0].personalization_snapshot.pieces) piece.text = " \uFEFF ";
+  render(React.createElement(PieceDisplay.default,{record:value}));
+  assert.ok(document.body.textContent.includes("\\u{FEFF}"));
+  assert.ok(document.body.textContent.includes("do not engrave these display codes"));
+});

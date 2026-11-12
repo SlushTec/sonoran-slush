@@ -31,7 +31,7 @@ function text(v: unknown, max: number, min = 0): v is string {
   return size >= min && size <= max;
 }
 const inscription = (v: unknown): v is string =>
-  text(v, 120, 1) && !!v.trim() && !/[\p{Cc}\p{Cs}]/u.test(v);
+  text(v, 120, 1) && /[^\u0009-\u000D\u001C-\u0020\u0085\u00A0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]/u.test(v) && !/[\p{Cc}\p{Cs}]/u.test(v);
 const keys = (v: Obj, names: string[]) =>
   Object.keys(v).sort().join("|") === [...names].sort().join("|");
 const owns = (v: Obj, name: string) =>
@@ -273,6 +273,10 @@ export default function RecordedPersonalization({
       <p className="field-help">
         Recorded configuration only. This is not proof approval or permission to
         manufacture.
+      </p>
+      <p className="field-help">
+        Formatting controls are shown as {String.raw`\u{CODE}`}. Stored text is
+        unchanged; do not engrave these display codes.
       </p>
       {view.legacy.map((item) => (
         <div
