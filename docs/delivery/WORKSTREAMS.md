@@ -1006,3 +1006,8 @@ Final desktop and 390px mobile screenshots were inspected. Owned final helper PI
 - Prefer extending the existing newly added local staff-pieces smoke to observe the same fixture timeline rather than another server harness. Preserve the original four smokes and cross-CI source/wiring; no new CI wiring is admitted.
 - Author gate: full Python/Node, optimized build/TypeScript, browser suites, all existing local ASGI qualification, archive/links/contracts/diff and clean frozen source/bundle. Independent review precedes publication.
 - No held-source access, accounts/roles/settings changes, price or inventory decisions, production qualification, deploy, AWS or WSL. Two store workers only. Implementation stops2026-11-12T02:20Z; final cutoff03:00Z.
+
+### Explicit stacked history execution authorization
+- Root now permits isolated history implementation on independently qualified mapping025af63 while its publication awaits owner approval. This supersedes the checkpoint's implementation wait only; mapping source remains frozen, and history publication/merge still requires predecessor green integration and exact combined independent review.
+- The1000-entry/500-label/64-timestamp bounds are existing consumer limits, not backend retention limits; backend event() appends without a declared cap. Over-limit/malformed history is clearly unavailable for reconciliation, never silently truncated or claimed complete.
+- Timestamp guard must validate real calendar dates, leap days and numeric timezone offsets without Date.parse normalization, preserving the exact accepted ISO timestamp text rather than converting it to a guessed locale.
