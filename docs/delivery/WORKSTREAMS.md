@@ -1165,3 +1165,10 @@ Final desktop and 390px mobile screenshots were inspected. Owned final helper PI
 - Add opt-in synthetic intake receipts isolated from available balances until a single immutable inspection partitions the exact quantity into accepted and rejected units. Accepted units alone enter available balances; rejected units remain excluded in inspection records. This does not impose a new policy on legacy fixture receipts, and is not production eligibility approval.
 - Staff/test gates, bounded strict quantities, global command identity across movements/holds/intake, exact replay, lot optimistic concurrency, atomic persistence and audit, rollback/restart/contention tests. No UI, real stock, supplier/customer data, live providers, AWS/WSL, production policy or deployment.
 - Independent design/source review, full relevant verification, draft PR and exact-head hosted checks required before serial integration. End by Nov13 03:00UTC; stop new implementation by02:20UTC. Full SS044/COM02 remains open.
+
+
+## RPG-124 / SS-044 synthetic inspection readout (November 12)
+- Base c93a6c9, reviewed incoming inspection PR35 integrated. Existing card only; backend unchanged.
+- Staff-session child uses manual GET for an exact intake reference, never receives or inspects stock. Strict positive projection of fixture identity, quantities/version, pending/inspected partition and known defect state. Pending and rejected are not sellable; accepted is historical inspection, not current free stock or manufacturing permission.
+- Clear/edit/Lock/unmount/session changes invalidate older requests and feedback. No persistent browser storage, polling, new credentials or authority. Never render raw backend metadata/errors. Ordinary work remains available if fixture read fails.
+- Required gates: focused projection/lifecycle negative tests, actual browser desktop/mobile/Lock cases, full frontend/build/typecheck/Python/contract/preservation checks and independent exact-source review before draft/CI/merge. No live inventory or deployment. Cutoff November13 03:00 UTC.

@@ -835,3 +835,118 @@ test("fixture old session result cannot overwrite a new verified session",async(
  assert.equal(document.body.textContent.includes("Test lot lot_test"),false);
  assert.equal(localStorage.length,0);
 });
+
+const InspectionModule = require("../../apps/storefront/src/components/FixtureInspection.tsx");
+const projectInspection = InspectionModule.fixtureInspection;
+const intakeFixture = () => ({id:"intake_test",lot_id:"lot_test",location_id:"shop",quantity:10,state:"pending",
+ accepted_units:0,rejected_units:0,defect:"none",received_at:"2026-11-12T21:00:00.123456+00:00",
+ inspected_at:null,inspection_request_id:null,lot_version:1,actor:"synthetic_staff",
+ actor_scope:"shared staff test credential; not individual identity",test_mode:true,checkout_authoritative:false});
+const inspectedFixture=()=>({...intakeFixture(),state:"inspected",accepted_units:8,rejected_units:2,defect:"chipped",
+ inspected_at:"2026-11-12T22:00:00Z",inspection_request_id:"11111111-1111-4111-8111-111111111111",lot_version:2});
+async function inspectionWorkspace(){await workspace();await screen.findByLabelText("Test intake reference");await act(async()=>{});}
+function requestInspection(reference="intake_test"){
+ fireEvent.change(screen.getByLabelText("Test intake reference"),{target:{value:reference}});
+ fireEvent.submit(screen.getByLabelText("Test intake reference").closest("form"));
+}
+test("inspection positive projection accepts pending and inspected without private extras",()=>{
+ for(const raw of [intakeFixture(),inspectedFixture()]){
+  raw.private="PRIVATE";const got=projectInspection(raw,"intake_test");
+  assert.equal(got.id,"intake_test");assert.equal(got.state,raw.state);assert.equal(got.private,undefined);
+  assert.equal(got.actor,undefined);assert.notEqual(got,raw);
+ }
+});
+for(const [name,damage] of [
+ ["wrong ID",v=>v.id="other"],["unsafe lot",v=>v.lot_id="<img>"],["unsafe location",v=>v.location_id="../"],
+ ["zero quantity",v=>v.quantity=0],["boolean quantity",v=>v.quantity=true],["overflow quantity",v=>v.quantity=1000001],
+ ["fractional quantity",v=>v.quantity=1.5],["string quantity",v=>v.quantity="10"],
+ ["unsafe version",v=>v.lot_version=9007199254740992],["zero version",v=>v.lot_version=0],
+ ["fractional version",v=>v.lot_version=1.5],["string version",v=>v.lot_version="1"],
+ ["false fixture",v=>v.test_mode=false],["authority",v=>v.checkout_authoritative=true],
+ ["wrong actor",v=>v.actor="real"],["wrong scope",v=>v.actor_scope="individual"],
+ ["pending accepted",v=>v.accepted_units=1],["pending rejected",v=>v.rejected_units=1],
+ ["pending defect",v=>v.defect="chipped"],["pending timestamp",v=>v.inspected_at="2026-11-12T22:00:00Z"],
+ ["pending request",v=>v.inspection_request_id="x"],["unknown state",v=>v.state="approved"],
+ ["invalid date",v=>v.received_at="2026-02-30T00:00:00Z"],["nonleap",v=>v.received_at="2025-02-29T00:00:00Z"],
+ ["invalid hour",v=>v.received_at="2026-11-12T24:00:00Z"],["invalid offset",v=>v.received_at="2026-11-12T00:00:00+00:60"],
+ ["raw date",v=>v.received_at="yesterday"],["unknown defect",v=>v.defect="secret"],
+]){
+ test("inspection rejects "+name,()=>{const raw=intakeFixture();damage(raw);assert.ok(projectInspection(raw,"intake_test")===null);});
+}
+for(const [name,damage] of [
+ ["partition",v=>v.accepted_units=9],["negative accepted",v=>v.accepted_units=-1],["fractional rejected",v=>v.rejected_units=2.5],
+ ["no defect for rejects",v=>v.defect="none"],["defect without rejects",v=>{v.accepted_units=10;v.rejected_units=0}],
+ ["missing timestamp",v=>v.inspected_at=null],["impossible timestamp",v=>v.inspected_at="2026-13-01T00:00:00Z"],
+ ["missing command",v=>v.inspection_request_id=null],["invalid command",v=>v.inspection_request_id="bad"],
+]){
+ test("inspected result rejects "+name,()=>{const raw=inspectedFixture();damage(raw);assert.ok(projectInspection(raw,"intake_test")===null);});
+}
+for(const raw of [null,[],true,1,"x"])test("inspection rejects primitive "+JSON.stringify(raw),()=>assert.ok(projectInspection(raw,"intake_test")===null));
+test("inspection accepts leap day and all accepted partition",()=>{
+ const raw=inspectedFixture();raw.received_at="2024-02-29T00:00:00Z";raw.accepted_units=10;raw.rejected_units=0;raw.defect="none";
+ assert.notEqual(projectInspection(raw,"intake_test"),null);
+});
+test("inspection requires verified staff then an explicit exact read, with no persistence",async()=>{
+ render(React.createElement(Staff));assert.ok(screen.queryByLabelText("Test intake reference")===null);assert.equal(calls.length,0);
+ handler=url=>url.includes("/intakes/")?reply({...inspectedFixture(),private:"PRIVATE"}):null;
+ login();await screen.findByLabelText("Test intake reference");await act(async()=>{});assert.equal(calls.length,1);
+ requestInspection();await screen.findByLabelText("Verified test intake readout");
+ assert.match(document.body.textContent,/Accepted at inspection8/);assert.match(document.body.textContent,/Rejected at inspection2/);
+ assert.match(document.body.textContent,/Historical intake quantities are not current free stock/);
+ assert.equal(document.body.textContent.includes("PRIVATE"),false);
+ const call=calls.find(c=>c.url.includes("/intakes/"));
+ assert.equal(call.url,"https://commerce.qa.invalid/v1/admin/retail-test/component-ledger/intakes/intake_test");
+ assert.equal(call.opts.method,"GET");assert.equal(call.opts.cache,"no-store");assert.equal(call.opts.body,undefined);assert.equal(call.opts.headers.Authorization,"Bearer synthetic-staff");
+ assert.equal(localStorage.length,0);assert.equal(calls.some(c=>c.opts.method!=="GET"),false);
+});
+test("inspection malformed response removes previous quantities",async()=>{
+ handler=url=>url.includes("/intakes/")?reply(intakeFixture()):null;
+ await inspectionWorkspace();requestInspection();await screen.findByText("Pending inspection: all intake units remain quarantined.");
+ handler=url=>url.includes("/intakes/")?reply({private:"PRIVATE"}):null;requestInspection();
+ await screen.findByText("The test intake response could not be verified. No quantities are shown.");
+ assert.ok(screen.queryByLabelText("Verified test intake readout")===null);assert.equal(document.body.textContent.includes("PRIVATE"),false);
+});
+for(const status of [401,403,404,409,503,500]){
+ test("inspection safe error "+status,async()=>{
+  handler=url=>url.includes("/intakes/")?reply({detail:"PRIVATE"},status):null;
+  await inspectionWorkspace();requestInspection();await screen.findByRole("alert");
+  assert.equal(document.body.textContent.includes("PRIVATE"),false);assert.ok(screen.queryByLabelText("Verified test intake readout")===null);
+ });
+}
+test("inspection invalid reference never makes a network request",async()=>{
+ await inspectionWorkspace();requestInspection("bad/reference");await screen.findByRole("alert");assert.equal(calls.length,1);
+});
+for(const action of ["clear","edit","lock","unmount","back","pagehide","restore"])
+ for(const outcome of ["success","failure"]){
+ test("inspection late "+outcome+" ignored after "+action,async()=>{
+  let release;handler=url=>url.includes("/intakes/")?new Promise(r=>release=r):null;
+  await inspectionWorkspace();requestInspection();
+  fireEvent.submit(screen.getByLabelText("Test intake reference").closest("form"));
+  assert.equal(calls.filter(c=>c.url.includes("/intakes/")).length,1);
+  if(action==="clear")fireEvent.click(screen.getByRole("button",{name:"Clear inspection view"}));
+  else if(action==="edit")fireEvent.change(screen.getByLabelText("Test intake reference"),{target:{value:"other"}});
+  else if(action==="lock")fireEvent.click(screen.getByRole("button",{name:"Lock workspace"}));
+  else if(action==="unmount")cleanup();
+  else if(action==="back")act(()=>window.dispatchEvent(new window.PopStateEvent("popstate")));
+  else if(action==="pagehide")act(()=>window.dispatchEvent(new window.Event("pagehide")));
+  else act(()=>window.dispatchEvent(new window.PageTransitionEvent("pageshow",{persisted:true})));
+  await act(async()=>release(outcome==="success"?reply(intakeFixture()):reply({detail:"PRIVATE"},409)));
+  assert.ok(screen.queryByLabelText("Verified test intake readout")===null);assert.ok(screen.queryByRole("alert")===null);
+ });
+}
+test("inspection token change invalidates old success and error",async()=>{
+ for(const outcome of ["success","failure"]){
+  let release;handler=()=>new Promise(r=>release=r);
+  const rendered=render(React.createElement(InspectionModule.default,{token:"old"}));await act(async()=>{});requestInspection();
+  rendered.rerender(React.createElement(InspectionModule.default,{token:"new"}));await act(async()=>{});
+  await act(async()=>release(outcome==="success"?reply(intakeFixture()):reply({detail:"PRIVATE"},409)));
+  assert.ok(screen.queryByLabelText("Verified test intake readout")===null);assert.ok(screen.queryByRole("alert")===null);
+  assert.equal(screen.getByLabelText("Test intake reference").value,"");cleanup();
+ }
+});
+test("inspection newer result wins over older failure",async()=>{
+ let old;handler=url=>url.endsWith("/intake_test")?new Promise(r=>old=r):url.endsWith("/other")?reply({...inspectedFixture(),id:"other"}):null;
+ await inspectionWorkspace();requestInspection();requestInspection("other");
+ await screen.findByLabelText("Verified test intake readout");await act(async()=>old(reply({detail:"PRIVATE"},409)));
+ assert.match(document.body.textContent,/Test intake other/);assert.ok(screen.queryByRole("alert")===null);
+});
