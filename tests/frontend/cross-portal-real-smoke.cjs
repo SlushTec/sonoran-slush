@@ -61,7 +61,7 @@ function start(command, args, env) {
 async function ready(url, logs) {
   for (let n = 0; n < 120; n++) {
     try {
-      if ((await fetch(url)).ok) return;
+      if ((await fetch(url, { redirect: "error" })).ok) return;
     } catch {}
     await new Promise((r) => setTimeout(r, 250));
   }
@@ -131,6 +131,7 @@ async function stop(c) {
     await ready(ui + "/api/health", frontendLogs);
     async function request(route, body, token) {
       const r = await fetch(api + route, {
+        redirect: "error",
         method: body ? "POST" : "GET",
         headers: {
           "Content-Type": "application/json",
@@ -210,13 +211,22 @@ async function stop(c) {
 
     browser = await chromium.launch({ headless: true });
     const context = await browser.newContext({
+      serviceWorkers: "block",
       viewport: { width: 1280, height: 900 },
     });
-    let relayed = 0;
-    await context.route("https://commerce.qa.invalid/**", async (route) => {
+    let relayed = 0,
+      externalAttempts = 0;
+    await context.route("**/*", async (route) => {
       const req = route.request(),
         u = new URL(req.url());
+      if (u.origin === ui || u.protocol === "blob:" || u.href === "about:blank")
+        return route.continue();
+      if (u.origin !== "https://commerce.qa.invalid") {
+        externalAttempts++;
+        return route.abort("blockedbyclient");
+      }
       const response = await fetch(api + u.pathname + u.search, {
+        redirect: "error",
         method: req.method(),
         headers: {
           "Content-Type": "application/json",
@@ -282,6 +292,7 @@ async function stop(c) {
     }
     async function denied(route, body, token, allowed) {
       const r = await fetch(api + route, {
+        redirect: "error",
         method: body ? "POST" : "GET",
         headers: {
           "Content-Type": "application/json",
@@ -571,12 +582,14 @@ async function stop(c) {
       path: path.join(root, "artifacts/cross-portal-closed.png"),
       fullPage: true,
     });
+    assert.ok(externalAttempts === 0, "No outside-origin network attempts");
     console.log(
       JSON.stringify({
         result: "PASS",
         source:
           "one real loopback ASGI database; browser staff/quote/order/proof; no provider calls",
         relayed_requests: relayed,
+        outside_origin_attempts: externalAttempts,
         exact_quote_accepted: true,
         explicit_receipt_handoffs: true,
         bound_proof_approved: true,
@@ -591,13 +604,21 @@ async function stop(c) {
     if (browser) await browser.close();
     for (const c of children.reverse()) await stop(c);
     for (const port of [apiPort, uiPort]) {
-      let closed = false;
-      try {
-        await fetch("http://127.0.0.1:" + port + "/health");
-      } catch {
-        closed = true;
-      }
-      assert.ok(closed, "Owned port remains open: " + port);
+      const closed = await new Promise((resolve) => {
+        const socket = net.createConnection({ host: "127.0.0.1", port });
+        let settled = false;
+        function finish(value) {
+          if (settled) return;
+          settled = true;
+          socket.destroy();
+          resolve(value);
+        }
+        socket.setTimeout(2000);
+        socket.once("connect", () => finish(false));
+        socket.once("timeout", () => finish(false));
+        socket.once("error", (error) => finish(error.code === "ECONNREFUSED"));
+      });
+      assert.ok(closed, "Owned port closure not verified");
     }
     assert.equal(path.dirname(path.resolve(temp)), base);
     assert.ok(path.basename(temp).startsWith("cross-smoke-"));
