@@ -16,7 +16,8 @@
     "test:archive": "python3 scripts/verify_archive.py",
     "test:frontend": "node --test tests/frontend/storefront.test.cjs tests/frontend/proof-review.test.cjs tests/frontend/order-review.test.cjs tests/frontend/quote-review.test.cjs tests/frontend/staff-session.test.cjs",
     "build:review": "node scripts/build-review.mjs",
-    "check:review": "node scripts/check-storefront-export.mjs"
+    "check:review": "node scripts/check-storefront-export.mjs",
+    "test:cross-portal": "node tests/frontend/cross-portal-real-smoke.cjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
