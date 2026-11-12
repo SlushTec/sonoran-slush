@@ -29,6 +29,7 @@ const staff = randomBytes(32).toString("hex"),
   access = randomBytes(32).toString("hex"),
   children = [];
 let browser,
+  outcome,
   stage = "startup";
 async function unused() {
   return new Promise((resolve, reject) => {
@@ -68,15 +69,19 @@ async function ready(url, logs) {
   throw Error("Owned local server did not become ready: ");
 }
 async function stop(c) {
-  if (c.exitCode !== null) return;
+  if (c.exitCode !== null || c.signalCode !== null) return;
+  if (!Number.isSafeInteger(c.pid) || c.pid <= 0)
+    throw Error("Owned child PID unavailable; no termination attempted");
   if (process.platform === "win32")
     spawnSync("taskkill", ["/pid", String(c.pid), "/T", "/F"], {
       windowsHide: true,
       stdio: "ignore",
     });
   else c.kill("SIGTERM");
-  for (let n = 0; n < 30 && c.exitCode === null; n++)
+  for (let n = 0; n < 30 && c.exitCode === null && c.signalCode === null; n++)
     await new Promise((r) => setTimeout(r, 100));
+  if (c.exitCode === null && c.signalCode === null)
+    throw Error("Owned child termination unverified");
 }
 (async () => {
   const apiPort = await unused(),
@@ -583,26 +588,38 @@ async function stop(c) {
       fullPage: true,
     });
     assert.ok(externalAttempts === 0, "No outside-origin network attempts");
-    console.log(
-      JSON.stringify({
-        result: "PASS",
-        source:
-          "one real loopback ASGI database; browser staff/quote/order/proof; no provider calls",
-        relayed_requests: relayed,
-        outside_origin_attempts: externalAttempts,
-        exact_quote_accepted: true,
-        explicit_receipt_handoffs: true,
-        bound_proof_approved: true,
-        same_version_summary_guard: true,
-        unpaid_order_legacy_migration_hold: true,
-        private_sessions_closed: true,
-        owned_pids: children.map((c) => c.pid),
-        ports: [apiPort, uiPort],
-      }),
-    );
+    outcome = {
+      result: "PASS",
+      source:
+        "one real loopback ASGI database; browser staff/quote/order/proof; no provider calls",
+      relayed_requests: relayed,
+      outside_origin_attempts: externalAttempts,
+      exact_quote_accepted: true,
+      explicit_receipt_handoffs: true,
+      bound_proof_approved: true,
+      same_version_summary_guard: true,
+      unpaid_order_legacy_migration_hold: true,
+      private_sessions_closed: true,
+      owned_pids: children.map((c) => c.pid),
+      ports: [apiPort, uiPort],
+    };
   } finally {
-    if (browser) await browser.close();
-    for (const c of children.reverse()) await stop(c);
+    const cleanupFailures = [];
+    if (browser) {
+      try {
+        await browser.close();
+      } catch {
+        cleanupFailures.push("browser close unverified");
+      }
+    }
+    for (const c of [...children].reverse()) {
+      try {
+        await stop(c);
+      } catch {
+        cleanupFailures.push("owned server stop unverified");
+      }
+    }
+    let portsClosed = true;
     for (const port of [apiPort, uiPort]) {
       const closed = await new Promise((resolve) => {
         const socket = net.createConnection({ host: "127.0.0.1", port });
@@ -618,15 +635,34 @@ async function stop(c) {
         socket.once("timeout", () => finish(false));
         socket.once("error", (error) => finish(error.code === "ECONNREFUSED"));
       });
-      assert.ok(closed, "Owned port closure not verified");
+      if (!closed) {
+        portsClosed = false;
+        cleanupFailures.push("owned port open or unknown");
+      }
     }
-    assert.equal(path.dirname(path.resolve(temp)), base);
-    assert.ok(path.basename(temp).startsWith("cross-smoke-"));
-    fs.rmSync(temp, { recursive: true, force: true });
+    if (
+      portsClosed &&
+      !cleanupFailures.includes("owned server stop unverified")
+    ) {
+      try {
+        assert.equal(path.dirname(path.resolve(temp)), base);
+        assert.ok(path.basename(temp).startsWith("cross-smoke-"));
+        fs.rmSync(temp, { recursive: true, force: true });
+      } catch {
+        cleanupFailures.push("owned temporary cleanup unverified");
+      }
+    } else {
+      cleanupFailures.push("owned temporary fixture preserved");
+    }
+    if (cleanupFailures.length) {
+      stage = "cleanup: " + cleanupFailures.join("; ");
+      throw Error("Owned cleanup incomplete");
+    }
     console.log(
       "Owned browser/server processes stopped; loopback ports closed; synthetic temporary database removed.",
     );
   }
+  if (outcome) console.log(JSON.stringify(outcome));
 })().catch((e) => {
   console.error(
     "Cross-portal smoke failed at static stage: " +
