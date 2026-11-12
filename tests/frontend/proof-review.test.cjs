@@ -205,8 +205,8 @@ test("historical view is read only and returning current refetches", async () =>
   );
   await screen.findByRole("heading", { name: "Historical proof (read only)" });
   await screen.findByText("Exact wording 1");
-  assert.equal(screen.queryByRole("checkbox"), null);
-  assert.equal(screen.queryByRole("button", { name: "Request changes" }), null);
+  assert.equal(screen.queryByRole("checkbox") === null, true);
+  assert.equal(screen.queryByRole("button", { name: "Request changes" }) === null, true);
   fireEvent.click(
     screen.getByRole("button", { name: "Return to current proof" }),
   );
@@ -255,8 +255,8 @@ for (const event of [
       await Promise.resolve();
     });
     assert.equal(
-      screen.queryByRole("heading", { name: "Current proof" }),
-      null,
+      screen.queryByRole("heading", { name: "Current proof" }) === null,
+      true,
     );
     assert.equal(calls.length, 1);
   });
@@ -308,10 +308,10 @@ for (const route of ["history", "detail", "action"])
       ),
     );
     assert.equal(
-      screen.queryByRole("heading", { name: /Current proof|Historical proof/ }),
-      null,
+      screen.queryByRole("heading", { name: /Current proof|Historical proof/ }) === null,
+      true,
     );
-    assert.equal(screen.queryByRole("status"), null);
+    assert.equal(screen.queryByRole("status") === null, true);
     assert.equal(screen.getByLabelText("Private access code").value, "");
   });
 test("legacy remains readable without approval", async () => {
@@ -327,7 +327,7 @@ test("legacy remains readable without approval", async () => {
   });
   fireEvent.submit(document.querySelector("form"));
   await screen.findByText(/retained legacy proof/);
-  assert.equal(screen.queryByRole("checkbox"), null);
+  assert.equal(screen.queryByRole("checkbox") === null, true);
   assert.equal(calls.length, 1);
 });
 for (const corruption of [
@@ -361,7 +361,7 @@ for (const corruption of [
     });
     fireEvent.submit(document.querySelector("form"));
     await screen.findByRole("alert");
-    assert.equal(screen.queryByRole("checkbox"), null);
+    assert.equal(screen.queryByRole("checkbox") === null, true);
   });
 test("409 action invalidates approval until refresh, duplicate click issues one mutation", async () => {
   mock((url) =>
@@ -376,7 +376,7 @@ test("409 action invalidates approval until refresh, duplicate click issues one 
   fireEvent.click(button);
   await screen.findByRole("alert");
   assert.equal(calls.filter((x) => x.url.endsWith("/approve")).length, 1);
-  assert.equal(screen.queryByRole("checkbox"), null);
+  assert.equal(screen.queryByRole("checkbox") === null, true);
   fireEvent.click(
     screen.getByRole("button", { name: "Refresh current proof" }),
   );
@@ -479,8 +479,8 @@ test("historical detail hash must match selected metadata", async () => {
     await screen.findByRole("button", { name: "View version 1" }),
   );
   await screen.findByRole("alert");
-  assert.equal(screen.queryByText("Exact wording 1"), null);
-  assert.equal(screen.queryByRole("checkbox"), null);
+  assert.equal(screen.queryByText("Exact wording 1") === null, true);
+  assert.equal(screen.queryByRole("checkbox") === null, true);
 });
 test("ordinary initial pageshow preserves entered credentials", async () => {
   render(React.createElement(Portal));
@@ -518,7 +518,7 @@ test("old failure cannot overwrite newly reopened valid session", async () => {
   fireEvent.submit(document.querySelector("form"));
   await screen.findByRole("checkbox");
   await act(async () => reject(new Error("late old failure")));
-  assert.equal(screen.queryByRole("alert"), null);
+  assert.equal(screen.queryByRole("alert") === null, true);
   assert.ok(screen.getByRole("checkbox"));
   assert.ok(
     calls.every((x) => x.opts.headers.Authorization === "Bearer new-code"),
@@ -578,7 +578,7 @@ for (const field of [
       });
       fireEvent.submit(document.querySelector("form"));
       await screen.findByRole("alert");
-      assert.equal(screen.queryByRole("checkbox"), null);
+      assert.equal(screen.queryByRole("checkbox") === null, true);
     },
   );
 test("maximum supplementary-Unicode proof and second inscription remain valid", async () => {
@@ -649,8 +649,8 @@ for (const field of [
       });
       fireEvent.submit(document.querySelector("form"));
       await screen.findByRole("alert");
-      assert.equal(screen.queryByRole("checkbox"), null);
-      assert.equal(screen.queryByRole("status"), null);
+      assert.equal(screen.queryByRole("checkbox") === null, true);
+      assert.equal(screen.queryByRole("status") === null, true);
       assert.ok(screen.getByText(/Evidence not verified/));
     },
   );
@@ -670,6 +670,6 @@ test("partial success response without decision evidence never confirms approval
   fireEvent.click(screen.getByRole("checkbox"));
   fireEvent.click(screen.getByRole("button", { name: "Approve version 2" }));
   await screen.findByRole("alert");
-  assert.equal(screen.queryByRole("status"), null);
+  assert.equal(screen.queryByRole("status") === null, true);
   assert.ok(screen.getByText(/Evidence not verified/));
 });

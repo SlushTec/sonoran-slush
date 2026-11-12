@@ -80,7 +80,7 @@ test('personalization, gift details, and bag survive refresh',async()=>{
  r.unmount();wrap(React.createElement(Bag));
  assert.ok(await screen.findByText('“Keep the good days close”'));
  assert.ok(screen.getByText(/A gift/));
- assert.equal(screen.queryByText(/order placed/i),null);
+ assert.equal(screen.queryByText(/order placed/i) === null,true);
 });
 
 test('a blank required design is kept out of the bag',async()=>{
@@ -95,14 +95,14 @@ test('a blank required design is kept out of the bag',async()=>{
 test('each crystal shape has its own listing and only its supported size choices',async()=>{
  const r=wrap(React.createElement(Customizer,{product:product('photo-crystal-heart')}));
  const size=await screen.findByLabelText('Size');
- assert.equal(screen.queryByLabelText('Crystal shape'),null);
+ assert.equal(screen.queryByLabelText('Crystal shape') === null,true);
  assert.deepEqual([...size.options].map(o=>o.value),['Small','Medium','Large']);
  assert.match(size.options[0].textContent,/3.2 × 2.8/);
  fireEvent.change(size,{target:{value:'Large'}});
  await waitFor(()=>assert.equal(readLocal('config:photo-crystal-heart',null).options.Size,'Large'));
  r.unmount();wrap(React.createElement(Customizer,{product:product('photo-crystal-prestige')}));
  assert.equal((await screen.findByLabelText('Size')).value,'Small only');
- assert.equal(screen.queryByRole('option',{name:/Large Mantel/}),null);
+ assert.equal(screen.queryByRole('option',{name:/Large Mantel/}) === null,true);
 });
 
 test('old saved crystal designs migrate to the shape listing without losing personalization',async()=>{
@@ -156,7 +156,7 @@ test('gift finder returns grounded products and permits editing',async()=>{
 test('empty checkout cannot invent an order',async()=>{
  wrap(React.createElement(Checkout));
  assert.ok(await screen.findByText('Your bag needs a little inspiration.'));
- assert.equal(screen.queryByRole('button',{name:'Request reviewed pricing'}),null);
+ assert.equal(screen.queryByRole('button',{name:'Request reviewed pricing'}) === null,true);
 });
 
 test('private record lookup keeps access code out of device storage',async()=>{

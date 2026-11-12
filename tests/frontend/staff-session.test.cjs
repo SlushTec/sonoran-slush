@@ -131,7 +131,7 @@ test("regression: late mutation cannot reopen locked staff workspace or start ol
   fireEvent.click(screen.getByRole("button", { name: "Lock workspace" }));
   await act(async () => resolve(reply({ ...doc, version: 3 })));
   assert.ok(screen.getByLabelText("Staff access code"));
-  assert.equal(screen.queryByText(doc.id), null);
+  assert.equal(screen.queryByText(doc.id) === null, true);
   assert.equal(calls.filter((x) => x.url.endsWith("/summary")).length, 1);
   assert.equal(screen.getByLabelText("Staff access code").value, "");
 });
@@ -179,10 +179,10 @@ for (const phase of ["login", "open", "action", "overview"])
         ),
       );
       assert.equal(
-        screen.queryByRole("heading", { name: "Needs a little attention." }),
-        null,
+        screen.queryByRole("heading", { name: "Needs a little attention." }) === null,
+        true,
       );
-      assert.equal(screen.queryByText(doc.id), null);
+      assert.equal(screen.queryByText(doc.id) === null, true);
     });
 test("credential edit invalidates pending login and old failure", async () => {
   let resolve;
@@ -193,7 +193,7 @@ test("credential edit invalidates pending login and old failure", async () => {
     target: { value: "new-staff" },
   });
   await act(async () => resolve(reply({}, 403)));
-  assert.equal(screen.queryByRole("alert"), null);
+  assert.equal(screen.queryByRole("alert") === null, true);
   assert.equal(screen.getByLabelText("Staff access code").value, "new-staff");
 });
 test("record reference edit invalidates pending mutation and clears terms", async () => {
@@ -208,11 +208,11 @@ test("record reference edit invalidates pending mutation and clears terms", asyn
   });
   await act(async () => resolve(reply({ ...doc, version: 3 })));
   assert.equal(
-    screen.queryByRole("button", { name: "Offer a new quote version" }),
-    null,
+    screen.queryByRole("button", { name: "Offer a new quote version" }) === null,
+    true,
   );
   assert.equal(calls.filter((x) => x.url.endsWith("/summary")).length, 1);
-  assert.equal(screen.queryByRole("status"), null);
+  assert.equal(screen.queryByRole("status") === null, true);
 });
 test("new staff session unaffected by old response or finally", async () => {
   await open();
@@ -226,8 +226,8 @@ test("new staff session unaffected by old response or finally", async () => {
   login();
   await screen.findByRole("heading", { name: "Needs a little attention." });
   await act(async () => resolve(reply({}, 409)));
-  assert.equal(screen.queryByRole("alert"), null);
-  assert.equal(screen.queryByText(doc.id), null);
+  assert.equal(screen.queryByRole("alert") === null, true);
+  assert.equal(screen.queryByText(doc.id) === null, true);
   assert.equal(calls.length, 4);
 });
 test("duplicate action blocked and exact captured staff/body retained", async () => {
@@ -268,7 +268,7 @@ test("mismatched action record is unconfirmed and never triggers summary", async
     screen.getByRole("button", { name: "Offer a new quote version" }),
   );
   await screen.findByRole("alert");
-  assert.equal(screen.queryByRole("status"), null);
+  assert.equal(screen.queryByRole("status") === null, true);
   assert.equal(calls.filter((x) => x.url.endsWith("/summary")).length, 1);
 });
 test("new record clears proof shipment and readiness drafts", async () => {
@@ -325,8 +325,8 @@ test("valid new order receipt clears on record edit and Lock", async () => {
     target: { value: "quo_next" },
   });
   assert.equal(
-    screen.queryByRole("button", { name: "Download receipt" }),
-    null,
+    screen.queryByRole("button", { name: "Download receipt" }) === null,
+    true,
   );
   fireEvent.click(screen.getByRole("button", { name: "Lock workspace" }));
   assert.equal(screen.getByLabelText("Staff access code").value, "");
@@ -359,8 +359,8 @@ for (const patch of [
       fireEvent.click(screen.getByRole("button", { name: "Open record" }));
       await screen.findByRole("alert");
       assert.equal(
-        screen.queryByRole("button", { name: "Offer a new quote version" }),
-        null,
+        screen.queryByRole("button", { name: "Offer a new quote version" }) === null,
+        true,
       );
     },
   );
@@ -383,8 +383,8 @@ test("late new-record receipt after Lock is discarded without summary", async ()
     ),
   );
   assert.equal(
-    screen.queryByRole("button", { name: "Download receipt" }),
-    null,
+    screen.queryByRole("button", { name: "Download receipt" }) === null,
+    true,
   );
   assert.equal(calls.filter((x) => x.url.endsWith("/summary")).length, 1);
   assert.ok(!document.body.textContent.includes("synthetic-secret"));
