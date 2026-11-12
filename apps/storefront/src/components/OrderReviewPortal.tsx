@@ -1,8 +1,14 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { commerce } from "@/lib/client";
+import CustomerInscriptions, {
+  customerInscriptions,
+  inscriptionSummary,
+  type CustomerInscriptionView,
+} from "./CustomerInscriptions";
 
 type Order = {
+  inscriptions: CustomerInscriptionView;
   id: string;
   kind: "order";
   version: number;
@@ -83,7 +89,32 @@ function record(v: unknown, id: string): Order {
       "This order response could not be verified. Reopen the current record or contact the studio.",
     );
   }
-  return v as Order;
+  return {
+    id,
+    kind: "order",
+    version: v.version as number,
+    status: v.status as string,
+    payment_status: v.payment_status as string,
+    proof_status: v.proof_status as string,
+    total_minor: v.total_minor as number | null,
+    currency: v.currency as string,
+    next_step: v.next_step as string | undefined,
+    test_payment_available: v.test_payment_available as boolean | undefined,
+    items: (
+      v.items as { product_slug: string; quantity: number }[] | undefined
+    )?.map((x) => ({ product_slug: x.product_slug, quantity: x.quantity })),
+    timeline: (v.timeline as { label: string; at: string }[] | undefined)?.map(
+      (x) => ({ label: x.label, at: x.at }),
+    ),
+    shipment:
+      v.shipment === undefined
+        ? undefined
+        : {
+            carrier: (v.shipment as { carrier: string }).carrier,
+            tracking: (v.shipment as { tracking: string }).tracking,
+          },
+    inscriptions: customerInscriptions(v),
+  };
 }
 export function squareSandboxAddress(value: unknown): value is string {
   if (typeof value !== "string") return false;
@@ -126,6 +157,7 @@ function summaryProjection(order: Order) {
     total_minor: order.total_minor,
     currency: order.currency,
     next_step: order.next_step ?? "",
+    inscriptions: order.inscriptions,
     items: (order.items ?? []).map(({ product_slug, quantity }) => ({
       product_slug,
       quantity,
@@ -175,6 +207,8 @@ function summaryText(order: Order) {
       (x, i) =>
         i + 1 + ". " + safe(x.product_slug) + " | Quantity: " + x.quantity,
     ),
+    "",
+    ...inscriptionSummary(o.inscriptions),
     "",
     "Recorded history:",
     ...o.timeline.map(
@@ -529,6 +563,7 @@ export default function OrderReviewPortal() {
                 <p>Tracking reference: {data.shipment.tracking}</p>
               </div>
             )}
+            <CustomerInscriptions key={data.id} view={data.inscriptions} />
             {!!data.items?.length && (
               <>
                 <h3 style={{ marginTop: 28 }}>Recorded items</h3>

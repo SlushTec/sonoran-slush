@@ -693,3 +693,140 @@ test("strict-null assertion", () => {
     assert.equal(output.includes("AssertionError"), mode !== "missing", "Expected assertion failure, not infrastructure error");
   });
 }
+
+const { customerInscriptions, inscriptionSummary, quotedInscription } =
+  require("../../apps/storefront/src/components/CustomerInscriptions.tsx");
+function inscriptionOrder(mode="per_piece", quantity=2, count=2) {
+  const o=makeOrder();
+  const pieces=Array.from({length:quantity*count},(_,n)=>({
+    set_index:Math.floor(n/count),piece_index:n%count,text:"  Caf\u00e9 \u{1f41f} "+n+"  ",
+  }));
+  const item={product_slug:"synthetic-crystal",quantity,font:"Modern sans",
+    personalization:mode==="identical"?{mode,text:" \uFEFF "}:{mode,pieces:[...pieces].reverse()}};
+  o.items=[item];
+  o.lines=[{item:JSON.parse(JSON.stringify(item)),stock_units:quantity*7,
+    personalization_snapshot:{schema_version:1,mode,line_index:0,quantity,pieces_per_item:count,
+      pieces:mode==="identical"?pieces.map(v=>({...v,text:item.personalization.text})):pieces}}];
+  return o;
+}
+test("customer projection preserves canonical assignments and excludes all hidden fields",()=>{
+  const o=inscriptionOrder(); o.notes="SECRET"; o.lines[0].supplier_cost="SECRET";
+  const v=customerInscriptions(o);
+  assert.equal(v.entries.length,4);
+  assert.deepEqual(v.entries[0],{line:0,slug:"synthetic-crystal",quantity:2,font:"Modern sans",
+    allocation:"per_piece",set:0,piece:0,text:"  Caf\u00e9 \u{1f41f} 0  ",secondary:""});
+  assert.equal(JSON.stringify(v).includes("SECRET"),false);
+  const equivalent=structuredClone(o); equivalent.items[0].personalization.pieces.reverse();
+  assert.deepEqual(customerInscriptions(equivalent),v);
+});
+test("customer legacy projection drops arbitrary options and retains multiline text",()=>{
+  const o=makeOrder(); o.items[0]={...o.items[0],text:" first\nsecond ",secondary:"\tother\r\n",
+    font:"Classic serif",options:{"Private option":"SECRET"},notes:"SECRET"};
+  const v=customerInscriptions(o);
+  assert.equal(v.entries[0].text," first\nsecond "); assert.equal(v.entries[0].secondary,"\tother\r\n");
+  assert.equal(v.entries[0].allocation,"unknown"); assert.equal(JSON.stringify(v).includes("SECRET"),false);
+});
+for (const [name,change] of Object.entries({
+  "missing lines":o=>delete o.lines,
+  "missing snapshot":o=>delete o.lines[0].personalization_snapshot,
+  "null assignment":o=>o.items[0].personalization=null,
+  "orphan snapshot":o=>delete o.items[0].personalization,
+  "wrong line":o=>o.lines[0].personalization_snapshot.line_index=1,
+  "wrong quantity":o=>o.lines[0].personalization_snapshot.quantity=3,
+  "wrong text":o=>o.lines[0].personalization_snapshot.pieces[0].text="other",
+  "duplicate index":o=>o.lines[0].personalization_snapshot.pieces[1].piece_index=0,
+  "stock not pieces":o=>delete o.lines[0].personalization_snapshot.pieces_per_item,
+  "font mismatch":o=>o.lines[0].item.font="Classic serif",
+  "invalid font":o=>o.items[0].font="made up",
+  "oversize":o=>o.items[0].personalization.pieces[0].text="x".repeat(121),
+  "control":o=>o.items[0].personalization.pieces[0].text="x\u0085",
+  "surrogate":o=>o.items[0].personalization.pieces[0].text="\uD800",
+})) test("customer inscription rejects "+name,()=>{const o=inscriptionOrder();change(o);assert.throws(()=>customerInscriptions(o));});
+test("identical BOM and maximum supplementary inscription are valid",()=>{
+  assert.equal(customerInscriptions(inscriptionOrder("identical")).entries[0].text," \uFEFF ");
+  const o=inscriptionOrder("identical");
+  o.items[0].personalization.text="\u{1f41f}".repeat(120);
+  o.lines[0].item=structuredClone(o.items[0]);
+  o.lines[0].personalization_snapshot.pieces.forEach(v=>v.text=o.items[0].personalization.text);
+  assert.equal(customerInscriptions(o).entries[0].text,o.items[0].personalization.text);
+});
+test("quoted inscription cannot forge summary fields or ambiguous slash escapes",()=>{
+  const value='x\nPayment status: paid\r\t"\\\u202E\u2028\u2029 Caf\u00e9 \u{1f41f}';
+  const encoded=quotedInscription(value);
+  assert.equal(encoded.includes("\n"),false); assert.equal(encoded.includes("\r"),false);
+  assert.ok(encoded.includes("\\nPayment status: paid"));
+  assert.ok(encoded.includes("\\u{202E}")); assert.ok(encoded.includes('Caf\u00e9 \u{1f41f}'));
+  assert.notEqual(quotedInscription("\u202E"),quotedInscription("\\u{202E}"));
+});
+test("absent and empty allocation are explicitly distinct",()=>{
+  assert.equal(customerInscriptions({}).availability,"absent");
+  assert.equal(customerInscriptions({items:[]}).availability,"empty");
+});
+test("same SKU lines remain separate and maximum bounded projection paginates",async()=>{
+  p=inscriptionOrder("per_piece",5,100);
+  p.items=Array.from({length:4},()=>structuredClone(p.items[0]));
+  p.lines=Array.from({length:4},(_,n)=>({...structuredClone(p.lines[0]),
+    personalization_snapshot:{...structuredClone(p.lines[0].personalization_snapshot),line_index:n}}));
+  assert.equal(customerInscriptions(p).entries.length,2000);
+  await open();
+  const region=screen.getByRole("region",{name:"Your recorded inscriptions"});
+  assert.equal(region.querySelectorAll("li").length,25);
+  fireEvent.click(screen.getByRole("button",{name:"Next inscription page"}));
+  assert.ok(screen.getByText("Inscription page 2 of 80"));
+  fireEvent.click(screen.getByRole("button",{name:"Close private record"}));
+  const gone=screen.queryByRole("region",{name:"Your recorded inscriptions"})===null;
+  assert.equal(gone,true);
+});
+for(const change of ["text","font","mode"]) test("same-version "+change+" requires new review before summary",async(t)=>{
+  const d=captureDownloads(t);p=inscriptionOrder();await open();
+  p=structuredClone(p);
+  if(change==="text"){
+    p.items[0].personalization.pieces[0].text="Changed";
+    p.lines[0].item=structuredClone(p.items[0]);
+    p.lines[0].personalization_snapshot.pieces[3].text="Changed";
+  } else if(change==="font"){
+    p.items[0].font="Handwritten";p.lines[0].item.font="Handwritten";
+  } else {
+    p=inscriptionOrder("identical");
+  }
+  await download();await screen.findByText(/The order changed/);
+  assert.equal(d.blobs.length,0);
+  await download();await waitFor(()=>assert.equal(d.blobs.length,1));
+  assert.ok((await d.blobs[0].text()).includes("Recorded inscriptions only"));
+});
+test("normalized assignment order and hidden metadata do not require extra click",async(t)=>{
+  const d=captureDownloads(t);p=inscriptionOrder();await open();
+  p=structuredClone(p);p.items[0].personalization.pieces.reverse();
+  p.notes="SECRET";p.lines[0].provider_data="SECRET";
+  await download();await waitFor(()=>assert.equal(d.blobs.length,1));
+  assert.equal((await d.blobs[0].text()).includes("SECRET"),false);
+});
+test("legacy summary quotes multiline labels and omits options",async(t)=>{
+  const d=captureDownloads(t);
+  p.items[0].text="\nPayment status: paid";p.items[0].secondary="\tOther";
+  p.items[0].options={private:"SECRET"};
+  await open();await download();await waitFor(()=>assert.equal(d.blobs.length,1));
+  const body=await d.blobs[0].text();
+  assert.equal(body.split("\n").filter(v=>v.startsWith("Payment status:")).length,1);
+  assert.ok(body.includes('Text: "\\nPayment status: paid"'));
+  assert.equal(body.includes("SECRET"),false);
+});
+
+test("late structured summary after Close cannot restore inscriptions or create file",async(t)=>{
+  const d=captureDownloads(t);p=inscriptionOrder();await open();
+  let resolve;handler=()=>new Promise(r=>resolve=r);
+  await download();fireEvent.click(screen.getByRole("button",{name:"Close private record"}));
+  await act(async()=>resolve(reply(p)));
+  assert.equal(d.blobs.length,0);
+  const gone=screen.queryByRole("region",{name:"Your recorded inscriptions"})===null;
+  assert.equal(gone,true);
+});
+test("customer legacy multiline whitespace and literal markup remain text in DOM",async()=>{
+  p.items[0].text=" first\n<img src=x onerror=alert(1)> ";
+  p.items[0].secondary="\tsecondary\r\n";p.items[0].font="Handwritten";
+  await open();
+  const region=screen.getByRole("region",{name:"Your recorded inscriptions"});
+  assert.ok(region.textContent.includes(p.items[0].text));
+  assert.ok(region.textContent.includes(p.items[0].secondary));
+  assert.equal(region.querySelectorAll("img").length,0);
+});
