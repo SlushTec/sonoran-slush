@@ -1108,6 +1108,8 @@ def drill_profile(value):
         return ProofDrill
     if type(value) is str and value == "commercial":
         return CommercialDrill
+    if type(value) is str and value == "inspection":
+        return InspectionDrill
     raise UnsafeDrill("Unknown explicit synthetic profile")
 
 
@@ -1697,3 +1699,266 @@ def test_commercial_rechecking_used_target_clears_prior_success(drill):
     with pytest.raises(UnsafeDrill):
         drill.verify_commercial_replay(target)
     assert drill.restored is None
+
+
+# Receipt quarantine has an explicit profile rather than expanding old profiles.
+INSPECTION_TABLES = tuple(sorted((*LEDGER_TABLES, "fixture_intakes", "fixture_intake_commands")))
+
+
+class InspectionDrill(LedgerDrill):
+    def seed(self):
+        super().seed()
+        self.ledger_expected = self.expected
+        from services.commerce.app import incoming_inspection
+        self.monkeypatch.setattr(incoming_inspection, "NOW", lambda: START.isoformat())
+        self.put(LEDGER + "/lots/intake-lot",
+                 {"component_id": "blank", "supplier_reference": "synthetic", "lot_reference": "intake-lot"})
+        self.intake_commands, self.intakes = [], {}
+        version = 0
+        for number, (name, quantity, accepted, rejected, defect) in enumerate((
+            ("pending", 5, 0, 0, "none"),
+            ("mixed", 6, 4, 2, "chipped"),
+            ("rejected", 3, 0, 3, "scratched"),
+        )):
+            url = LEDGER + "/intakes/" + name
+            body = {"request_id": str(UUID(int=30000 + number)), "expected_lot_version": version,
+                    "lot_id": "intake-lot", "location_id": "shop", "quantity": quantity}
+            expected = {"id": name, "lot_id": "intake-lot", "location_id": "shop", "quantity": quantity,
+                        "state": "pending", "accepted_units": 0, "rejected_units": 0, "defect": "none",
+                        "receipt_request_id": body["request_id"], "inspection_request_id": None,
+                        "received_at": START.isoformat(), "inspected_at": None, "lot_version": version + 1,
+                        "actor": "synthetic_staff", "actor_scope": "shared staff test credential; not individual identity",
+                        "test_mode": True, "checkout_authoritative": False}
+            assert self.post(url, body, staff=True) == expected
+            self.intake_commands.append((url, body, expected, {"operation": "receive", "intake_id": name, **body}))
+            version += 1
+            if name != "pending":
+                body = {"request_id": str(UUID(int=31000 + number)), "expected_lot_version": version,
+                        "accepted_units": accepted, "rejected_units": rejected, "defect": defect}
+                expected = {**expected, "state": "inspected", "accepted_units": accepted, "rejected_units": rejected,
+                            "defect": defect, "inspection_request_id": body["request_id"],
+                            "inspected_at": START.isoformat(), "lot_version": version + 1}
+                assert self.post(url + "/inspection", body, staff=True) == expected
+                self.intake_commands.append((url + "/inspection", body, expected,
+                                             {"operation": "inspect", "intake_id": name, **body}))
+                version += 1
+            self.intakes[name] = expected
+        assert version == 5
+        self.tables = INSPECTION_TABLES
+        with closing(read_database(self.source)) as reader:
+            self.expected = state(reader, self.tables)
+        self.assert_inspection_contract(self.expected)
+
+    def assert_inspection_contract(self, saved):
+        schema, rows = saved
+        assert tuple(sorted(rows)) == INSPECTION_TABLES
+        # Independently preserve all earlier ledger, hold, payment and proof rows.
+        for table in LEDGER_TABLES:
+            if table not in ("fixture_lots", "fixture_balances"):
+                assert rows[table] == self.ledger_expected[1][table]
+        lots = tuple(row for row in rows["fixture_lots"] if row[0] != "intake-lot")
+        balances = tuple(row for row in rows["fixture_balances"] if row[0] != "intake-lot")
+        assert lots == self.ledger_expected[1]["fixture_lots"]
+        assert balances == self.ledger_expected[1]["fixture_balances"]
+        new_lots = [row for row in rows["fixture_lots"] if row[0] == "intake-lot"]
+        assert len(new_lots) == 1
+        key, raw, version = new_lots[0]
+        assert version == 5 and json.loads(raw) == {
+            "id": "intake-lot", "component_id": "blank", "supplier_reference": "synthetic",
+            "lot_reference": "intake-lot", "test_mode": True, "checkout_authoritative": False}
+        assert tuple(row for row in rows["fixture_balances"] if row[0] == "intake-lot") == (
+            ("intake-lot", "shop", "available", 4),)
+        assert len(rows["fixture_intakes"]) == 3
+        assert {key: json.loads(raw) for key, raw in rows["fixture_intakes"]} == self.intakes
+        assert sum(v["quantity"] for v in self.intakes.values()) == 14
+        assert sum(v["accepted_units"] for v in self.intakes.values()) == 4
+        assert sum(v["rejected_units"] for v in self.intakes.values()) == 5
+        assert self.intakes["pending"]["quantity"] == 5
+        commands = {key: (digest, json.loads(raw)) for key, digest, raw in rows["fixture_intake_commands"]}
+        assert len(commands) == 5
+        for _, body, expected, canonical in self.intake_commands:
+            assert commands[body["request_id"]] == (digest_document(canonical), expected)
+        assert not (commands.keys() & {r[1] for r in rows["fixture_movements"]})
+        assert not (commands.keys() & {r[0] for r in rows["fixture_hold_commands"]})
+
+    def read_intake(self, name, status=200):
+        response = self.client.get(LEDGER + "/intakes/" + name, headers={"Authorization": "Bearer " + STAFF})
+        assert response.status_code == status
+        return response.json()
+
+    def availability(self):
+        response = self.client.get(LEDGER + "/lots/intake-lot/availability",
+                                   headers={"Authorization": "Bearer " + STAFF})
+        assert response.status_code == 200
+        return response.json()
+
+    def verify_inspection_replay(self, target):
+        self.restored = None
+        try:
+            Drill.verify_replay(self, target)
+        finally:
+            self.restored = None  # Earlier profile success is not inspection success.
+        for url, body, expected, _ in (*self.movement_commands, *self.commands, *self.intake_commands):
+            assert self.post(url, body, staff=True) == expected
+            changed = {**body, "expected_lot_version": 99} if "/intakes/" in url else {**body, "reason": "conflicting"}
+            self.post(url, changed, staff=True, status=409)
+        for name, expected in self.intakes.items():
+            assert self.read_intake(name) == expected
+        availability = self.availability()
+        assert availability["version"] == 5
+        assert availability["test_mode"] is True and availability["checkout_authoritative"] is False
+        assert availability["locations"] == [{
+            "location_id": "shop", "condition_units": {"available": 4, "damaged": 0, "sample": 0,
+                "in_production": 0, "completed": 0, "shipped": 0}, "reserved_units": 0, "free_units": 4}]
+        # The immutable receipt replay stays pending even when GET is inspected.
+        assert self.intake_commands[1][2]["state"] == "pending"
+        assert self.read_intake("mixed")["state"] == "inspected"
+        intake_url, intake_body, _, _ = self.intake_commands[0]
+        for url, body, _, _ in (self.movement_commands[0], self.commands[0]):
+            self.post(intake_url, {**intake_body, "request_id": body["request_id"]}, staff=True, status=409)
+            self.post(url, {**body, "request_id": intake_body["request_id"]}, staff=True, status=409)
+        self.post(LEDGER + "/intakes/wrong-identity", intake_body, staff=True, status=409)
+        with closing(read_database(target / "state.db")) as reader:
+            saved = state(reader, self.tables)
+        assert saved == self.expected
+        self.assert_inspection_contract(saved)
+        self.assert_offline()
+        self.restored = target
+
+
+@pytest.mark.parametrize("drill", ["inspection"], indirect=True)
+def test_inspection_restore_quarantine_replay_and_continuation(drill):
+    before = drill.source_bytes()
+    drill.make_snapshot()
+    target = drill.restore()
+    assert drill.restored is None
+    drill.verify_inspection_replay(target)
+    assert drill.restored == target and drill.source_bytes() == before
+    body = {"request_id": str(UUID(int=32000)), "expected_lot_version": 5,
+            "accepted_units": 1, "rejected_units": 4, "defect": "incorrect_item"}
+    url = LEDGER + "/intakes/pending/inspection"
+    result = drill.post(url, body, staff=True)
+    assert result["lot_version"] == 6 and result["accepted_units"] == 1 and result["rejected_units"] == 4
+    assert drill.post(url, body, staff=True) == result
+    drill.post(url, {**body, "request_id": str(UUID(int=32001)), "expected_lot_version": 6}, staff=True, status=409)
+    assert drill.availability()["locations"][0]["free_units"] == 5
+    assert drill.source_bytes() == before
+
+
+@pytest.mark.parametrize("drill", ["inspection"], indirect=True)
+def test_inspection_wal_snapshot_excludes_uncommitted_acceptance(drill):
+    before = drill.source_bytes()
+    writer = sqlite3.connect(drill.source, isolation_level=None)
+    writer.execute("BEGIN IMMEDIATE")
+    writer.execute("UPDATE fixture_balances SET units=999 WHERE lot_id='intake-lot'")
+    writer.execute("DELETE FROM fixture_intakes WHERE id='pending'")
+    try:
+        drill.make_snapshot()
+        target = drill.restore()
+        drill.verify_inspection_replay(target)
+        assert drill.availability()["locations"][0]["free_units"] == 4
+        assert drill.source_bytes() == before
+    finally:
+        writer.rollback()
+        writer.close()
+
+
+INSPECTION_DAMAGE = {
+    "missing-intake": "DELETE FROM fixture_intakes WHERE id='pending'",
+    "orphan-lot": "UPDATE fixture_intakes SET document=json_set(document,'$.lot_id','missing') WHERE id='mixed'",
+    "cross-identity": "UPDATE fixture_intakes SET document=json_set(document,'$.id','rejected') WHERE id='mixed'",
+    "invalid-partition": "UPDATE fixture_intakes SET document=json_set(document,'$.accepted_units',5) WHERE id='mixed'",
+    "pending-accepted": "UPDATE fixture_intakes SET document=json_set(document,'$.accepted_units',5) WHERE id='pending'",
+    "rejected-promoted": "UPDATE fixture_balances SET units=9 WHERE lot_id='intake-lot'",
+    "lot-version": "UPDATE fixture_lots SET version=6 WHERE id='intake-lot'",
+    "missing-receipt": "DELETE FROM fixture_intake_commands WHERE request_id='00000000-0000-0000-0000-000000007530'",
+    "receipt-digest": "UPDATE fixture_intake_commands SET fingerprint='wrong'",
+    "replay-rewritten": "UPDATE fixture_intake_commands SET document=json_set(document,'$.state','inspected')",
+    "duplicate-command": "UPDATE fixture_intakes SET document=json_set(document,'$.receipt_request_id','00000000-0000-0000-0000-000000007530') WHERE id='mixed'",
+    "live-authority": "UPDATE fixture_intakes SET document=json_set(document,'$.checkout_authoritative',json('true'))",
+}
+
+
+@pytest.mark.parametrize("drill", ["inspection"], indirect=True)
+@pytest.mark.parametrize("damage", INSPECTION_DAMAGE)
+def test_inspection_resealed_corruption_rejected_before_target(drill, damage):
+    bundle = drill.make_snapshot()
+    before = drill.source_bytes()
+    with closing(sqlite3.connect(bundle / "state.db")) as db:
+        db.execute(INSPECTION_DAMAGE[damage])
+        db.commit()
+    reseal_digest(bundle)
+    with pytest.raises(UnsafeDrill, match="lineage"):
+        drill.restore()
+    assert drill.restored is None and not (drill.root / "restored").exists()
+    assert drill.source_bytes() == before
+    # Even with a pre-existing target, validation cannot change its sentinel.
+    target = drill.root / "existing"
+    new_directory(target)
+    new_file(target / "sentinel.bin", b"owned-sentinel")
+    with pytest.raises(UnsafeDrill):
+        drill.restore("existing")
+    assert list(target.iterdir()) == [target / "sentinel.bin"]
+    assert (target / "sentinel.bin").read_bytes() == b"owned-sentinel"
+    assert drill.source_bytes() == before
+
+
+@pytest.mark.parametrize("drill", ["inspection"], indirect=True)
+@pytest.mark.parametrize("failure_stage", ["base", "intake", "availability", "final"])
+def test_inspection_interruption_never_reports_complete(drill, monkeypatch, failure_stage):
+    drill.make_snapshot()
+    target = drill.restore()
+    before = drill.source_bytes()
+    def fail(*args, **kwargs):
+        raise RuntimeError("injected synthetic verification failure")
+    if failure_stage == "base":
+        monkeypatch.setattr(Drill, "verify_replay", fail)
+    elif failure_stage == "intake":
+        monkeypatch.setattr(drill, "read_intake", fail)
+    elif failure_stage == "availability":
+        monkeypatch.setattr(drill, "availability", fail)
+    else:
+        monkeypatch.setattr(drill, "assert_inspection_contract", fail)
+    with pytest.raises(RuntimeError, match="injected"):
+        drill.verify_inspection_replay(target)
+    assert drill.restored is None
+    assert drill.source_bytes() == before
+
+
+@pytest.mark.parametrize("drill", ["inspection"], indirect=True)
+@pytest.mark.parametrize("suffix", SIDECARS, ids=("wal", "shm", "journal"))
+def test_inspection_snapshot_sidecar_rejected_without_destination(drill, suffix):
+    bundle = drill.make_snapshot()
+    before = drill.source_bytes()
+    new_file(bundle / ("state.db" + suffix), b"synthetic-sidecar")
+    with pytest.raises(UnsafeDrill):
+        drill.restore()
+    assert drill.restored is None and not (drill.root / "restored").exists()
+    assert (bundle / ("state.db" + suffix)).read_bytes() == b"synthetic-sidecar"
+    assert drill.source_bytes() == before
+
+
+@pytest.mark.parametrize("drill", ["inspection"], indirect=True)
+def test_inspection_valid_snapshot_cannot_replace_existing_target(drill):
+    drill.make_snapshot()
+    before = drill.source_bytes()
+    target = drill.root / "existing"
+    new_directory(target)
+    new_file(target / "state.db", b"owned-sentinel")
+    with pytest.raises(UnsafeDrill, match="exists"):
+        drill.restore("existing")
+    assert drill.restored is None and (target / "state.db").read_bytes() == b"owned-sentinel"
+    assert drill.source_bytes() == before
+
+
+@pytest.mark.parametrize("drill", ["inspection"], indirect=True)
+def test_inspection_rechecking_used_target_clears_prior_success(drill):
+    drill.make_snapshot()
+    target = drill.restore()
+    drill.verify_inspection_replay(target)
+    assert drill.restored == target
+    before = drill.source_bytes()
+    # API replay put the used target into WAL. Do not silently reseal or reuse it.
+    with pytest.raises(UnsafeDrill):
+        drill.verify_inspection_replay(target)
+    assert drill.restored is None and drill.source_bytes() == before
