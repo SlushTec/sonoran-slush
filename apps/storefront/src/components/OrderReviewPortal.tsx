@@ -115,11 +115,96 @@ function eligible(o: Order) {
     o.currency === "USD"
   );
 }
+
+function summaryProjection(order: Order) {
+  return {
+    id: order.id,
+    version: order.version,
+    status: order.status,
+    payment_status: order.payment_status,
+    proof_status: order.proof_status,
+    total_minor: order.total_minor,
+    currency: order.currency,
+    next_step: order.next_step ?? "",
+    items: (order.items ?? []).map(({ product_slug, quantity }) => ({
+      product_slug,
+      quantity,
+    })),
+    timeline: (order.timeline ?? []).map(({ label, at }) => ({ label, at })),
+    shipment: order.shipment
+      ? { carrier: order.shipment.carrier, tracking: order.shipment.tracking }
+      : null,
+  };
+}
+function summaryValue(value: string) {
+  return value.replace(
+    /[\p{Cf}\u2028\u2029]/gu,
+    (c) => "\\u{" + c.codePointAt(0)!.toString(16).toUpperCase() + "}",
+  );
+}
+function summaryText(order: Order) {
+  const o = summaryProjection(order),
+    safe = summaryValue;
+  return [
+    "Sonoran Slush - Order summary",
+    "Not a paid receipt or tax invoice.",
+    "This is a point-in-time summary, not proof of payment, booking or production approval.",
+    "Private order details: the downloaded file remains on your device after Close.",
+    "",
+    "Order reference: " + safe(o.id),
+    "Version: " + o.version,
+    "Order status: " + safe(o.status),
+    "Payment status: " + safe(o.payment_status),
+    "Proof status: " + safe(o.proof_status),
+    "Reviewed total: " +
+      (o.total_minor === null
+        ? "Not yet quoted"
+        : o.currency === "USD"
+          ? "USD " +
+            (BigInt(o.total_minor) / BigInt(100)).toString() +
+            "." +
+            (BigInt(o.total_minor) % BigInt(100)).toString().padStart(2, "0")
+          : o.total_minor +
+            " minor units (" +
+            safe(o.currency) +
+            "; decimal convention not assumed)"),
+    "Next step: " + safe(o.next_step),
+    "",
+    "Recorded items:",
+    ...o.items.map(
+      (x, i) =>
+        i + 1 + ". " + safe(x.product_slug) + " | Quantity: " + x.quantity,
+    ),
+    "",
+    "Recorded history:",
+    ...o.timeline.map(
+      (x, i) => i + 1 + ". " + safe(x.at) + " | " + safe(x.label),
+    ),
+    ...(o.shipment
+      ? [
+          "",
+          "Carrier: " + safe(o.shipment.carrier),
+          "Tracking: " + safe(o.shipment.tracking),
+        ]
+      : []),
+    "",
+  ].join("\n");
+}
+
 export default function OrderReviewPortal() {
   const [id, setID] = useState(""),
     [token, setToken] = useState("");
   const [data, setData] = useState<Order | null>(null),
     [busy, setBusy] = useState(false);
+  const [notice, setNotice] = useState("");
+  const urls = useRef(new Map<string, ReturnType<typeof setTimeout>>());
+  function releaseDownloads() {
+    for (const [url, timer] of urls.current) {
+      clearTimeout(timer);
+      URL.revokeObjectURL(url);
+    }
+    urls.current.clear();
+  }
   const [error, setError] = useState(""),
     [itemPage, setItemPage] = useState(0),
     [eventPage, setEventPage] = useState(0);
@@ -127,6 +212,8 @@ export default function OrderReviewPortal() {
     session = useRef<Session | null>(null),
     locked = useRef(false);
   function clear() {
+    releaseDownloads();
+    setNotice("");
     generation.current++;
     session.current = null;
     locked.current = false;
@@ -150,6 +237,7 @@ export default function OrderReviewPortal() {
     window.addEventListener("pagehide", leave);
     window.addEventListener("pageshow", restore);
     return () => {
+      releaseDownloads();
       generation.current++;
       session.current = null;
       locked.current = false;
@@ -192,6 +280,83 @@ export default function OrderReviewPortal() {
       if (active(s))
         setError(
           "This order could not be verified. Check your reference and private access code, then retry.",
+        );
+    } finally {
+      if (active(s)) {
+        locked.current = false;
+        setBusy(false);
+      }
+    }
+  }
+  async function downloadSummary() {
+    const s = session.current,
+      order = data;
+    if (!s || !active(s) || locked.current || !order || order.id !== s.id)
+      return;
+    locked.current = true;
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      if (!text(s.id, 160, 1)) throw new Error("Invalid order reference.");
+      const refreshed = record(
+        await commerce<unknown>(
+          "/v1/orders/" + encodeURIComponent(s.id),
+          undefined,
+          s.token,
+        ),
+        s.id,
+      );
+      if (!active(s)) return;
+      if (
+        JSON.stringify(summaryProjection(refreshed)) !==
+        JSON.stringify(summaryProjection(order))
+      ) {
+        setData(refreshed);
+        setItemPage(0);
+        setEventPage(0);
+        setNotice(
+          "The order changed. Review the refreshed details, then choose Download order summary again. No file was created.",
+        );
+        return;
+      }
+      if (!active(s)) return;
+      const blob = new Blob([summaryText(refreshed)], {
+        type: "text/plain;charset=utf-8",
+      });
+      const url = URL.createObjectURL(blob);
+      const timer = setTimeout(() => {
+        URL.revokeObjectURL(url);
+        urls.current.delete(url);
+      }, 1000);
+      urls.current.set(url, timer);
+      const anchor = document.createElement("a");
+      try {
+        anchor.href = url;
+        anchor.download =
+          "sonoran-order-" +
+          s.id.replace(/[^A-Za-z0-9_-]/g, "_").slice(0, 80) +
+          ".txt";
+        document.body.appendChild(anchor);
+        if (!active(s)) {
+          releaseDownloads();
+          return;
+        }
+        anchor.click();
+        if (active(s))
+          setNotice(
+            "Order-summary download requested. This is not a paid receipt or tax invoice. The private file remains on your device after Close.",
+          );
+      } catch (error) {
+        releaseDownloads();
+        throw error;
+      } finally {
+        anchor.remove();
+      }
+    } catch {
+      if (active(s))
+        setError(
+          "The order summary could not be verified or downloaded. No payment is confirmed. Reopen the order or retry.",
         );
     } finally {
       if (active(s)) {
@@ -322,6 +487,20 @@ export default function OrderReviewPortal() {
               </div>
             )}
             {data.next_step && <p>{data.next_step}</p>}
+            <button
+              type="button"
+              className="button secondary"
+              disabled={busy}
+              onClick={downloadSummary}
+            >
+              Download order summary
+            </button>
+            <p>Private local file, not a paid receipt or tax invoice.</p>
+            {notice && (
+              <p className="form-notice" role="status">
+                {notice}
+              </p>
+            )}
             {eligible(data) ? (
               <div className="form-notice">
                 <p>
