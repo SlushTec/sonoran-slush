@@ -358,3 +358,247 @@ test("bounded item and event DOM pagination", async () => {
   fireEvent.click(screen.getByRole("button", { name: "Next events" }));
   assert.ok(screen.getByText("event-25"));
 });
+
+function captureDownloads(t) {
+  const blobs = [],
+    clicks = [],
+    revoked = [];
+  const create = URL.createObjectURL,
+    revoke = URL.revokeObjectURL,
+    click = window.HTMLAnchorElement.prototype.click;
+  URL.createObjectURL = (blob) => {
+    blobs.push(blob);
+    return "blob:owned-" + blobs.length;
+  };
+  URL.revokeObjectURL = (url) => revoked.push(url);
+  window.HTMLAnchorElement.prototype.click = function () {
+    clicks.push({ href: this.href, name: this.download });
+  };
+  t.after(() => {
+    cleanup();
+    URL.createObjectURL = create;
+    URL.revokeObjectURL = revoke;
+    window.HTMLAnchorElement.prototype.click = click;
+  });
+  return { blobs, clicks, revoked };
+}
+async function download() {
+  fireEvent.click(
+    screen.getByRole("button", { name: "Download order summary" }),
+  );
+}
+test("summary refreshes with captured capability and positive allowlist, never raw secrets", async (t) => {
+  const d = captureDownloads(t);
+  p.extra_secret = "DO-NOT-EXPORT";
+  p.access_token = "PRIVATE";
+  p.staff_notes = "COST";
+  p.items[0].hidden = "SUPPLIER";
+  await open();
+  await download();
+  await waitFor(() => assert.equal(d.clicks.length, 1));
+  const body = await d.blobs[0].text();
+  assert.match(body, /Payment status: unpaid/);
+  assert.match(body, /Not a paid receipt or tax invoice/);
+  for (const value of [
+    "DO-NOT-EXPORT",
+    "PRIVATE",
+    "COST",
+    "SUPPLIER",
+    "synthetic-code",
+  ])
+    assert.equal(body.includes(value), false);
+  assert.equal(calls.length, 2);
+  assert.equal(calls[1].opts.headers.Authorization, "Bearer synthetic-code");
+  assert.equal(d.clicks[0].name, "sonoran-order-ord_test.txt");
+  assert.equal(document.querySelector("a[download]"), null);
+  fireEvent.click(screen.getByRole("button", { name: "Close private record" }));
+  assert.deepEqual(d.revoked, ["blob:owned-1"]);
+});
+test("summary preserves accents emoji and visibly encodes format and line controls", async (t) => {
+  const d = captureDownloads(t);
+  p.next_step = "Café 🌼\u202Epaid\u2028Payment status: paid\u2029\u2066";
+  await open();
+  await download();
+  await waitFor(() => assert.equal(d.blobs.length, 1));
+  const body = await d.blobs[0].text();
+  assert.ok(body.includes("Café 🌼"));
+  assert.ok(body.includes("\\u{202E}"));
+  assert.ok(body.includes("\\u{2028}"));
+  assert.ok(body.includes("\\u{2029}"));
+  assert.ok(body.includes("\\u{2066}"));
+  assert.equal(
+    body.split("\n").filter((x) => x.startsWith("Payment status:")).length,
+    1,
+  );
+});
+test("unquoted summary never invents zero price", async (t) => {
+  const d = captureDownloads(t);
+  p.total_minor = null;
+  await open();
+  await download();
+  await waitFor(() => assert.equal(d.blobs.length, 1));
+  assert.match(await d.blobs[0].text(), /Reviewed total: Not yet quoted/);
+});
+for (const field of [
+  "version",
+  "payment_status",
+  "status",
+  "proof_status",
+  "total_minor",
+  "next_step",
+  "items",
+  "timeline",
+  "shipment",
+]) {
+  test(
+    "changed " + field + " requires review and another click even same version",
+    async (t) => {
+      const d = captureDownloads(t);
+      await open();
+      const values = {
+        version: 3,
+        payment_status: "paid",
+        status: "awaiting_production_checks",
+        proof_status: "approved",
+        total_minor: 5000,
+        next_step: "Review change",
+        items: [{ product_slug: "new", quantity: 2 }],
+        timeline: [],
+        shipment: { carrier: "Synthetic", tracking: "123" },
+      };
+      p = { ...p, [field]: values[field] };
+      await download();
+      await screen.findByText(/The order changed/);
+      assert.equal(d.blobs.length, 0);
+      await download();
+      await waitFor(() => assert.equal(d.blobs.length, 1));
+    },
+  );
+}
+for (const leave of [
+  "close",
+  "id",
+  "token",
+  "back",
+  "pagehide",
+  "bfcache",
+  "unmount",
+]) {
+  test(
+    "late summary after " + leave + " creates no file or stale state",
+    async (t) => {
+      const d = captureDownloads(t);
+      const view = render(React.createElement(Portal));
+      enter();
+      await screen.findByRole("heading", { name: "Current order" });
+      let resolve;
+      handler = () => new Promise((r) => (resolve = r));
+      await download();
+      if (leave === "close")
+        fireEvent.click(
+          screen.getByRole("button", { name: "Close private record" }),
+        );
+      if (leave === "id" || leave === "token")
+        fireEvent.change(
+          screen.getByLabelText(
+            leave === "id" ? "Order reference" : "Private access code",
+          ),
+          { target: { value: "new" } },
+        );
+      if (leave === "back")
+        fireEvent(window, new window.PopStateEvent("popstate"));
+      if (leave === "pagehide") fireEvent(window, new window.Event("pagehide"));
+      if (leave === "bfcache") {
+        const e = new window.Event("pageshow");
+        Object.defineProperty(e, "persisted", { value: true });
+        fireEvent(window, e);
+      }
+      if (leave === "unmount") view.unmount();
+      await act(async () => resolve(reply(p)));
+      assert.equal(d.blobs.length, 0);
+      assert.equal(d.clicks.length, 0);
+    },
+  );
+}
+test("duplicate summary and interleaved checkout share synchronous operation lock", async (t) => {
+  const d = captureDownloads(t);
+  await open();
+  let resolve;
+  handler = () => new Promise((r) => (resolve = r));
+  const button = screen.getByRole("button", { name: "Download order summary" });
+  fireEvent.click(button);
+  fireEvent.click(button);
+  fireEvent.click(
+    screen.getByRole("button", { name: "Open Square sandbox checkout" }),
+  );
+  assert.equal(calls.length, 2);
+  await act(async () => resolve(reply(p)));
+  assert.equal(d.blobs.length, 1);
+});
+test("failed refresh permits retry without an unverified download", async (t) => {
+  const d = captureDownloads(t);
+  await open();
+  handler = () => reply({}, 500);
+  await download();
+  await screen.findByText(/summary could not be verified/);
+  assert.equal(d.blobs.length, 0);
+  handler = null;
+  await download();
+  await waitFor(() => assert.equal(d.blobs.length, 1));
+});
+test("wrong refreshed identity never downloads", async (t) => {
+  const d = captureDownloads(t);
+  await open();
+  p = { ...p, id: "other" };
+  await download();
+  await screen.findByText(/summary could not be verified/);
+  assert.equal(d.blobs.length, 0);
+});
+test("download anchor failure revokes owned URL and removes anchor", async (t) => {
+  const d = captureDownloads(t);
+  await open();
+  window.HTMLAnchorElement.prototype.click = () => {
+    throw Error("synthetic");
+  };
+  await download();
+  await screen.findByText(/summary could not be verified/);
+  assert.equal(d.revoked.length, 1);
+  assert.equal(document.querySelector("a[download]"), null);
+});
+
+test("synchronous dismissal during download click cannot restore stale notice", async (t) => {
+  const d = captureDownloads(t);
+  await open();
+  window.HTMLAnchorElement.prototype.click = () =>
+    window.dispatchEvent(new window.Event("pagehide"));
+  await act(async () => {
+    await download();
+  });
+  assert.ok(screen.queryByRole("heading", { name: "Current order" }) === null);
+  assert.ok(screen.queryByText(/Order-summary download requested/) === null);
+  assert.equal(d.revoked.length, 1);
+  enter();
+  await screen.findByRole("heading", { name: "Current order" });
+  assert.ok(screen.queryByText(/Order-summary download requested/) === null);
+});
+for (const [amount, currency, expected] of [
+  [1234, "USD", "USD 12.34"],
+  [0, "USD", "USD 0.00"],
+  [Number.MAX_SAFE_INTEGER, "USD", "USD 90071992547409.91"],
+  [1234, "JPY", "1234 minor units (JPY; decimal convention not assumed)"],
+]) {
+  test(
+    "summary formats exact server amount " + amount + " " + currency,
+    async (t) => {
+      const d = captureDownloads(t);
+      p.total_minor = amount;
+      p.currency = currency;
+      await open();
+      await download();
+      await waitFor(() => assert.equal(d.blobs.length, 1));
+      assert.ok(
+        (await d.blobs[0].text()).includes("Reviewed total: " + expected),
+      );
+    },
+  );
+}

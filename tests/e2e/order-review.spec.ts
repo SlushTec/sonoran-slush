@@ -108,9 +108,14 @@ for (const width of [1440, 390])
     await expect(
       page.getByRole("button", { name: "Open Square sandbox checkout" }),
     ).toBeVisible();
-    const result = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
+    const result = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa"])
+      .analyze();
     expect(result.violations).toEqual([]);
-    expect((await new AxeBuilder({page}).include(".lookup-layout").analyze()).violations).toEqual([]);
+    expect(
+      (await new AxeBuilder({ page }).include(".lookup-layout").analyze())
+        .violations,
+    ).toEqual([]);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= window.innerWidth,
@@ -123,6 +128,11 @@ for (const width of [1440, 390])
       page.getByRole("button", { name: "Open Square sandbox checkout" }),
     ).toBeFocused();
     await page.evaluate(() => window.scrollTo(0, 0));
+    await page.evaluate(() => {
+      if (document.activeElement instanceof HTMLElement)
+        document.activeElement.blur();
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    });
     await page.screenshot({
       path: "artifacts/order-" + width + ".png",
       fullPage: true,
@@ -165,4 +175,105 @@ test("malformed provider and conflicts stay in private portal, explicit retry", 
     .click();
   await expect(page.locator(".form-error[role=alert]")).toBeVisible();
   expect(count).toBe(2);
+});
+
+test("private summary download contains only refreshed allowlisted data on mobile", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const order = {
+    ...fixture(),
+    next_step: "Café 🌼\u2028Payment status: paid",
+    access_token: "DO-NOT-SAVE",
+    staff_notes: "PRIVATE-COST",
+  };
+  await page.route("https://commerce.qa.invalid/**", (r) =>
+    r.fulfill({ json: order }),
+  );
+  await open(page);
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download order summary" }).focus();
+  await page.keyboard.press("Enter");
+  const download = await downloadPromise,
+    stream = await download.createReadStream();
+  const chunks: Buffer[] = [];
+  for await (const chunk of stream!) chunks.push(Buffer.from(chunk));
+  const body = Buffer.concat(chunks).toString("utf8");
+  expect(download.suggestedFilename()).toBe("sonoran-order-ord_browser.txt");
+  expect(body).toContain("Payment status: unpaid");
+  expect(body).toContain("Café 🌼\\u{2028}");
+  expect(body).not.toContain("DO-NOT-SAVE");
+  expect(body).not.toContain("PRIVATE-COST");
+  expect(body).not.toContain("synthetic-code");
+  expect(
+    body.split("\n").filter((x) => x.startsWith("Payment status:")),
+  ).toHaveLength(1);
+  const results = await new AxeBuilder({ page })
+    .include(".lookup-layout")
+    .analyze();
+  expect(results.violations).toEqual([]);
+  await page.evaluate(() => {
+    if (document.activeElement instanceof HTMLElement)
+      document.activeElement.blur();
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  });
+  await page.screenshot({
+    path: "artifacts/order-summary-mobile.png",
+    fullPage: true,
+  });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+});
+test("same-version payment change requires reviewed second summary click", async ({
+  page,
+}) => {
+  let reads = 0,
+    downloads = 0;
+  page.on("download", () => downloads++);
+  await page.route("https://commerce.qa.invalid/**", (r) =>
+    r.fulfill({
+      json: { ...fixture(), payment_status: ++reads === 1 ? "unpaid" : "paid" },
+    }),
+  );
+  await open(page);
+  await page.getByRole("button", { name: "Download order summary" }).click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "The order changed" }),
+  ).toContainText("The order changed");
+  expect(downloads).toBe(0);
+  const pending = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download order summary" }).click();
+  await pending;
+  expect(downloads).toBe(1);
+});
+test("summary refresh completing after Close cannot start download", async ({
+  page,
+}) => {
+  let reads = 0,
+    release: () => void = () => {},
+    entered: () => void = () => {},
+    downloads = 0;
+  const pending = new Promise<void>((r) => (release = r)),
+    began = new Promise<void>((r) => (entered = r));
+  page.on("download", () => downloads++);
+  await page.route("https://commerce.qa.invalid/**", async (r) => {
+    if (++reads > 1) {
+      entered();
+      await pending;
+    }
+    await r.fulfill({ json: fixture() });
+  });
+  await open(page);
+  await page.getByRole("button", { name: "Download order summary" }).click();
+  await began;
+  await page.getByRole("button", { name: "Close private record" }).click();
+  release();
+  await expect(
+    page.getByRole("heading", { name: "Current order" }),
+  ).toHaveCount(0);
+  await page.waitForTimeout(100);
+  expect(downloads).toBe(0);
 });

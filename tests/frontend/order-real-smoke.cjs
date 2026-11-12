@@ -228,7 +228,29 @@ async function stop(c) {
     await page
       .getByRole("button", { name: "Open Square sandbox checkout" })
       .waitFor();
+    const summaryPending = page.waitForEvent("download");
+    await page.getByRole("button", { name: "Download order summary" }).click();
+    const summary = await summaryPending,
+      stream = await summary.createReadStream(),
+      chunks = [];
+    for await (const chunk of stream) chunks.push(Buffer.from(chunk));
+    const summaryBody = Buffer.concat(chunks).toString("utf8");
+    assert.ok(summaryBody.includes("Payment status: unpaid"));
+    assert.ok(summaryBody.includes("Not a paid receipt or tax invoice."));
+    assert.ok(summaryBody.includes(order.id));
+    assert.ok(summaryBody.includes("Reviewed total: USD 12.34"));
+    assert.ok(!summaryBody.includes(order.access_token));
+    assert.equal(
+      summary.suggestedFilename(),
+      "sonoran-order-" + order.id + ".txt",
+    );
     fs.mkdirSync(path.join(root, "artifacts"), { recursive: true });
+    await page.evaluate(() => {
+      if (document.activeElement instanceof HTMLElement)
+        document.activeElement.blur();
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    });
+    await page.waitForTimeout(150);
     await page.screenshot({
       path: path.join(root, "artifacts/order-real-backend.png"),
       fullPage: true,
@@ -263,6 +285,7 @@ async function stop(c) {
         navigation_intercepted: navigation,
         payment_status: after.payment_status,
         session_replayed: true,
+        private_order_summary_verified: true,
         owned_pids: children.map((c) => c.pid),
         ports: [apiPort, uiPort],
       }),
