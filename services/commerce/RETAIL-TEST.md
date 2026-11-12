@@ -356,3 +356,8 @@ No owner/production approval is granted, and no real database, asset, provider,
 account or production recovery action is used. Square, large contexts, private
 assets, durable jobs/outbox, production schema compatibility and owner recovery
 targets/cost/retention remain unqualified.
+
+
+## Customer order response projection
+
+The scoped GET/cancel-test response contract and its limits are documented in [Customer order responses](CUSTOMER-ORDER-RESPONSES.md). Staff storage and internal state remain full-fidelity; this is not API-wide redaction or production activation.

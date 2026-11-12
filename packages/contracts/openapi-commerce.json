@@ -257,6 +257,375 @@
         "title": "Component",
         "type": "object"
       },
+      "CustomerEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "at": {
+            "maxLength": 64,
+            "title": "At",
+            "type": "string"
+          },
+          "label": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "at"
+        ],
+        "title": "CustomerEvent",
+        "type": "object"
+      },
+      "CustomerItem": {
+        "additionalProperties": false,
+        "properties": {
+          "font": {
+            "enum": [
+              "",
+              "Classic serif",
+              "Modern sans",
+              "Handwritten"
+            ],
+            "title": "Font",
+            "type": "string"
+          },
+          "personalization": {
+            "discriminator": {
+              "mapping": {
+                "identical": "#/components/schemas/IdenticalText",
+                "per_piece": "#/components/schemas/PieceText"
+              },
+              "propertyName": "mode"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IdenticalText"
+              },
+              {
+                "$ref": "#/components/schemas/PieceText"
+              }
+            ],
+            "title": "Personalization"
+          },
+          "product_slug": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Product Slug",
+            "type": "string"
+          },
+          "quantity": {
+            "maximum": 500.0,
+            "minimum": 1.0,
+            "title": "Quantity",
+            "type": "integer"
+          },
+          "secondary": {
+            "maxLength": 120,
+            "title": "Secondary",
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 120,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "product_slug",
+          "quantity"
+        ],
+        "title": "CustomerItem",
+        "type": "object"
+      },
+      "CustomerLine": {
+        "additionalProperties": false,
+        "properties": {
+          "item": {
+            "$ref": "#/components/schemas/CustomerItem"
+          },
+          "personalization_snapshot": {
+            "$ref": "#/components/schemas/CustomerSnapshot"
+          }
+        },
+        "title": "CustomerLine",
+        "type": "object"
+      },
+      "CustomerOrder": {
+        "additionalProperties": false,
+        "properties": {
+          "approved_proof_version": {
+            "anyOf": [
+              {
+                "maximum": 9007199254740991.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approved Proof Version"
+          },
+          "currency": {
+            "maxLength": 3,
+            "minLength": 3,
+            "title": "Currency",
+            "type": "string"
+          },
+          "current_proof_id": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Proof Id"
+          },
+          "current_proof_version": {
+            "maximum": 9007199254740991.0,
+            "minimum": 0.0,
+            "title": "Current Proof Version",
+            "type": "integer"
+          },
+          "id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CustomerItem"
+            },
+            "maxItems": 100,
+            "title": "Items",
+            "type": "array"
+          },
+          "kind": {
+            "const": "order",
+            "title": "Kind",
+            "type": "string"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/CustomerLine"
+            },
+            "maxItems": 100,
+            "title": "Lines",
+            "type": "array"
+          },
+          "next_step": {
+            "maxLength": 3000,
+            "title": "Next Step",
+            "type": "string"
+          },
+          "payment_status": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Payment Status",
+            "type": "string"
+          },
+          "pricing_scope": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Pricing Scope",
+            "type": "string"
+          },
+          "proof_status": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Proof Status",
+            "type": "string"
+          },
+          "reservation_status": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Reservation Status",
+            "type": "string"
+          },
+          "retail_test": {
+            "title": "Retail Test",
+            "type": "boolean"
+          },
+          "shipment": {
+            "$ref": "#/components/schemas/CustomerShipment"
+          },
+          "status": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Status",
+            "type": "string"
+          },
+          "test_hold_expires_at": {
+            "maxLength": 64,
+            "title": "Test Hold Expires At",
+            "type": "string"
+          },
+          "test_mode": {
+            "title": "Test Mode",
+            "type": "boolean"
+          },
+          "test_payment_available": {
+            "title": "Test Payment Available",
+            "type": "boolean"
+          },
+          "timeline": {
+            "items": {
+              "$ref": "#/components/schemas/CustomerEvent"
+            },
+            "maxItems": 1000,
+            "title": "Timeline",
+            "type": "array"
+          },
+          "total_minor": {
+            "anyOf": [
+              {
+                "maximum": 9007199254740991.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Minor"
+          },
+          "version": {
+            "maximum": 9007199254740991.0,
+            "minimum": 1.0,
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "version",
+          "status",
+          "payment_status",
+          "proof_status",
+          "total_minor",
+          "currency"
+        ],
+        "title": "CustomerOrder",
+        "type": "object"
+      },
+      "CustomerPiece": {
+        "additionalProperties": false,
+        "properties": {
+          "piece_index": {
+            "maximum": 99.0,
+            "minimum": 0.0,
+            "title": "Piece Index",
+            "type": "integer"
+          },
+          "set_index": {
+            "maximum": 499.0,
+            "minimum": 0.0,
+            "title": "Set Index",
+            "type": "integer"
+          },
+          "text": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "set_index",
+          "piece_index",
+          "text"
+        ],
+        "title": "CustomerPiece",
+        "type": "object"
+      },
+      "CustomerShipment": {
+        "additionalProperties": false,
+        "properties": {
+          "carrier": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Carrier",
+            "type": "string"
+          },
+          "tracking": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Tracking",
+            "type": "string"
+          }
+        },
+        "required": [
+          "carrier",
+          "tracking"
+        ],
+        "title": "CustomerShipment",
+        "type": "object"
+      },
+      "CustomerSnapshot": {
+        "additionalProperties": false,
+        "properties": {
+          "line_index": {
+            "maximum": 99.0,
+            "minimum": 0.0,
+            "title": "Line Index",
+            "type": "integer"
+          },
+          "mode": {
+            "enum": [
+              "identical",
+              "per_piece"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "pieces": {
+            "items": {
+              "$ref": "#/components/schemas/CustomerPiece"
+            },
+            "maxItems": 500,
+            "minItems": 1,
+            "title": "Pieces",
+            "type": "array"
+          },
+          "pieces_per_item": {
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Pieces Per Item",
+            "type": "integer"
+          },
+          "quantity": {
+            "maximum": 500.0,
+            "minimum": 1.0,
+            "title": "Quantity",
+            "type": "integer"
+          },
+          "schema_version": {
+            "maximum": 1.0,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "schema_version",
+          "mode",
+          "line_index",
+          "quantity",
+          "pieces_per_item",
+          "pieces"
+        ],
+        "title": "CustomerSnapshot",
+        "type": "object"
+      },
       "Decision": {
         "additionalProperties": false,
         "properties": {
@@ -344,6 +713,28 @@
           "text"
         ],
         "title": "Identical",
+        "type": "object"
+      },
+      "IdenticalText": {
+        "additionalProperties": false,
+        "properties": {
+          "mode": {
+            "const": "identical",
+            "title": "Mode",
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "mode",
+          "text"
+        ],
+        "title": "IdenticalText",
         "type": "object"
       },
       "Inquiry": {
@@ -888,6 +1279,31 @@
           "text"
         ],
         "title": "Piece",
+        "type": "object"
+      },
+      "PieceText": {
+        "additionalProperties": false,
+        "properties": {
+          "mode": {
+            "const": "per_piece",
+            "title": "Mode",
+            "type": "string"
+          },
+          "pieces": {
+            "items": {
+              "$ref": "#/components/schemas/CustomerPiece"
+            },
+            "maxItems": 500,
+            "minItems": 1,
+            "title": "Pieces",
+            "type": "array"
+          }
+        },
+        "required": [
+          "mode",
+          "pieces"
+        ],
+        "title": "PieceText",
         "type": "object"
       },
       "Plan": {
@@ -4828,7 +5244,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerOrder"
+                }
               }
             },
             "description": "Successful Response"
@@ -4894,7 +5312,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerOrder"
+                }
               }
             },
             "description": "Successful Response"

@@ -212,17 +212,23 @@ async function stop(c) {
       { version: 1 },
       cart.access_token,
     );
+    const storedBefore = await request(
+      "/v1/admin/records/" + receipt.id, undefined, staff,
+    );
     const before = await request(
       "/v1/orders/" + receipt.id,
       undefined,
       receipt.access_token,
     );
     assert.ok(
-      before.lines.length === 2 &&
-        before.lines[0].stock_units === 105 &&
-        before.lines[1].stock_units === 105,
+      storedBefore.lines.length === 2 &&
+        storedBefore.lines[0].stock_units === 105 &&
+        storedBefore.lines[1].stock_units === 105,
       "Stock units remain distinct from piece count",
     );
+    assert.ok(before.lines.every(line => !Object.hasOwn(line, "stock_units") &&
+      !Object.hasOwn(line, "stock_id") && !Object.hasOwn(line, "offer_version")),
+      "Customer network response omits internal inventory fields");
     assert.ok(
       before.lines.every(
         (l) =>
@@ -404,6 +410,11 @@ async function stop(c) {
       JSON.stringify(after) === JSON.stringify(before),
       "Read-only display preserves order",
     );
+    const storedAfter = await request(
+      "/v1/admin/records/" + receipt.id, undefined, staff,
+    );
+    assert.ok(JSON.stringify(storedAfter) === JSON.stringify(storedBefore),
+      "Read-only display preserves the entire stored order");
     assert.ok(externalAttempts === 0, "No outside-origin attempts");
     outcome = {
       result: "PASS",

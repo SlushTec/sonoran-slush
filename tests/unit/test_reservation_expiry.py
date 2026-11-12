@@ -15,6 +15,7 @@ from services.commerce.app.main import app
 from services.commerce.app.workflows import database, load, save
 from test_commerce_workflows import connected, staff, auth, proof, order
 from test_retail_durability import setup, cart, purchase, simulate, release, SLUG, OTHER
+from customer_order_oracle import expected_customer
 
 START = datetime(2030, 1, 1, tzinfo=timezone.utc)
 DEADLINE = START + timedelta(minutes=1)
@@ -47,12 +48,10 @@ def cancel(c, o):
 
 
 def doc(c, o):
-    result = c.get("/v1/orders/" + o["id"], headers=auth(o))
+    # Full internal-state oracle; customer response shape is tested separately.
+    result = c.get("/v1/admin/records/" + o["id"], headers=staff())
     assert result.status_code == 200
-    document = result.json()
-    # GET adds a derived checkout capability that is not a persisted order field.
-    document.pop("test_payment_available", None)
-    return document
+    return result.json()
 
 
 def reserve(c, monkeypatch, count=1):
@@ -89,7 +88,7 @@ def test_exact_deadline_and_expiry_cancel_replays(connected, monkeypatch, clock)
     assert expired["inventory_reserved"] is False
     assert rows(o) == [("shared", 1, "released")]
     assert expire(connected, o).json() == expired
-    assert cancel(connected, o).json() == expired
+    assert cancel(connected, o).json() == expected_customer(expired)
     assert hold(connected, o).json() == expired
     with database() as db:
         assert db.execute("SELECT on_hand,version FROM retail_stock WHERE id='shared'").fetchone() == (1, 1)
@@ -242,7 +241,7 @@ def test_late_payment_enters_sticky_recovery_not_production(connected, monkeypat
     assert simulate(connected, o, outcome="failed").json()["recovery_required"] is True
     assert doc(connected, o) == recovery
     assert expire(connected, o).json() == recovery
-    assert cancel(connected, o).json() == recovery
+    assert cancel(connected, o).json() == expected_customer(recovery)
     assert release(connected, o).status_code == 409
     assert connected.post("/v1/admin/retail-test/orders/" + o["id"] + "/capacity",
                           json={"version": 1, "confirmed": True}, headers=staff()).status_code == 409

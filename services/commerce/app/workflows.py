@@ -24,6 +24,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt, field_validator, model_validator
 
 from services.commerce.app.domain.prerequisites import ProductionPrerequisites
+from services.commerce.app.customer_orders import CustomerOrder, customer_order
 
 router = APIRouter()
 ROOT = Path(__file__).resolve().parents[3]
@@ -318,7 +319,7 @@ def get_quote(record_id: str, authorization: Annotated[str | None, Header()] = N
         return private(db, record_id, authorization, {"retail", "bulk", "event", "contact"})
 
 
-@router.get("/v1/orders/{record_id}", dependencies=[Depends(enabled)], tags=["private"])
+@router.get("/v1/orders/{record_id}", response_model=CustomerOrder, dependencies=[Depends(enabled)], tags=["private"])
 def get_order(record_id: str, authorization: Annotated[str | None, Header()] = None):
     with database() as db:
         doc = private(db, record_id, authorization, {"order"})
@@ -329,7 +330,7 @@ def get_order(record_id: str, authorization: Annotated[str | None, Header()] = N
         except HTTPException:
             available = False
         doc["test_payment_available"] = available and not doc.get("retail_test", False)
-        return doc
+        return customer_order(doc, record_id)
 
 
 @router.get("/v1/proofs/{record_id}", dependencies=[Depends(enabled)], tags=["private"])
