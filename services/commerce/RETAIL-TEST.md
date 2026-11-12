@@ -361,3 +361,8 @@ targets/cost/retention remain unqualified.
 ## Customer order response projection
 
 The scoped GET/cancel-test response contract and its limits are documented in [Customer order responses](CUSTOMER-ORDER-RESPONSES.md). Staff storage and internal state remain full-fidelity; this is not API-wide redaction or production activation.
+
+
+## Fixture component availability
+
+The staff-only, read-only condition/reserved/free contract and fail-closed limits are documented in [Fixture availability](FIXTURE-AVAILABILITY.md). This partial fixture read is not real inventory, inspection, checkout or manufacturing authority.
