@@ -46,7 +46,7 @@ def admin_routes(routes, prefix=""):
 
 def test_admin_inventory_is_complete_and_reviewed():
     assert admin_routes(app.routes) == sorted(ROUTES)
-    assert len(ROUTES) == len(set(ROUTES)) == 40
+    assert len(ROUTES) == len(set(ROUTES)) == 41
 
 
 def test_inventory_sees_schema_hidden_routes_and_nested_prefixes():

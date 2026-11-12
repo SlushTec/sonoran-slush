@@ -109,6 +109,10 @@
   ],
   [
     "POST",
+    "/v1/admin/retail-test/component-ledger/lots/{lot_id}/count-preview"
+  ],
+  [
+    "POST",
     "/v1/admin/retail-test/component-ledger/lots/{lot_id}/movements"
   ],
   [

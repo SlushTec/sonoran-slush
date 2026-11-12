@@ -308,6 +308,215 @@
         "title": "ConditionUnits",
         "type": "object"
       },
+      "CountDifference": {
+        "additionalProperties": false,
+        "properties": {
+          "condition": {
+            "enum": [
+              "available",
+              "damaged",
+              "sample",
+              "in_production",
+              "completed",
+              "shipped"
+            ],
+            "title": "Condition",
+            "type": "string"
+          },
+          "location_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Location Id",
+            "type": "string"
+          },
+          "observed_units": {
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Observed Units",
+            "type": "integer"
+          },
+          "protected_reserved_units": {
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Protected Reserved Units",
+            "type": "integer"
+          },
+          "recorded_units": {
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Recorded Units",
+            "type": "integer"
+          },
+          "reservation_floor_conflict": {
+            "title": "Reservation Floor Conflict",
+            "type": "boolean"
+          },
+          "variance_units": {
+            "maximum": 1000000.0,
+            "minimum": -1000000.0,
+            "title": "Variance Units",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "location_id",
+          "condition",
+          "observed_units",
+          "recorded_units",
+          "variance_units",
+          "protected_reserved_units",
+          "reservation_floor_conflict"
+        ],
+        "title": "CountDifference",
+        "type": "object"
+      },
+      "CountObservation": {
+        "additionalProperties": false,
+        "properties": {
+          "condition": {
+            "enum": [
+              "available",
+              "damaged",
+              "sample",
+              "in_production",
+              "completed",
+              "shipped"
+            ],
+            "title": "Condition",
+            "type": "string"
+          },
+          "location_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Location Id",
+            "type": "string"
+          },
+          "observed_units": {
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Observed Units",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "location_id",
+          "condition",
+          "observed_units"
+        ],
+        "title": "CountObservation",
+        "type": "object"
+      },
+      "CountPreview": {
+        "additionalProperties": false,
+        "properties": {
+          "applied": {
+            "const": false,
+            "default": false,
+            "title": "Applied",
+            "type": "boolean"
+          },
+          "checkout_authoritative": {
+            "const": false,
+            "default": false,
+            "title": "Checkout Authoritative",
+            "type": "boolean"
+          },
+          "component_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Component Id",
+            "type": "string"
+          },
+          "correction_authorized": {
+            "const": false,
+            "default": false,
+            "title": "Correction Authorized",
+            "type": "boolean"
+          },
+          "lot_id": {
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "title": "Lot Id",
+            "type": "string"
+          },
+          "observations": {
+            "items": {
+              "$ref": "#/components/schemas/CountDifference"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Observations",
+            "type": "array"
+          },
+          "scope": {
+            "const": "explicit_buckets_only",
+            "default": "explicit_buckets_only",
+            "title": "Scope",
+            "type": "string"
+          },
+          "test_mode": {
+            "const": true,
+            "default": true,
+            "title": "Test Mode",
+            "type": "boolean"
+          },
+          "unit": {
+            "enum": [
+              "piece",
+              "millilitre",
+              "gram",
+              "millimetre"
+            ],
+            "title": "Unit",
+            "type": "string"
+          },
+          "version": {
+            "maximum": 9.223372036854776e+18,
+            "minimum": 0.0,
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "lot_id",
+          "component_id",
+          "unit",
+          "version",
+          "observations"
+        ],
+        "title": "CountPreview",
+        "type": "object"
+      },
+      "CountRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_version": {
+            "maximum": 9.223372036854776e+18,
+            "minimum": 0.0,
+            "title": "Expected Version",
+            "type": "integer"
+          },
+          "observations": {
+            "items": {
+              "$ref": "#/components/schemas/CountObservation"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Observations",
+            "type": "array"
+          }
+        },
+        "required": [
+          "expected_version",
+          "observations"
+        ],
+        "title": "CountRequest",
+        "type": "object"
+      },
       "CustomerEvent": {
         "additionalProperties": false,
         "properties": {
@@ -4657,6 +4866,77 @@
         "summary": "Lot Availability",
         "tags": [
           "synthetic component ledger"
+        ]
+      }
+    },
+    "/v1/admin/retail-test/component-ledger/lots/{lot_id}/count-preview": {
+      "post": {
+        "operationId": "count_preview_v1_admin_retail_test_component_ledger_lots__lot_id__count_preview_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lot_id",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_-]+$",
+              "title": "Lot Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CountRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountPreview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Count Preview",
+        "tags": [
+          "synthetic count preview"
         ]
       }
     },
