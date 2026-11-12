@@ -1105,6 +1105,8 @@ def drill_profile(value):
         return LedgerDrill
     if type(value) is str and value == "proof":
         return ProofDrill
+    if type(value) is str and value == "commercial":
+        return CommercialDrill
     raise UnsafeDrill("Unknown explicit synthetic profile")
 
 
@@ -1377,4 +1379,269 @@ def test_personalized_legacy_rehashed_corruption_rejected(drill, damage):
     with pytest.raises(UnsafeDrill):
         drill.restore("rejected")
     assert not (drill.root / "rejected").exists()
+    assert drill.source_bytes() == original
+
+
+# Commercial test fixtures are a separate explicit profile, not a discovered whitelist.
+COMMERCIAL = "/v1/admin/retail-test/commercial"
+COMMERCIAL_TABLES = tuple(sorted((*TABLES, "fixture_commercial_snapshots",
+    "fixture_commercial_commands", "fixture_commercial_sets",
+    "fixture_commercial_pointer", "fixture_commercial_publications")))
+COMMERCIAL_SCOPE = {"test_mode": True, "owner_approved": False, "production_approved": False}
+COMMERCIAL_DOMAINS = ["options", "tax", "machine_profiles", "owner_identity", "production"]
+COMMERCIAL_AT = (START + timedelta(seconds=10)).isoformat()
+
+
+class CommercialDrill(Drill):
+    def audit(self, action, reason):
+        return {"action": action, "reason": reason, "recorded_at": COMMERCIAL_AT,
+                "actor": "synthetic_staff",
+                "actor_scope": "shared staff test credential; not an owner or individual reviewer"}
+
+    def command(self, url, body, canonical, expected):
+        # Establish the oracle before observing the API response.
+        expected = json.loads(json.dumps(expected))
+        result = self.post(url, body, staff=True)
+        assert result == expected
+        self.commercial_commands.append((url, body, canonical, expected))
+        return expected
+
+    def references(self, revision):
+        return {kind: {"snapshot_id": "restore-" + kind, "revision": revision}
+                for kind in ("catalog", "prices", "policies")}
+
+    def seed(self):
+        from services.commerce.app import commercial_snapshots
+        super().seed()
+        self.monkeypatch.setattr(commercial_snapshots, "NOW", lambda: COMMERCIAL_AT)
+        self.commercial_commands = []
+        self.snapshots, self.manifests, self.publications = {}, {}, {}
+        self.retired = False
+        serial = 20000
+        for revision in (1, 2):
+            for kind in ("catalog", "prices", "policies"):
+                key = "restore-" + kind
+                rows = {"catalog": [{"product_slug": SLUG, "fixture_eligible": True}],
+                        "prices": [{"product_slug": SLUG, "variant_key": "fixture-standard",
+                                    "unit_price_minor": 1234 if revision == 1 else 2345, "currency": "USD"}],
+                        "policies": [{"policy_key": "fixture-policy",
+                                      "fixture_text": "Synthetic café policy " + str(revision)}]}[kind]
+                body = {"request_id": str(UUID(int=serial)), "previous_revision": revision - 1,
+                        "source_reference": "fixture-source", "kind": kind, "rows": rows}
+                serial += 1
+                doc = {"id": key, "revision": revision, "kind": kind,
+                       "source_reference": "fixture-source", "rows": rows,
+                       "audit": [self.audit("draft_created", "Explicit synthetic fixture draft")],
+                       **COMMERCIAL_SCOPE, "status": "draft", "lifecycle_version": 1}
+                url = COMMERCIAL + "/snapshots/" + key + "/versions/" + str(revision)
+                self.command(url, body, {"operation": "create_snapshot", "id": key,
+                                        "revision": revision, **body}, doc)
+                review = {"request_id": str(UUID(int=serial)), "expected_lifecycle_version": 1,
+                          "decision": "approve_test", "reason": "Synthetic approval"}
+                serial += 1
+                doc = {**doc, "audit": doc["audit"] + [self.audit("approve_test", "Synthetic approval")],
+                       "status": "approved_test", "lifecycle_version": 2}
+                self.command(url + "/review-test", review,
+                             {"operation": "review_snapshot", "id": key, "revision": revision, **review}, doc)
+                self.snapshots[(key, revision)] = doc
+            set_id = "set-a" if revision == 1 else "set-b"
+            refs = self.references(revision)
+            hashes = {kind: digest_document({k: self.snapshots[("restore-" + kind, revision)][k]
+                        for k in ("id", "revision", "kind", "source_reference", "rows")})
+                      for kind in ("catalog", "prices", "policies")}
+            manifest = {"id": set_id, "references": refs, "content_hashes": hashes,
+                        "audit": [self.audit("test_set_created", "Exact synthetic snapshot composition")],
+                        "unqualified_domains": COMMERCIAL_DOMAINS, **COMMERCIAL_SCOPE}
+            body = {"request_id": str(UUID(int=serial)), **refs}; serial += 1
+            self.command(COMMERCIAL + "/sets/" + set_id, body,
+                         {"operation": "create_set", "id": set_id, **body}, manifest)
+            self.manifests[set_id] = manifest
+        for version, set_id, action in ((1, "set-a", "publish_test"),
+                                       (2, "set-b", "publish_test"), (3, "set-a", "rollback_test")):
+            body = {"request_id": str(UUID(int=serial)), "expected_pointer_version": version - 1,
+                    "set_id": set_id, "action": action, "reason": "Synthetic selection"}
+            serial += 1
+            pointer = {"set_id": set_id, "pointer_version": version,
+                       "audit": self.audit(action, "Synthetic selection"), **COMMERCIAL_SCOPE}
+            self.command(COMMERCIAL + "/current-test", body, {"operation": "select_set", **body}, pointer)
+            self.publications[version] = pointer
+        self.tables = COMMERCIAL_TABLES
+        self.refresh_expectation()
+
+    def refresh_expectation(self):
+        with closing(read_database(self.source)) as reader:
+            saved = state(reader, self.tables)
+        self.assert_seed_contract(saved)
+        self.assert_commercial_contract(saved)
+        self.expected = saved  # Accepted only after independent exact namespace assertions.
+
+    def assert_commercial_contract(self, saved):
+        schema, rows = saved
+        assert tuple(sorted(rows)) == COMMERCIAL_TABLES
+        assert "sqlite_sequence" not in rows
+        expected_schema = {
+            "fixture_commercial_snapshots": "CREATE TABLE fixture_commercial_snapshots (id TEXT NOT NULL, revision INTEGER NOT NULL, kind TEXT NOT NULL, status TEXT NOT NULL CHECK(status IN ('draft','approved_test','retired_test')), lifecycle_version INTEGER NOT NULL, document TEXT NOT NULL, PRIMARY KEY(id,revision))",
+            "fixture_commercial_commands": "CREATE TABLE fixture_commercial_commands (request_id TEXT PRIMARY KEY, fingerprint TEXT NOT NULL, document TEXT NOT NULL)",
+            "fixture_commercial_sets": "CREATE TABLE fixture_commercial_sets (id TEXT PRIMARY KEY, document TEXT NOT NULL)",
+            "fixture_commercial_pointer": "CREATE TABLE fixture_commercial_pointer (slot TEXT PRIMARY KEY CHECK(slot='current'), version INTEGER NOT NULL, document TEXT NOT NULL)",
+            "fixture_commercial_publications": "CREATE TABLE fixture_commercial_publications (version INTEGER PRIMARY KEY, set_id TEXT NOT NULL, document TEXT NOT NULL)",
+        }
+        assert {name: sql for kind, name, table, sql in schema
+                if kind == "table" and name.startswith("fixture_commercial_")} == expected_schema
+        expected_indexes = {
+            ("index", "sqlite_autoindex_fixture_commercial_snapshots_1", "fixture_commercial_snapshots", None),
+            ("index", "sqlite_autoindex_fixture_commercial_commands_1", "fixture_commercial_commands", None),
+            ("index", "sqlite_autoindex_fixture_commercial_sets_1", "fixture_commercial_sets", None),
+            ("index", "sqlite_autoindex_fixture_commercial_pointer_1", "fixture_commercial_pointer", None),
+            ("index", "fixture_commercial_publication_sets", "fixture_commercial_publications",
+             "CREATE INDEX fixture_commercial_publication_sets ON fixture_commercial_publications(set_id)"),
+        }
+        assert {entry for entry in schema if entry[0] == "index" and entry[2] in expected_schema} == expected_indexes
+        assert ("index", "fixture_commercial_publication_sets", "fixture_commercial_publications",
+                "CREATE INDEX fixture_commercial_publication_sets ON fixture_commercial_publications(set_id)") in schema
+        expected_snapshots = tuple(sorted((key, rev, doc["kind"], doc["status"],
+            doc["lifecycle_version"], json.dumps(doc)) for (key, rev), doc in self.snapshots.items()))
+        assert rows["fixture_commercial_snapshots"] == expected_snapshots
+        assert rows["fixture_commercial_sets"] == tuple(sorted(
+            (key, json.dumps(doc)) for key, doc in self.manifests.items()))
+        assert rows["fixture_commercial_publications"] == tuple(
+            (v, doc["set_id"], json.dumps(doc)) for v, doc in sorted(self.publications.items()))
+        assert rows["fixture_commercial_pointer"] == (("current", 3, json.dumps(self.publications[3])),)
+        assert rows["fixture_commercial_commands"] == tuple(sorted(
+            (body["request_id"], digest_document(canonical), json.dumps(receipt))
+            for _, body, canonical, receipt in self.commercial_commands))
+        # No relationship is inferred from runtime-returned data.
+        for manifest in self.manifests.values():
+            for kind, ref in manifest["references"].items():
+                doc = self.snapshots[(ref["snapshot_id"], ref["revision"])]
+                assert doc["kind"] == kind
+                assert manifest["content_hashes"][kind] == digest_document(
+                    {k: doc[k] for k in ("id", "revision", "kind", "source_reference", "rows")})
+        for doc in (*self.snapshots.values(), *self.manifests.values(), *self.publications.values()):
+            assert doc["test_mode"] is True
+            assert doc["owner_approved"] is False and doc["production_approved"] is False
+
+    def retire_current(self):
+        key, revision = "restore-prices", 1
+        body = {"request_id": str(UUID(int=29990)), "expected_lifecycle_version": 2,
+                "decision": "retire_test", "reason": "Synthetic retirement"}
+        old = self.snapshots[(key, revision)]
+        doc = {**old, "status": "retired_test", "lifecycle_version": 3,
+               "audit": old["audit"] + [self.audit("retire_test", "Synthetic retirement")]}
+        self.command(COMMERCIAL + "/snapshots/" + key + "/versions/1/review-test", body,
+                     {"operation": "review_snapshot", "id": key, "revision": 1, **body}, doc)
+        self.snapshots[(key, revision)] = doc
+        self.retired = True
+        self.refresh_expectation()
+
+    def verify_commercial_replay(self, target):
+        super().verify_replay(target)
+        for url, body, _, expected in self.commercial_commands:
+            assert self.post(url, body, staff=True) == expected
+            altered = json.loads(json.dumps(body))
+            if "reason" in altered:
+                altered["reason"] = "Conflicting synthetic reason"
+            elif "source_reference" in altered:
+                altered["source_reference"] = "conflicting-source"
+            else:
+                altered["catalog"]["revision"] = 2 if altered["catalog"]["revision"] == 1 else 1
+            self.post(url, altered, staff=True, status=409)
+        current = self.client.get(COMMERCIAL + "/current-test",
+                                  headers={"Authorization": "Bearer " + STAFF})
+        assert current.status_code == (409 if self.retired else 200)
+        if not self.retired:
+            expected = {**self.publications[3], "manifest": self.manifests["set-a"],
+                        "snapshots": {k: self.snapshots[("restore-" + k, 1)]
+                                      for k in ("catalog", "prices", "policies")}}
+            assert current.json() == expected
+        self.post(COMMERCIAL + "/current-test",
+            {"request_id": str(UUID(int=29991)), "expected_pointer_version": 2,
+             "set_id": "set-b", "action": "publish_test", "reason": "Stale synthetic pointer"},
+            staff=True, status=409)
+        comparison = self.post(COMMERCIAL + "/compare/snapshots",
+            {"before": {"snapshot_id": "restore-prices", "revision": 2},
+             "after": {"snapshot_id": "restore-prices", "revision": 2}}, staff=True)
+        assert comparison["changes"] == []
+        assert comparison["owner_approved"] is False and comparison["production_approved"] is False
+        with closing(read_database(target / "state.db")) as reader:
+            saved = state(reader, self.tables)
+        assert saved == self.expected
+        self.assert_commercial_contract(saved)
+
+
+@pytest.mark.parametrize("drill", ["commercial"], indirect=True)
+@pytest.mark.parametrize("retired", [False, True])
+def test_commercial_restore_exact_replay_retirement_and_continuation(drill, retired):
+    if retired:
+        drill.retire_current()
+    original = drill.source_bytes()
+    drill.make_snapshot()
+    target = drill.restore()
+    drill.verify_commercial_replay(target)
+    # The next valid publication advances the restored version, without reusing history.
+    result = drill.post(COMMERCIAL + "/current-test",
+        {"request_id": str(UUID(int=29992)), "expected_pointer_version": 3,
+         "set_id": "set-b", "action": "publish_test", "reason": "Restored synthetic publication"}, staff=True)
+    expected = {"set_id": "set-b", "pointer_version": 4,
+        "audit": drill.audit("publish_test", "Restored synthetic publication"), **COMMERCIAL_SCOPE}
+    assert result == expected
+    with closing(read_database(target / "state.db")) as reader:
+        rows = state(reader, drill.tables)[1]
+    assert rows["fixture_commercial_publications"][:3] == drill.expected[1]["fixture_commercial_publications"]
+    assert rows["fixture_commercial_publications"][3] == (4, "set-b", json.dumps(expected))
+    assert rows["fixture_commercial_pointer"] == (("current", 4, json.dumps(expected)),)
+    assert drill.source_bytes() == original
+
+
+COMMERCIAL_DAMAGE = {
+    "missing-snapshot": "DELETE FROM fixture_commercial_snapshots WHERE id='restore-prices' AND revision=1",
+    "orphan-reference": "UPDATE fixture_commercial_sets SET document=json_set(document,'$.references.prices.snapshot_id','orphan') WHERE id='set-a'",
+    "lifecycle": "UPDATE fixture_commercial_snapshots SET lifecycle_version=9 WHERE id='restore-prices' AND revision=1",
+    "audit": "UPDATE fixture_commercial_snapshots SET document=json_set(document,'$.audit[0].actor','invented-owner') WHERE id='restore-prices' AND revision=1",
+    "pointer": "UPDATE fixture_commercial_pointer SET version=2",
+    "publication": "DELETE FROM fixture_commercial_publications WHERE version=2",
+    "receipt": "UPDATE fixture_commercial_commands SET document=json_set(document,'$.owner_approved',json('true'))",
+    "fingerprint": "UPDATE fixture_commercial_commands SET fingerprint='changed'",
+    "unknown-table": "CREATE TABLE unauthorized_fixture(value TEXT)",
+    "index": "DROP INDEX fixture_commercial_publication_sets",
+}
+
+
+@pytest.mark.parametrize("drill", ["commercial"], indirect=True)
+@pytest.mark.parametrize("damage", list(COMMERCIAL_DAMAGE) + ["recomputed-content"])
+def test_commercial_resealed_corruption_rejected_before_target(drill, damage):
+    original = drill.source_bytes()
+    bundle = drill.make_snapshot()
+    with sqlite3.connect(bundle / "state.db") as db:
+        if damage != "recomputed-content":
+            db.execute(COMMERCIAL_DAMAGE[damage])
+        else:
+            raw = db.execute("SELECT document FROM fixture_commercial_snapshots WHERE id='restore-prices' AND revision=1").fetchone()[0]
+            doc = json.loads(raw)
+            doc["rows"][0]["unit_price_minor"] = 9999
+            db.execute("UPDATE fixture_commercial_snapshots SET document=? WHERE id='restore-prices' AND revision=1", (json.dumps(doc),))
+            manifest = json.loads(db.execute("SELECT document FROM fixture_commercial_sets WHERE id='set-a'").fetchone()[0])
+            manifest["content_hashes"]["prices"] = digest_document({k: doc[k] for k in ("id","revision","kind","source_reference","rows")})
+            db.execute("UPDATE fixture_commercial_sets SET document=? WHERE id='set-a'", (json.dumps(manifest),))
+    reseal_digest(bundle)
+    with pytest.raises(UnsafeDrill):
+        drill.restore("rejected")
+    assert not (drill.root / "rejected").exists()
+    assert drill.source_bytes() == original
+
+
+@pytest.mark.parametrize("drill", ["commercial"], indirect=True)
+def test_commercial_wal_snapshot_excludes_uncommitted_pointer_change(drill):
+    original = drill.source_bytes()
+    writer = sqlite3.connect(drill.source, isolation_level=None)
+    writer.execute("BEGIN IMMEDIATE")
+    writer.execute("UPDATE fixture_commercial_pointer SET version=999")
+    try:
+        drill.make_snapshot()
+        target = drill.restore()
+        drill.verify_commercial_replay(target)
+        assert drill.source_bytes() == original
+    finally:
+        writer.rollback()
+        writer.close()
     assert drill.source_bytes() == original
