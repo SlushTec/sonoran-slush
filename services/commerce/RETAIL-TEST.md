@@ -366,3 +366,9 @@ The scoped GET/cancel-test response contract and its limits are documented in [C
 ## Fixture component availability
 
 The staff-only, read-only condition/reserved/free contract and fail-closed limits are documented in [Fixture availability](FIXTURE-AVAILABILITY.md). This partial fixture read is not real inventory, inspection, checkout or manufacturing authority.
+
+### Incoming-inspection restore drill (partial SS-070)
+
+The existing owned SQLite drill has an explicit `inspection` profile. It seeds its own pending quarantine, mixed accepted/rejected intake and all-rejected intake alongside earlier ledger/BOM/retail fixtures. Four accepted units alone appear as free stock; five pending and five rejected units remain excluded. The isolated restore replays immutable receipt/inspection commands, rejects conflicting/global command identities, verifies exact persisted rows and permits a new eligible inspection without repeating accepted stock. A committed WAL snapshot excludes an uncommitted acceptance change. Recomputed snapshot hashes do not authorize malformed rows: exact fixture lineage is still required before any destination is created. Sidecars, existing destinations and interrupted verification remain fail-closed.
+
+Run `python -m pytest tests/unit/test_sqlite_restore_drill.py -k inspection` with `PYTHONUTF8=1` on Windows. All sources, snapshots and restored targets are pytest-owned synthetic paths; no supplied database or customer file is accepted. This qualifies only these recorded synthetic contracts. Actual private assets, production schema/migration compatibility, outbox jobs, provider reconciliation, production recovery targets and machine eligibility remain unassessed. No deployment, inventory activation or external reconnection follows a passing drill.
