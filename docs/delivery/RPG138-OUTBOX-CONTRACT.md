@@ -1,4 +1,4 @@
-﻿# RPG-138 / SS-069: durable job intent and recovery contract
+# RPG-138 / SS-069: durable job intent and recovery contract
 
 Status: proposed design and acceptance map, not implemented or activated.
 Source reviewed: main `0aae8d3ef6ae33548c90d83d63b00a62fc6a418d`.
@@ -17,8 +17,8 @@ Scope: future synthetic-only local qualification before any production queue or 
 1. Intent is inserted in the SAME database transaction as its authoritative source transition. An intent failure rolls back the transition; a transition rollback leaves no intent. A side transaction or best-effort post-commit enqueue is insufficient.
 2. Stable intent identity covers job kind, exact source record/version and destination scope. Same identity plus same canonical fingerprint replays; changed content conflicts. The worker never invents a fresh identity after a timeout.
 3. Stored payload is a bounded allowlisted reference envelope, not arbitrary model text, raw artwork, credentials, payment details, supplier cost or an executable URL/command. Any later private lookup requires ownership and data-sharing authorization.
-4. Claiming work uses atomic compare-and-swap with a monotonically increasing fencing token. Exactly one current lease may record a result. Clock values are server controlled and read inside the claim transaction.
-5. Before an external attempt, revalidate consent, recipient/destination, current proof/version, payment, stock, spend and production gates applicable to that job. Cancellation or changed approval blocks stale queued work.
+4. Claiming work uses atomic compare-and-swap with a monotonically increasing fencing token. Exactly one current lease may record a result. Fencing prevents stale database result writes; it cannot undo or prevent an already-issued external effect. Clock values are server controlled and read inside the claim transaction.
+5. Before an external attempt, revalidate consent, recipient/destination, current proof/version, payment, stock, spend and production gates applicable to that job. Recheck immediately before dispatch. Cancellation or changed approval blocks work that is still known not to have been sent; this cannot promise atomic cancellation across a provider boundary.
 6. Persist an attempt identity BEFORE possible external dispatch. Never hold the SQLite write transaction across network calls. Recording success requires matching intent, attempt and current fencing token.
 7. A timeout, crash after dispatch, or lost receipt means UNKNOWN outcome, not failed. Lease expiry does not itself make an unknown external action safe to repeat.
 8. Automatic retries apply only to established non-delivery/transient failures or a provider operation whose idempotency contract and lifetime were independently qualified. Unknown outcomes require reconciliation with that exact provider identity; if unavailable, hold for operator review.
@@ -37,10 +37,10 @@ Scope: future synthetic-only local qualification before any production queue or 
 | retry_wait | Confirmed eligible retry, bounded schedule | Claim with new fencing token and same intent identity |
 | unknown | Delivery/outcome cannot be established | Read-only reconciliation or explicit eligible operator decision |
 | succeeded | Verified provider receipt or qualified synthetic effect | No further dispatch |
-| cancelled | Intent invalidated before safe delivery | No dispatch; preserve history |
+| cancelled | Intent invalidated while known not to have been dispatched | No dispatch; preserve history |
 | dead_letter | Retry/age bound or permanent failure reached | Authorized inspect/replay only after cause corrected |
 
-The states are a design vocabulary, not a database migration or API contract. In particular, stale leased work with a persisted attempt must not be treated like never-sent pending work.
+The states are a design vocabulary, not a database migration or API contract. In particular, stale leased work with a persisted attempt must not be treated like never-sent pending work. A cancellation after an attempt is persisted stays unknown/reconciliation until non-delivery is proven; do not mark it cancelled or redispatch merely because the owner requested cancellation.
 
 ## First implementation slice admission
 
