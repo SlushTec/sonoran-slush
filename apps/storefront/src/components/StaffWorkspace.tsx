@@ -6,6 +6,7 @@ import RecordedPersonalization from "./RecordedPersonalization";
 import RecordedHistory from "./RecordedHistory";
 import FixtureAvailability from "./FixtureAvailability";
 import FixtureInspection from "./FixtureInspection";
+import FixtureCount from "./FixtureCount";
 type Doc = {
   id: string;
   kind: string;
@@ -387,6 +388,12 @@ export default function StaffWorkspace() {
           </article>
         ))}
       </div>
+      {session.current && (
+        <FixtureCount
+          key={"count-" + session.current.generation}
+          token={session.current.token}
+        />
+      )}
       {session.current && (
         <FixtureInspection
           key={"inspection-" + session.current.generation}
