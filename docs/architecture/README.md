@@ -14,7 +14,7 @@ Owner's target is a full polished production service, not a class demo or a crys
 | Records | DynamoDB planned | Access patterns, transactions, stock reservations and webhook idempotency require design/tests |
 | Files | Separate public product assets and private S3 uploads/proofs | Authorization before short-lived links; validation/quarantine/retention work pending |
 | Notifications | SES + durable outbox/queue | Receipts, proof requests, event/bulk status; production sending approval pending |
-| Payments | Hosted processor checkout, Stripe adapter proposed | Card details never traverse our app; no SDK/live keys in this foundation |
+| Payments | Square hosted checkout using Brian's existing account direction; PayPal excluded | Card details never traverse our app; synthetic adapter work does not qualify actual Square checkout or wallet availability |
 | Operations | CloudWatch, Secrets Manager, scoped IAM, Terraform | Metrics/alerts/restore/budget work not yet implemented |
 | Development | Four lanes, branch/PR review, automated verification | No agents activated by this reset |
 
@@ -42,7 +42,13 @@ Do not jump major versions without verifying the host, dependencies and security
 4. Add helpful AI and operational safeguards without making commerce depend on inference.
 5. Pass all production gates, then request live deployment/cutover approval.
 
-## Primary technical references checked 2026-10-14
+## Payment direction reconciliation (November 13, 2026)
+
+Brian selected his existing Square account and excluded PayPal on November 6. RPG-125 / SS-021 through SS-030 remain the canonical payment acceptance gates. Verify actual account, online versus market wallet support, signed events and reconciliation before activation; do not promise Samsung Wallet or any other wallet from scaffold support. No live payment, provider setup, cloud changes or deployment is authorized by this correction.
+
+## Historical technical references checked 2026-10-14
+
+The Stripe reference below is retained as historical research, not the selected processor or current implementation direction.
 
 - Amplify Next.js support: https://docs.aws.amazon.com/amplify/latest/userguide/ssr-amplify-support.html
 - ECS/Fargate responsibilities: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html
