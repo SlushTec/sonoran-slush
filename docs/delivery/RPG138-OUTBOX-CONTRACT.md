@@ -65,3 +65,23 @@ Admission prerequisites: independently reviewed envelope/state schema; exact sou
 ## Explicit non-goals and remaining decisions
 
 This document does not satisfy full SS-069 or SS-070. Production storage/migration, private assets, retention/RPO/RTO, monitoring ownership, retry budgets, supplier/payment reconciliation semantics and authorized deployment remain open. Do not auto-close RPG-138. No worker is running, no real message is sent, and no live configuration is changed by this proposal.
+
+## Disconnected lifecycle vocabulary slice
+
+The pure helper in services/commerce/outbox_lifecycle.py and its synthetic unit
+tests enumerate permitted state/event edges. This is not imported by runtime
+routes or workers and performs no persistence or external effects. Strict enum
+events are assertions supplied by a future trusted caller, NOT evidence or
+authorization. No dispatch is permitted by invoking this helper.
+
+In particular, VERIFIED_RETRYABLE_NONDELIVERY requires a future caller to prove
+non-delivery, remaining retry/age budget, current consent and business gates.
+A cancel request while attempting becomes unknown, not cancelled; a future
+journal must independently retain the cancellation request and prohibit retry
+unless cancellation is rescinded through the authorized workflow. The lifecycle
+state alone does not contain that intent. Fencing tokens, persisted attempts,
+operator roles, cancellation history and receipt validation are deliberately not
+represented here and remain admission blockers for a durable implementation.
+
+These tests prove only the local edge table and static errors. They do not close
+any full SS-069 acceptance row above or qualify production recovery.
