@@ -1059,7 +1059,7 @@ test("count malformed response clears previous result",async()=>{
  assert.ok(screen.queryByLabelText("Verified test count comparison")===null);
 });
 
-for(const unit of ["piece","pair","set","meter","gram"])test("count projection unit and positive variance "+unit,()=>{
+for(const unit of ["piece","millilitre","gram","millimetre"])test("count projection unit and positive variance "+unit,()=>{
  const s=countSource();s.unit=unit;const o={...countObserved(),condition:"damaged",observed_units:4};
  const r={...countResult(),unit,observations:[{...o,recorded_units:1,variance_units:3,protected_reserved_units:0,reservation_floor_conflict:false}]};
  const v=CountModule.fixtureCount(r,s,o);assert.equal(v.variance_units,3);assert.equal(v.protected_reserved_units,0);assert.equal(v.unit,unit);
