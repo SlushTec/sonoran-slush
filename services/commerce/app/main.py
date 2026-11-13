@@ -53,3 +53,6 @@ app.include_router(proof_evidence_router)
 
 from services.commerce.app.incoming_inspection import router as incoming_inspection_router
 app.include_router(incoming_inspection_router)
+
+from services.commerce.app.count_preview import router as count_preview_router
+app.include_router(count_preview_router)
