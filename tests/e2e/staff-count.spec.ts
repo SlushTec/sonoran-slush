@@ -174,7 +174,7 @@ test("count stale version is manual retry with no automatic correction", async (
   await page
     .getByRole("button", { name: "Compare test count", exact: true })
     .click();
-  await expect(page.getByRole("alert")).toContainText(
+  await expect(page.locator('section[aria-labelledby="fixture-count-title"]').getByRole("alert")).toContainText(
     "Compare again after reviewing",
   );
   await expect(page.getByLabel("Verified test count comparison")).toHaveCount(
