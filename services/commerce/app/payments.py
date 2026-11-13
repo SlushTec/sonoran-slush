@@ -101,7 +101,7 @@ def verify_signature(raw: bytes, signature: str, secret: str, notification_url: 
         if not isinstance(payload, dict) or not isinstance(payload.get("event_id"), str) or not payload["event_id"]:
             raise ValueError("Missing event identity")
         return payload
-    except (ValueError, TypeError):
+    except (ValueError, TypeError, RecursionError):
         raise HTTPException(400, "The payment event could not be verified.")
 
 
