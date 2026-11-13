@@ -950,3 +950,130 @@ test("inspection newer result wins over older failure",async()=>{
  await screen.findByLabelText("Verified test intake readout");await act(async()=>old(reply({detail:"PRIVATE"},409)));
  assert.match(document.body.textContent,/Test intake other/);assert.ok(screen.queryByRole("alert")===null);
 });
+
+
+const CountModule=require("../../apps/storefront/src/components/FixtureCount.tsx");
+const countSource=()=>({lot_id:"count_lot",component_id:"blank",unit:"piece",version:2,
+ test_mode:true,checkout_authoritative:false,locations:[{location_id:"shop",
+ condition_units:{available:10,damaged:1,sample:0,in_production:0,completed:0,shipped:0},
+ reserved_units:2,free_units:8}]});
+const countObserved=()=>({location_id:"shop",condition:"available",observed_units:1});
+const countResult=()=>({lot_id:"count_lot",component_id:"blank",unit:"piece",version:2,
+ observations:[{...countObserved(),recorded_units:10,variance_units:-9,protected_reserved_units:2,reservation_floor_conflict:true}],
+ scope:"explicit_buckets_only",applied:false,correction_authorized:false,test_mode:true,checkout_authoritative:false});
+function countHandler(url){return url.endsWith("/availability")?reply(countSource()):url.endsWith("/count-preview")?reply(countResult()):null;}
+async function countWorkspace(){await workspace();await act(async()=>{});}
+function fillCount(lot="count_lot",amount="1"){
+ fireEvent.change(screen.getByLabelText("Count lot reference"),{target:{value:lot}});
+ fireEvent.change(screen.getByLabelText("Count location reference"),{target:{value:"shop"}});
+ fireEvent.change(screen.getByLabelText("Observed test units"),{target:{value:amount}});
+}
+function compareCount(){fireEvent.click(screen.getByRole("button",{name:"Compare test count"}));}
+test("count projection exact allowlist and does not retain metadata",()=>{
+ const raw={...countResult(),private:"PRIVATE"};raw.observations[0].private="PRIVATE";
+ const value=CountModule.fixtureCount(raw,countSource(),countObserved());
+ assert.equal(value.variance_units,-9);assert.equal(value.reservation_floor_conflict,true);
+ assert.equal(JSON.stringify(value).includes("PRIVATE"),false);
+});
+for(const [name,damage] of [
+ ["lot",v=>v.lot_id="other"],["component",v=>v.component_id="other"],["unit",v=>v.unit="gram"],
+ ["version",v=>v.version=3],["version bool",v=>v.version=true],["scope",v=>v.scope="all"],
+ ["test flag",v=>v.test_mode=false],["authority",v=>v.checkout_authoritative=true],
+ ["applied",v=>v.applied=true],["correction",v=>v.correction_authorized=true],
+ ["empty",v=>v.observations=[]],["duplicate",v=>v.observations.push(v.observations[0])],
+ ["null item",v=>v.observations=[null]],["location",v=>v.observations[0].location_id="other"],
+ ["condition",v=>v.observations[0].condition="damaged"],["observed",v=>v.observations[0].observed_units=0],
+ ["recorded",v=>v.observations[0].recorded_units=9],["variance",v=>v.observations[0].variance_units=9],
+ ["reserved",v=>v.observations[0].protected_reserved_units=0],["conflict",v=>v.observations[0].reservation_floor_conflict=false],
+ ["boolean quantity",v=>v.observations[0].observed_units=true],
+]){
+ test("count projection rejects "+name,()=>{const raw=countResult();damage(raw);assert.ok(CountModule.fixtureCount(raw,countSource(),countObserved())===null);});
+}
+test("count projection accepts explicit zero and empty known location with response validation",()=>{
+ const observed={location_id:"empty",condition:"damaged",observed_units:0};
+ const raw={...countResult(),observations:[{...observed,recorded_units:0,variance_units:0,protected_reserved_units:0,reservation_floor_conflict:false}]};
+ assert.notEqual(CountModule.fixtureCount(raw,countSource(),observed),null);
+});
+test("count UI performs only availability GET and bound read-only preview POST",async()=>{
+ handler=countHandler;await countWorkspace();const storage={...localStorage};
+ fillCount();compareCount();await screen.findByLabelText("Verified test count comparison");
+ assert.match(document.body.textContent,/Recorded units10/);assert.match(document.body.textContent,/Observed units1/);
+ assert.match(document.body.textContent,/below protected reservations/);assert.match(document.body.textContent,/No stock was changed/);
+ const steps=calls.filter(c=>!c.url.endsWith("/summary"));assert.equal(steps.length,2);
+ assert.equal(steps[0].opts.method,"GET");assert.equal(steps[1].opts.method,"POST");
+ assert.equal(steps[1].url,"https://commerce.qa.invalid/v1/admin/retail-test/component-ledger/lots/count_lot/count-preview");
+ assert.deepEqual(JSON.parse(steps[1].opts.body),{expected_version:2,observations:[countObserved()]});
+ for(const c of steps){assert.equal(c.opts.headers.Authorization,"Bearer synthetic-staff");assert.equal(c.url.includes("synthetic-staff"),false);assert.equal(c.opts.cache,"no-store");}
+ assert.deepEqual({...localStorage},storage);
+});
+for(const amount of ["","-1","1.5","1e2","1000001","true"])
+ test("count UI rejects invalid amount "+JSON.stringify(amount),async()=>{
+ await countWorkspace();fillCount("count_lot",amount);compareCount();await screen.findByRole("alert");assert.equal(calls.length,1);
+ });
+test("count invalid availability prevents preview request",async()=>{
+ handler=url=>url.endsWith("/availability")?reply({...countSource(),version:9007199254740992}):null;
+ await countWorkspace();fillCount();compareCount();await screen.findByText("The test availability response could not be verified. No comparison was requested.");
+ assert.equal(calls.some(c=>c.url.endsWith("/count-preview")),false);
+});
+for(const status of [401,403,404,409,503,500])
+ for(const phase of ["availability","count-preview"])
+ test("count safe error "+phase+" "+status,async()=>{
+ handler=url=>url.endsWith("/"+phase)?reply({detail:"PRIVATE"},status):countHandler(url);
+ await countWorkspace();fillCount();compareCount();await screen.findByRole("alert");
+ assert.equal(document.body.textContent.includes("PRIVATE"),false);assert.ok(screen.queryByLabelText("Verified test count comparison")===null);
+ });
+for(const phase of ["availability","count-preview"])
+ for(const action of ["clear","edit","lock","unmount","back","pagehide","restore"])
+ for(const outcome of ["success","failure"])
+ test("count "+phase+" late "+outcome+" ignored after "+action,async()=>{
+ let release;handler=url=>url.endsWith("/"+phase)?new Promise(r=>release=r):countHandler(url);
+ await countWorkspace();fillCount();compareCount();await waitFor(()=>assert.equal(typeof release,"function"));
+ fireEvent.submit(screen.getByLabelText("Count lot reference").closest("form"));
+ assert.equal(calls.filter(c=>c.url.endsWith("/"+phase)).length,1);
+ if(action==="clear")fireEvent.click(screen.getByRole("button",{name:"Clear count comparison"}));
+ else if(action==="edit")fireEvent.change(screen.getByLabelText("Observed test units"),{target:{value:"3"}});
+ else if(action==="lock")fireEvent.click(screen.getByRole("button",{name:"Lock workspace"}));
+ else if(action==="unmount")cleanup();
+ else if(action==="back")act(()=>window.dispatchEvent(new window.PopStateEvent("popstate")));
+ else if(action==="pagehide")act(()=>window.dispatchEvent(new window.Event("pagehide")));
+ else act(()=>window.dispatchEvent(new window.PageTransitionEvent("pageshow",{persisted:true})));
+ await act(async()=>release(outcome==="failure"?reply({detail:"PRIVATE"},409):reply(phase==="availability"?countSource():countResult())));
+ assert.ok(screen.queryByLabelText("Verified test count comparison")===null);assert.ok(screen.queryByRole("alert")===null);
+ if(phase==="availability")assert.equal(calls.some(c=>c.url.endsWith("/count-preview")),false);
+ });
+test("count token replacement rejects both-stage stale work",async()=>{
+ for(const phase of ["availability","count-preview"]){
+ let release;handler=url=>url.endsWith("/"+phase)?new Promise(r=>release=r):countHandler(url);
+ const rendered=render(React.createElement(CountModule.default,{token:"old"}));await act(async()=>{});fillCount();compareCount();
+ await waitFor(()=>assert.equal(typeof release,"function"));
+ rendered.rerender(React.createElement(CountModule.default,{token:"new"}));await act(async()=>{});
+ await act(async()=>release(reply(phase==="availability"?countSource():countResult())));
+ assert.ok(screen.queryByLabelText("Verified test count comparison")===null);
+ assert.equal(screen.getByLabelText("Count lot reference").value,"");cleanup();calls=[];
+ }
+});
+test("count malformed response clears previous result",async()=>{
+ handler=countHandler;await countWorkspace();fillCount();compareCount();await screen.findByLabelText("Verified test count comparison");
+ handler=url=>url.endsWith("/count-preview")?reply({...countResult(),applied:true}):countHandler(url);
+ compareCount();await screen.findByText("The test count response could not be verified. No quantities are shown.");
+ assert.ok(screen.queryByLabelText("Verified test count comparison")===null);
+});
+
+for(const unit of ["piece","pair","set","meter","gram"])test("count projection unit and positive variance "+unit,()=>{
+ const s=countSource();s.unit=unit;const o={...countObserved(),condition:"damaged",observed_units:4};
+ const r={...countResult(),unit,observations:[{...o,recorded_units:1,variance_units:3,protected_reserved_units:0,reservation_floor_conflict:false}]};
+ const v=CountModule.fixtureCount(r,s,o);assert.equal(v.variance_units,3);assert.equal(v.protected_reserved_units,0);assert.equal(v.unit,unit);
+});
+for(const amount of ["0","1000000"])test("count UI accepts boundary "+amount,async()=>{
+ handler=url=>{
+ if(url.endsWith("/availability"))return reply(countSource());
+ if(url.endsWith("/count-preview")){const r=countResult();r.observations[0]={...r.observations[0],observed_units:Number(amount),variance_units:Number(amount)-10,reservation_floor_conflict:Number(amount)<2};return reply(r);}
+ return null;};
+ await countWorkspace();fillCount("count_lot",amount);compareCount();await screen.findByLabelText("Verified test count comparison");
+ const post=calls.find(c=>c.url.endsWith("/count-preview"));assert.equal(JSON.parse(post.opts.body).observations[0].observed_units,Number(amount));
+});
+test("count stale version never retries or writes automatically",async()=>{
+ handler=url=>url.endsWith("/count-preview")?reply({detail:"PRIVATE"},409):countHandler(url);
+ await countWorkspace();fillCount();compareCount();await screen.findByText("Test stock changed or needs reconciliation. Compare again after reviewing the fixture.");
+ assert.equal(calls.filter(c=>c.url.endsWith("/count-preview")).length,1);assert.equal(calls.filter(c=>!c.url.endsWith("/summary")).length,2);
+});
