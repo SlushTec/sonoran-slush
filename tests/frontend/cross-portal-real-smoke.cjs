@@ -8,7 +8,7 @@ const fs = require("node:fs"),
   os = require("node:os"),
   net = require("node:net"),
   assert = require("node:assert/strict");
-const { chromium } = require("@playwright/test");
+const { chromium, expect } = require("@playwright/test");
 const root = path.resolve(__dirname, "../.."),
   python = process.env.CROSS_SMOKE_PYTHON;
 if (!python)
@@ -91,6 +91,7 @@ async function stop(c) {
   const env = {
     ...process.env,
     PYTHONUTF8: "1",
+    PYTHONPATH: root,
     SONORAN_STAGE: "scaffold",
     SONORAN_REQUESTS_ENABLED: "true",
     SONORAN_RETAIL_TEST_ENABLED: "true",
@@ -110,6 +111,7 @@ async function stop(c) {
   const backendLogs = start(
     python,
     [
+      "-B",
       "-m",
       "uvicorn",
       "services.commerce.app.main:app",
@@ -168,21 +170,7 @@ async function stop(c) {
       "Owned backend still alive",
     );
     stage = "synthetic API seed";
-    const quote = await request("/v1/quotes", {
-      request_id: randomUUID(),
-      kind: "retail",
-      name: "Synthetic Customer",
-      email: "synthetic@example.test",
-      consent: true,
-      items: [
-        {
-          product_slug: "makertwist-40oz-tumbler",
-          quantity: 1,
-          text: "Synthetic José 🌵",
-          font: "Classic serif",
-        },
-      ],
-    });
+    let quote;
     // Separate supported-API fixture for cross-order denial, not another customer.
     const otherQuote = await request("/v1/quotes", {
       request_id: randomUUID(),
@@ -214,11 +202,14 @@ async function stop(c) {
       staff,
     );
 
-    browser = await chromium.launch({ headless: true });
+    browser = await chromium.launch({ headless: true,
+      ...(process.env.CROSS_SMOKE_BROWSER ? { executablePath: process.env.CROSS_SMOKE_BROWSER } : {}),
+    });
     const context = await browser.newContext({
       serviceWorkers: "block",
       viewport: { width: 1280, height: 900 },
     });
+    const quoteBodies = [], quoteReceipts = [];
     let relayed = 0,
       externalAttempts = 0;
     await context.route("**/*", async (route) => {
@@ -242,9 +233,16 @@ async function stop(c) {
         body: req.postData() || undefined,
       });
       relayed++;
+      const responseBody = await response.text();
+      if (u.pathname === "/v1/quotes" && req.method() === "POST") {
+        assert.equal(response.status, 200, "Actual quote commit succeeds before simulated response loss");
+        quoteBodies.push(JSON.parse(req.postData()));
+        quoteReceipts.push(JSON.parse(responseBody));
+        if (quoteBodies.length === 1) return route.abort("failed");
+      }
       await route.fulfill({
         status: response.status,
-        body: await response.text(),
+        body: responseBody,
         contentType: "application/json",
       });
     });
@@ -339,6 +337,46 @@ async function stop(c) {
       return result.stdout;
     }
     const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+    // Exercise the actual customer UI before continuing the existing real-ledger
+    // staff/quote/proof/order flow. Only the first response is lost, after commit.
+    stage = "customer design and bag";
+    const customerPage = await context.newPage();
+    await customerPage.goto(ui + "/products/makertwist-40oz-tumbler");
+    await button(customerPage, "Add your personal touch").click();
+    await customerPage.getByLabel("Name, initials, or message", {exact:false}).fill("Synthetic connected gift");
+    await customerPage.getByRole("button", {name:"Finishing touches", exact:false}).click();
+    await button(customerPage, "Add design to bag").click();
+    await customerPage.goto(ui + "/cart");
+    await customerPage.reload();
+    const savedBag = await customerPage.evaluate(() => JSON.parse(localStorage.getItem("sonoran:cart")).value);
+    assert.equal(savedBag.length, 1);
+    assert.equal(savedBag[0].text, "Synthetic connected gift");
+    await customerPage.getByRole("link", {name:"Review your request"}).click();
+    await customerPage.getByLabel("Full name").fill("Synthetic Customer");
+    await customerPage.getByLabel("Email address").fill("synthetic@example.test");
+    await customerPage.locator("input[type=checkbox][required]").check();
+    stage = "committed quote response loss and explicit replay";
+    await button(customerPage, "Request reviewed pricing").click();
+    await expect(customerPage.locator("form").getByRole("alert")).toBeVisible();
+    await expect(customerPage.locator("form").getByRole("status")).toContainText("may have reached the studio");
+    await customerPage.waitForTimeout(250);
+    assert.equal(quoteBodies.length, 1, "No automatic replay after uncertain outcome");
+    stage = "verify actual first commit";
+    const committed = await request("/v1/quotes/" + quoteReceipts[0].id, undefined, quoteReceipts[0].access_token);
+    assert.equal(committed.items[0].text, savedBag[0].text);
+    assert.equal(committed.items[0].quantity, savedBag[0].quantity);
+    const committedFingerprint = fixtureFingerprint();
+    stage = "explicit same-payload retry";
+    await button(customerPage, "Request reviewed pricing").click();
+    await customerPage.getByText("Your request is with the studio.", {exact:true}).waitFor();
+    assert.equal(quoteBodies.length, 2);
+    assert.deepEqual(quoteBodies[1], quoteBodies[0], "Explicit retry preserves complete payload and request identity");
+    assert.deepEqual(quoteReceipts[1], quoteReceipts[0], "Actual backend returns same committed receipt");
+    assert.equal(fixtureFingerprint(), committedFingerprint, "Replay does not change actual ledger");
+    stage = "customer receipt identity handoff";
+    quote = JSON.parse(await download(customerPage, "Download private receipt"));
+    assert.deepEqual(quote, quoteReceipts[0], "Customer receipt becomes the same staff-reviewed quote");
+    assert.deepEqual(await customerPage.evaluate(() => JSON.parse(localStorage.getItem("sonoran:cart")).value), savedBag);
     const offerMessage =
       "Synthetic connected offer\nExact engraving and total only.";
     stage = "staff quote/order stage";
@@ -398,6 +436,10 @@ async function stop(c) {
       undefined,
       order.access_token,
     );
+    assert.equal(initial.items[0].text, savedBag[0].text, "Customer engraving survives quote-to-order handoff");
+    assert.equal(initial.items[0].quantity, savedBag[0].quantity);
+    const internalOrder = await request("/v1/admin/records/" + order.id, undefined, staff);
+    assert.equal(internalOrder.quote_id, quote.id, "Order ancestry matches customer quote");
     const firstSummary = await download(orderPage, "Download order summary");
     assert.ok(
       firstSummary.includes("USD 12.34") &&
@@ -557,7 +599,7 @@ async function stop(c) {
     stage = "close final order";
     await closePrivate(orderPage);
     stage = "browser storage check";
-    for (const p of [quotePage, orderPage, proofPage]) {
+    for (const p of [customerPage, quotePage, orderPage, proofPage]) {
       assert.ok(
         await p.evaluate(
           (values) => {
@@ -574,6 +616,8 @@ async function stop(c) {
             proof.access_token,
             order.id,
             proof.id,
+            "synthetic@example.test",
+            "Synthetic Customer",
           ],
         ),
         "No private capabilities or record identities in browser storage",
@@ -594,6 +638,8 @@ async function stop(c) {
         "one real loopback ASGI database; browser staff/quote/order/proof; no provider calls",
       relayed_requests: relayed,
       outside_origin_attempts: externalAttempts,
+      actual_customizer_bag_checkout: true,
+      committed_response_loss_explicit_idempotent_replay: true,
       exact_quote_accepted: true,
       explicit_receipt_handoffs: true,
       bound_proof_approved: true,
