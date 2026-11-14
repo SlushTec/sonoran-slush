@@ -7,7 +7,7 @@ const Module = require('node:module');
 const ts = require('typescript');
 const {JSDOM} = require('jsdom');
 const dom = new JSDOM('<!doctype html><html lang="en"><head><title>Storefront test</title></head><body><div id="test-root"></div></body></html>',{url:'https://review.example.test/'});
-for(const key of ['window','document','HTMLElement','HTMLInputElement','HTMLDialogElement','Node','MutationObserver','localStorage','location','getComputedStyle']){
+for(const key of ['window','document','HTMLElement','HTMLInputElement','HTMLDialogElement','Node','MutationObserver','localStorage','sessionStorage','location','getComputedStyle']){
  Object.defineProperty(global,key,{value:key==='getComputedStyle'?dom.window.getComputedStyle.bind(dom.window):dom.window[key],configurable:true,writable:true});
 }
 Object.defineProperty(global,'navigator',{value:dom.window.navigator,configurable:true});
@@ -37,7 +37,7 @@ const axe=require('axe-core');
 const product=slug=>catalog.products.find(p=>p.slug===slug);
 const wrap=element=>render(React.createElement(StoreProvider,null,element));
 const nativeFetch=global.fetch;
-test.afterEach(()=>{cleanup();localStorage.clear();window.history.replaceState({},'','/');delete process.env.NEXT_PUBLIC_COMMERCE_API_URL;global.fetch=nativeFetch;});
+test.afterEach(()=>{cleanup();localStorage.clear();sessionStorage.clear();window.history.replaceState({},'','/');delete process.env.NEXT_PUBLIC_COMMERCE_API_URL;global.fetch=nativeFetch;});
 
 test('expired or corrupted local drafts do not break shopping',()=>{
  localStorage.setItem('sonoran:broken','not-json');assert.equal(readLocal('broken','fallback'),'fallback');
@@ -584,4 +584,36 @@ test('all bag edit links identify bag context without changing saved links',asyn
  assert.equal(edits.length,3);assert.ok(edits.every(a=>new URL(a.href).searchParams.get('from')==='bag'));
  v.unmount();wrap(React.createElement(Saved));
  assert.equal(new URL((await screen.findByRole('link',{name:'Continue designing'})).href).searchParams.has('from'),false);
+});
+
+const attemptAPI=require('../../apps/storefront/src/lib/retail-attempt.ts');
+test('retail recovery stores only opaque identity and state and never rotates pending identity',()=>{
+ const a=attemptAPI.prepareRetailAttempt();const b=attemptAPI.prepareRetailAttempt(a);
+ assert.equal(a.id,b.id);assert.deepEqual(Object.keys(JSON.parse(sessionStorage.getItem('sonoran:retail-attempt'))).sort(),['id','state','version']);
+ assert.throws(()=>attemptAPI.clearConfirmedRetailAttempt(a.id));
+ attemptAPI.confirmRetailAttempt(a.id);assert.throws(()=>attemptAPI.prepareRetailAttempt());
+ attemptAPI.clearConfirmedRetailAttempt(a.id);assert.notEqual(attemptAPI.prepareRetailAttempt().id,a.id);
+});
+test('retail recovery rejects malformed or unexpectedly removed references without overwrite',()=>{
+ sessionStorage.setItem('sonoran:retail-attempt',JSON.stringify({version:1,id:'bad',state:'pending',contact:'must-not-accept'}));
+ const raw=sessionStorage.getItem('sonoran:retail-attempt');assert.throws(()=>attemptAPI.prepareRetailAttempt());assert.equal(sessionStorage.getItem('sonoran:retail-attempt'),raw);
+ sessionStorage.removeItem('sonoran:retail-attempt');const a=attemptAPI.prepareRetailAttempt();sessionStorage.removeItem('sonoran:retail-attempt');
+ assert.throws(()=>attemptAPI.prepareRetailAttempt(a));assert.ok(!sessionStorage.getItem('sonoran:retail-attempt'));
+});
+test('retail recovery refuses dispatch when tab storage cannot be written',async()=>{
+ const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');
+ writeLocal('cart',[{...emptyDesign('makertwist-40oz-tumbler'),text:'Synthetic'}]);
+ process.env.NEXT_PUBLIC_COMMERCE_API_URL='https://commerce.test';let calls=0;global.fetch=async()=>{calls++;return {ok:true,json:async()=>({})};};
+ wrap(React.createElement(Checkout));fireEvent.change(await screen.findByLabelText('Full name'),{target:{value:'Synthetic'}});
+ fireEvent.change(screen.getByLabelText('Email address'),{target:{value:'synthetic@example.test'}});
+ fireEvent.click(document.querySelector('input[type=checkbox][required]'));
+ const proto=Object.getPrototypeOf(sessionStorage),original=proto.setItem;
+ proto.setItem=function(k,v){if(this===sessionStorage)throw Error('denied');return original.call(this,k,v);};
+ try{fireEvent.click(screen.getByRole('button',{name:'Request reviewed pricing'}));assert.ok(await screen.findByText(/Request recovery storage is unavailable/));assert.equal(calls,0);}
+ finally{proto.setItem=original;}
+});
+test('retail recovery read denial blocks form instead of creating another identity',async()=>{
+ const original=global.sessionStorage;global.sessionStorage={getItem:()=>{throw Error('denied');}};
+ try{wrap(React.createElement(Checkout));assert.ok(await screen.findByText(/Request recovery storage is unavailable/));assert.equal(screen.queryAllByRole('button',{name:'Request reviewed pricing'}).length,0);}
+ finally{global.sessionStorage=original;}
 });
