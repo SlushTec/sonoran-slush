@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { commerce } from "@/lib/client";
+import { commerce, ServiceError } from "@/lib/client";
 import CustomerInscriptions, {
   customerInscriptions,
   inscriptionSummary,
@@ -387,11 +387,22 @@ export default function OrderReviewPortal() {
       } finally {
         anchor.remove();
       }
-    } catch {
-      if (active(s))
-        setError(
-          "The order summary could not be verified or downloaded. No payment is confirmed. Reopen the order or retry.",
-        );
+    } catch (error) {
+      if (active(s)) {
+        if (
+          error instanceof ServiceError &&
+          [401, 403, 404, 410].includes(error.status)
+        ) {
+          close();
+          setError(
+            "Access to this order could not be verified. The private session has been cleared. Reopen with current access details or contact the studio.",
+          );
+        } else {
+          setError(
+            "The order summary could not be verified or downloaded. No payment is confirmed. Reopen the order or retry.",
+          );
+        }
+      }
     } finally {
       if (active(s)) {
         locked.current = false;

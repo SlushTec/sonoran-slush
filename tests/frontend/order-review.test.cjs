@@ -832,3 +832,33 @@ test("customer legacy multiline whitespace and literal markup remain text in DOM
   assert.ok(region.textContent.includes(p.items[0].secondary));
   assert.equal(region.querySelectorAll("img").length,0);
 });
+
+for (const status of [401, 403, 404, 410]) test("summary access rejection clears private session " + status, async (t) => {
+  const d = captureDownloads(t);
+  await open();
+  handler = () => reply({}, status);
+  await download();
+  await screen.findByRole("alert");
+  assert.ok(screen.queryByRole("heading", { name: "Current order" }) === null, "private order must be hidden after access rejection");
+  assert.equal(screen.getByLabelText("Private access code").value, "");
+  assert.equal(screen.getByLabelText("Order reference").value, "");
+  assert.equal(d.blobs.length, 0);
+  assert.equal(calls.length, 2);
+});
+
+test("late access rejection cannot close a newer private session", async (t) => {
+  const d = captureDownloads(t);
+  await open();
+  let resolve;
+  handler = () => new Promise((r) => (resolve = r));
+  await download();
+  fireEvent.click(screen.getByRole("button", { name: "Close private record" }));
+  handler = null;
+  enter();
+  await screen.findByRole("heading", { name: "Current order" });
+  await act(async () => resolve(reply({}, 403)));
+  assert.ok(screen.queryByRole("heading", { name: "Current order" }));
+  assert.equal(screen.getByLabelText("Private access code").value, "synthetic-code");
+  assert.ok(screen.queryByRole("alert") === null);
+  assert.equal(d.blobs.length, 0);
+});

@@ -332,3 +332,27 @@ test("malformed canonical customer snapshot fails closed without showing inscrip
   await expect(page.getByRole("region",{name:"Your recorded inscriptions"})).toHaveCount(0);
   await expect(page.getByRole("button",{name:"Download order summary"})).toHaveCount(0);
 });
+
+for (const status of [401, 403, 404, 410]) test("summary access rejection clears session and requires explicit reopen " + status, async ({ page }) => {
+  let requests = 0;
+  let downloads = 0;
+  page.on("download", () => downloads++);
+  await page.route("https://commerce.qa.invalid/**", async (route) => {
+    requests++;
+    if (requests === 2) await route.fulfill({ status, json: { detail: "synthetic access rejection" } });
+    else await route.fulfill({ json: fixture() });
+  });
+  await open(page);
+  await page.getByRole("button", { name: "Download order summary" }).click();
+  await expect(page.getByRole("alert").filter({ hasText: "Access to this order" })).toContainText("private session has been cleared");
+  await expect(page.getByRole("heading", { name: "Current order" })).toHaveCount(0);
+  await expect(page.getByLabel("Private access code")).toHaveValue("");
+  await expect(page.getByLabel("Order reference")).toHaveValue("");
+  expect(requests).toBe(2);
+  expect(downloads).toBe(0);
+  await page.getByLabel("Order reference").fill("ord_browser");
+  await page.getByLabel("Private access code").fill("synthetic-code");
+  await page.getByRole("button", { name: "Open securely" }).click();
+  await expect(page.getByRole("heading", { name: "Current order" })).toBeVisible();
+  expect(requests).toBe(3);
+});
