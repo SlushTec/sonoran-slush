@@ -563,3 +563,25 @@ test('choosing artwork later supersedes a pending local photo decode',async()=>{
   assert.equal(readLocal('cart',[])[0].artworkName,'');
  }finally{global.createImageBitmap=originalBitmap;URL.createObjectURL=originalCreate;URL.revokeObjectURL=originalRevoke;}
 });
+
+for(const [source,expected] of [['bag','3'],['saved','1'],['unrecognized','1']]){
+ test('design edit preserves '+source+' collection precedence',async()=>{
+  const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');
+  const design={...emptyDesign('makertwist-40oz-tumbler'),id:'synthetic-shared',text:'Synthetic'};
+  writeLocal('designs',[design]);writeLocal('cart',[{...design,quantity:3}]);
+  window.history.replaceState({},'', '/products/makertwist-40oz-tumbler?design=synthetic-shared'+(source==='saved'?'':'&from='+source));
+  wrap(React.createElement(Customizer,{product:product('makertwist-40oz-tumbler')}));
+  await waitFor(()=>assert.equal(screen.getByRole('spinbutton',{name:'Quantity'}).value,expected));
+ });
+}
+test('all bag edit links identify bag context without changing saved links',async()=>{
+ const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');
+ const design={...emptyDesign('makertwist-40oz-tumbler'),id:'synthetic-shared',text:'Synthetic'};
+ writeLocal('designs',[design]);writeLocal('cart',[design]);
+ const v=wrap(React.createElement(Bag));
+ await screen.findByRole('link',{name:'Edit design'});
+ const edits=[...document.querySelectorAll('a[href*="?design="]')];
+ assert.equal(edits.length,3);assert.ok(edits.every(a=>new URL(a.href).searchParams.get('from')==='bag'));
+ v.unmount();wrap(React.createElement(Saved));
+ assert.equal(new URL((await screen.findByRole('link',{name:'Continue designing'})).href).searchParams.has('from'),false);
+});

@@ -48,14 +48,14 @@ export function Bag() {
           return (
             <article className="bag-item" key={d.id}>
               <Link
-                href={"/products/" + d.slug + "?design=" + d.id}
+                href={"/products/" + d.slug + "?design=" + d.id + "&from=bag"}
                 aria-label={"Edit " + infoFor(p).title}
               >
                 <ProductVisual category={p.category} product={p} />
               </Link>
               <div>
                 <h2>
-                  <Link href={"/products/" + d.slug + "?design=" + d.id}>
+                  <Link href={"/products/" + d.slug + "?design=" + d.id + "&from=bag"}>
                     {infoFor(p).title}
                   </Link>
                 </h2>
@@ -96,7 +96,7 @@ export function Bag() {
                   </div>
                   <Link
                     className="link-button"
-                    href={"/products/" + d.slug + "?design=" + d.id}
+                    href={"/products/" + d.slug + "?design=" + d.id + "&from=bag"}
                   >
                     Edit design
                   </Link>

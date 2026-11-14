@@ -52,9 +52,13 @@ export default function Customizer({ product }: { product: Product }) {
     allowsPhoto = isPhoto || info.personalization === "either";
   useEffect(() => {
     if (!store.hydrated) return;
-    const id = new URLSearchParams(location.search).get("design");
+    const query = new URLSearchParams(location.search);
+    const id = query.get("design");
+    const candidates = query.get("from") === "bag"
+      ? [...store.cart, ...store.designs]
+      : [...store.designs, ...store.cart];
     const stored = id
-      ? [...store.designs, ...store.cart].find(
+      ? candidates.find(
           (d) => d.id === id && d.slug === product.slug,
         )
       : readLocal<Design | null>("config:" + product.slug, null);
