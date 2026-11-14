@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   commerce,
@@ -36,6 +36,7 @@ export default function InquiryForm({
 }: {
   kind: "event" | "bulk" | "contact";
 }) {
+  const lifecycle = useRef(0);
   const { notify } = useStore(),
     [v, setV] = useState<Values>(initial),
     [consent, setConsent] = useState(false),
@@ -48,6 +49,13 @@ export default function InquiryForm({
   const event = kind === "event",
     contact = kind === "contact";
   useEffect(() => {
+    lifecycle.current += 1;
+    setBusy(false);
+    setError("");
+    setReceipt(null);
+    setNewerDraft(false);
+    setConsent(false);
+    setStep(0);
     const saved = readLocal<{ values: Values; request_id: string } | null>(
       "inquiry:" + kind,
       null,
@@ -55,7 +63,13 @@ export default function InquiryForm({
     if (saved?.values && typeof saved.values.name === "string") {
       setV({ ...initial, ...saved.values });
       setRequestID(saved.request_id || newId());
-    } else setRequestID(newId());
+    } else {
+      setV(initial);
+      setRequestID(newId());
+    }
+    return () => {
+      lifecycle.current += 1;
+    };
   }, [kind]);
   function field(k: keyof Values, val: string) {
     setV((a) => ({ ...a, [k]: val }));
@@ -84,6 +98,7 @@ export default function InquiryForm({
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (busy || !consent) return;
+    const owner = lifecycle.current;
     setBusy(true);
     setError("");
     const storageKey = "sonoran:inquiry:" + kind;
@@ -97,6 +112,7 @@ export default function InquiryForm({
         event ? "/v1/events/requests" : contact ? "/v1/contact" : "/v1/quotes",
         payload(),
       );
+      if (owner !== lifecycle.current) return;
       setReceipt(verifiedReceipt(result, kind));
       try {
         const current = localStorage.getItem(storageKey);
@@ -130,13 +146,14 @@ export default function InquiryForm({
         }
       } catch {}
     } catch (err) {
+      if (owner !== lifecycle.current) return;
       setError(
         err instanceof Error
           ? err.message
           : "Your request could not be sent. Please try again.",
       );
     } finally {
-      setBusy(false);
+      if (owner === lifecycle.current) setBusy(false);
     }
   }
   if (receipt)

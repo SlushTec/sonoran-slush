@@ -398,3 +398,49 @@ for(const variant of ['foreign','malformed','expired','ambiguous']) test('inquir
  else assert.ok(await screen.findByText('Your request is with the studio.'));
  assert.equal(localStorage.getItem('sonoran:inquiry:contact'),raw);
 });
+
+test('leaving inquiry before response preserves explicit draft for same-ID recovery',async()=>{
+ process.env.NEXT_PUBLIC_COMMERCE_API_URL='https://commerce.qa.invalid';
+ let release;const pending=new Promise(resolve=>{release=resolve;});const calls=[];
+ global.fetch=async(url,options)=>{calls.push(JSON.parse(options.body));if(calls.length===1)await pending;return {ok:true,json:async()=>({id:'msg_'+'a'.repeat(32),status:'submitted',access_token:'b'.repeat(43)})};};
+ const mounted=wrap(React.createElement(InquiryForm,{kind:'contact'}));
+ fireEvent.change(await screen.findByLabelText('Your name'),{target:{value:'Synthetic Person'}});
+ fireEvent.change(screen.getByLabelText('Email address'),{target:{value:'person@example.test'}});
+ fireEvent.click(screen.getByRole('checkbox'));
+ fireEvent.click(screen.getByRole('button',{name:'Save draft on this device'}));
+ const saved=localStorage.getItem('sonoran:inquiry:contact');
+ fireEvent.submit(document.querySelector('form'));
+ await waitFor(()=>assert.equal(calls.length,1));
+ mounted.unmount();
+ await require('@testing-library/react').act(async()=>{release();await pending;});
+ assert.equal(localStorage.getItem('sonoran:inquiry:contact'),saved);
+ wrap(React.createElement(InquiryForm,{kind:'contact'}));
+ assert.equal((await screen.findByLabelText('Your name')).value,'Synthetic Person');
+ fireEvent.click(screen.getByRole('checkbox'));
+ fireEvent.submit(document.querySelector('form'));
+ assert.ok(await screen.findByText('Your request is with the studio.'));
+ assert.equal(calls.length,2);
+ assert.deepEqual(calls[1],calls[0]);
+ assert.ok(localStorage.getItem('sonoran:inquiry:contact') === null);
+});
+
+for(const failure of [false,true])test('previous inquiry kind cannot apply late response to another form: '+failure,async()=>{
+ process.env.NEXT_PUBLIC_COMMERCE_API_URL='https://commerce.qa.invalid';
+ let release;const pending=new Promise(resolve=>{release=resolve;});let sent=false;
+ global.fetch=async()=>{sent=true;await pending;if(failure)throw Error('late network failure');return {ok:true,json:async()=>({id:'msg_'+'a'.repeat(32),status:'submitted',access_token:'b'.repeat(43)})};};
+ const mounted=wrap(React.createElement(InquiryForm,{kind:'contact'}));
+ fireEvent.change(await screen.findByLabelText('Your name'),{target:{value:'Old contact'}});
+ fireEvent.change(screen.getByLabelText('Email address'),{target:{value:'person@example.test'}});
+ fireEvent.click(screen.getByRole('checkbox'));fireEvent.click(screen.getByRole('button',{name:'Save draft on this device'}));
+ const saved=localStorage.getItem('sonoran:inquiry:contact');
+ fireEvent.submit(document.querySelector('form'));await waitFor(()=>assert.equal(sent,true));
+ mounted.rerender(React.createElement(StoreProvider,null,React.createElement(InquiryForm,{kind:'bulk'})));
+ fireEvent.click(screen.getByRole('button',{name:'Contact details',exact:true}));
+ assert.equal(screen.getByLabelText('Your name').value,'');
+ assert.equal(document.querySelector('button[type="submit"]').disabled,false);
+ assert.equal(screen.getByRole('checkbox').checked,false);
+ await require('@testing-library/react').act(async()=>{release();await pending;});
+ assert.equal(localStorage.getItem('sonoran:inquiry:contact'),saved);
+ assert.equal(screen.queryAllByText('Your request is with the studio.').length,0);
+ assert.equal(screen.queryAllByRole('alert').length,0);
+});
