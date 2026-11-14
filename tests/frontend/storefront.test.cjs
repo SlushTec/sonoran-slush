@@ -519,6 +519,9 @@ test('current local photo still attaches and its object URL is revoked on remova
   fireEvent.change(document.querySelector('input[type=file]'),{target:{files:[{name:'current.png',size:32,slice:()=>({arrayBuffer:async()=>Uint8Array.from([137,80,78,71]).buffer})}]}});
   assert.ok(await screen.findByText('current.png'));assert.equal(closed,1);
   assert.equal(screen.getByAltText('Your local artwork layout').getAttribute('src'),'blob:current-photo');
+  fireEvent.click(screen.getByRole('checkbox',{name:'I will add artwork later.'}));
+  assert.ok(screen.getByText('current.png'));assert.equal(screen.getByAltText('Your local artwork layout').getAttribute('src'),'blob:current-photo');
+  assert.deepEqual(revoked,[]);
   fireEvent.click(screen.getByRole('button',{name:'Remove artwork'}));
   assert.deepEqual(revoked,['blob:current-photo']);assert.equal(screen.queryAllByAltText('Your local artwork layout').length,0);
  }finally{global.createImageBitmap=originalBitmap;URL.createObjectURL=originalCreate;URL.revokeObjectURL=originalRevoke;}
@@ -537,4 +540,26 @@ test('cancelled local photo failure cannot replace the newer cleared state',asyn
   assert.equal(screen.queryAllByText('Stale synthetic decode failure').length,0);
   assert.equal(document.querySelector('input[type=file]').disabled,false);
  }finally{global.createImageBitmap=original;}
+});
+
+test('choosing artwork later supersedes a pending local photo decode',async()=>{
+ const originalBitmap=global.createImageBitmap,originalCreate=URL.createObjectURL,originalRevoke=URL.revokeObjectURL;
+ let release,started=false,closed=0,urls=0;
+ global.createImageBitmap=()=>{started=true;return new Promise(resolve=>{release=resolve;});};
+ URL.createObjectURL=()=>{urls++;return 'blob:late-photo';};URL.revokeObjectURL=()=>{};
+ try{
+  wrap(React.createElement(Customizer,{product:product('photo-crystal-heart')}));
+  fireEvent.click(await screen.findByRole('button',{name:/Add your personal touch/}));
+  fireEvent.change(document.querySelector('input[type=file]'),{target:{files:[{name:'pending.png',size:32,slice:()=>({arrayBuffer:async()=>Uint8Array.from([137,80,78,71]).buffer})}]}});
+  await waitFor(()=>assert.ok(started));
+  fireEvent.click(screen.getByRole('checkbox',{name:'I will add artwork later.'}));
+  await React.act(async()=>{release({width:1000,height:1000,close:()=>closed++});});
+  assert.equal(screen.getByRole('checkbox',{name:'I will add artwork later.'}).checked,true);
+  assert.equal(urls,0);assert.equal(closed,1);
+  assert.equal(document.querySelector('input[type=file]').disabled,false);
+  fireEvent.click(screen.getByRole('button',{name:/Finishing touches/}));
+  fireEvent.click(screen.getByRole('button',{name:'Add design to bag'}));
+  await waitFor(()=>assert.equal(readLocal('cart',[]).length,1));
+  assert.equal(readLocal('cart',[])[0].artworkName,'');
+ }finally{global.createImageBitmap=originalBitmap;URL.createObjectURL=originalCreate;URL.revokeObjectURL=originalRevoke;}
 });
