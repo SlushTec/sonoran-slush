@@ -480,3 +480,61 @@ test('clear saved work detects retained keys and successful explicit retry dismi
  assert.equal(localStorage.getItem('other-app:keep'),'unrelated');
  assert.ok(await screen.findByText('Saved designs and browsing data cleared from this device.'));
 });
+
+for(const action of ['remove','new-design','unmount']){
+ test('pending local photo respects '+action+' rather than reviving old artwork',async()=>{
+  const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');
+  writeLocal('config:photo-crystal-heart',{...emptyDesign('photo-crystal-heart'),artworkName:'previous.png'});
+  const originalBitmap=global.createImageBitmap, originalCreate=URL.createObjectURL, originalRevoke=URL.revokeObjectURL;
+  let resolveBitmap,started=false,closed=0,urls=0;
+  global.createImageBitmap=()=>{started=true;return new Promise(resolve=>{resolveBitmap=resolve;});};
+  URL.createObjectURL=()=>{urls++;return 'blob:synthetic-photo';};URL.revokeObjectURL=()=>{};
+  try{
+   const view=wrap(React.createElement(Customizer,{product:product('photo-crystal-heart')}));
+   fireEvent.click(await screen.findByRole('button',{name:/Add your personal touch/}));
+   const file={name:'pending.png',size:32,slice:()=>({arrayBuffer:async()=>Uint8Array.from([137,80,78,71,0,0,0,0,0,0,0,0]).buffer})};
+   fireEvent.change(document.querySelector('input[type=file]'),{target:{files:[file]}});
+   await waitFor(()=>assert.ok(started));
+   if(action==='remove')fireEvent.click(screen.getByRole('button',{name:'Remove artwork'}));
+   else if(action==='new-design')fireEvent.click(screen.getByRole('button',{name:'Save & start another design'}));
+   else view.unmount();
+   await React.act(async()=>{resolveBitmap({width:1000,height:1000,close:()=>closed++});});
+   assert.equal(closed,1);assert.equal(urls,0);
+   if(action!=='unmount'){
+    assert.equal(screen.queryAllByText('pending.png').length,0);
+    assert.equal(readLocal('config:photo-crystal-heart',null).artworkName,'');
+   }
+  }finally{global.createImageBitmap=originalBitmap;URL.createObjectURL=originalCreate;URL.revokeObjectURL=originalRevoke;}
+ });
+}
+
+test('current local photo still attaches and its object URL is revoked on removal',async()=>{
+ const originalBitmap=global.createImageBitmap, originalCreate=URL.createObjectURL, originalRevoke=URL.revokeObjectURL;
+ let closed=0;const revoked=[];
+ global.createImageBitmap=async()=>({width:1000,height:1000,close:()=>closed++});
+ URL.createObjectURL=()=> 'blob:current-photo';URL.revokeObjectURL=url=>revoked.push(url);
+ try{
+  wrap(React.createElement(Customizer,{product:product('photo-crystal-heart')}));
+  fireEvent.click(await screen.findByRole('button',{name:/Add your personal touch/}));
+  fireEvent.change(document.querySelector('input[type=file]'),{target:{files:[{name:'current.png',size:32,slice:()=>({arrayBuffer:async()=>Uint8Array.from([137,80,78,71]).buffer})}]}});
+  assert.ok(await screen.findByText('current.png'));assert.equal(closed,1);
+  assert.equal(screen.getByAltText('Your local artwork layout').getAttribute('src'),'blob:current-photo');
+  fireEvent.click(screen.getByRole('button',{name:'Remove artwork'}));
+  assert.deepEqual(revoked,['blob:current-photo']);assert.equal(screen.queryAllByAltText('Your local artwork layout').length,0);
+ }finally{global.createImageBitmap=originalBitmap;URL.createObjectURL=originalCreate;URL.revokeObjectURL=originalRevoke;}
+});
+test('cancelled local photo failure cannot replace the newer cleared state',async()=>{
+ const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');
+ writeLocal('config:photo-crystal-heart',{...emptyDesign('photo-crystal-heart'),artworkName:'previous.png'});
+ const original=global.createImageBitmap;let rejectBitmap,started=false;
+ global.createImageBitmap=()=>{started=true;return new Promise((_,reject)=>{rejectBitmap=reject;});};
+ try{
+  wrap(React.createElement(Customizer,{product:product('photo-crystal-heart')}));
+  fireEvent.click(await screen.findByRole('button',{name:/Add your personal touch/}));
+  fireEvent.change(document.querySelector('input[type=file]'),{target:{files:[{name:'pending.png',size:32,slice:()=>({arrayBuffer:async()=>Uint8Array.from([137,80,78,71]).buffer})}]}});
+  await waitFor(()=>assert.ok(started));fireEvent.click(screen.getByRole('button',{name:'Remove artwork'}));
+  await React.act(async()=>{rejectBitmap(Error('Stale synthetic decode failure'));});
+  assert.equal(screen.queryAllByText('Stale synthetic decode failure').length,0);
+  assert.equal(document.querySelector('input[type=file]').disabled,false);
+ }finally{global.createImageBitmap=original;}
+});
