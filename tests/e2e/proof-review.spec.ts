@@ -255,3 +255,32 @@ test("tracked preview brand assets return exact content and images load", async 
       ),
     ).toBeTruthy();
 });
+
+for (const action of [false, true]) test("access rejection clears proof and requires explicit reopen " + action, async ({ page }) => {
+  let denied = false;
+  let posts = 0;
+  await page.route("https://commerce.qa.invalid/**", async (r) => {
+    if (r.request().method() === "POST") posts++;
+    if (denied) return r.fulfill({ status: 403, json: { detail: "PRIVATE_BACKEND_MARKER" } });
+    return r.fulfill({ json: r.request().url().endsWith("/history/2") ? detail() : fixture() });
+  });
+  await open(page);
+  await expect(page.getByRole("button", { name: "Approve version 2" })).toBeVisible();
+  denied = true;
+  if (action) {
+    await page.getByRole("checkbox").check();
+    await page.getByRole("button", { name: "Approve version 2" }).click();
+  } else await page.getByRole("button", { name: "Refresh current proof" }).click();
+  await expect(page.getByRole("alert").filter({ hasText: "Access to this proof" })).toContainText("No action outcome is confirmed");
+  await expect(page.getByRole("heading", { name: "Current proof" })).toHaveCount(0);
+  await expect(page.getByLabel("Private access code")).toHaveValue("");
+  await expect(page.getByLabel("Proof reference")).toHaveValue("");
+  await expect(page.getByText("PRIVATE_BACKEND_MARKER")).toHaveCount(0);
+  expect(posts).toBe(action ? 1 : 0);
+  denied = false;
+  await page.getByLabel("Proof reference").fill("prf_browser");
+  await page.getByLabel("Private access code").fill("synthetic-browser-code");
+  await page.getByRole("button", { name: "Open securely" }).click();
+  await expect(page.getByRole("button", { name: "Approve version 2" })).toBeVisible();
+  expect(posts).toBe(action ? 1 : 0);
+});

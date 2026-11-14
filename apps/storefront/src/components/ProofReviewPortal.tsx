@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { commerce } from "@/lib/client";
+import { commerce, ServiceError } from "@/lib/client";
 
 type Proof = {
   id: string;
@@ -319,6 +319,16 @@ export default function ProofReviewPortal() {
       await work(n);
     } catch (e) {
       if (active(s, n)) {
+        if (
+          e instanceof ServiceError &&
+          [401, 403, 404, 410].includes(e.status)
+        ) {
+          clear();
+          setError(
+            "Access to this proof could not be verified. The private session has been cleared. Reopen with current access details or contact the studio. No action outcome is confirmed here.",
+          );
+          return;
+        }
         setError(
           e instanceof Error
             ? e.message

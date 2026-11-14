@@ -673,3 +673,54 @@ test("partial success response without decision evidence never confirms approval
   assert.equal(screen.queryByRole("status") === null, true);
   assert.ok(screen.getByText(/Evidence not verified/));
 });
+
+for (const status of [401, 403, 404, 410]) test("proof access rejection clears private session " + status, async () => {
+  let denied = false;
+  mock(() => denied ? reply({ detail: "PRIVATE_BACKEND_MARKER" }, status) : undefined);
+  await open();
+  denied = true;
+  fireEvent.click(screen.getByRole("button", { name: "Refresh current proof" }));
+  await screen.findByRole("alert");
+  assert.equal(screen.getByLabelText("Private access code").value, "");
+  assert.equal(screen.getByLabelText("Proof reference").value, "");
+  assert.ok(screen.queryByText("Exact wording 2") === null);
+  assert.ok(screen.queryByText("PRIVATE_BACKEND_MARKER") === null);
+});
+
+for (const route of ["history", "detail", "action"]) test("proof denied " + route + " clears session without confirming mutation", async () => {
+  await open();
+  const original = global.fetch;
+  global.fetch = (url, opts) => {
+    if ((route === "history" && url.includes("/history?")) || (route === "detail" && url.endsWith("/history/1")) || (route === "action" && url.endsWith("/approve"))) return Promise.resolve(reply({ detail: "PRIVATE_BACKEND_MARKER" }, 403));
+    return original(url, opts);
+  };
+  if (route === "history") fireEvent.click(screen.getByRole("button", { name: "Past versions" }));
+  else if (route === "detail") {
+    fireEvent.click(screen.getByRole("button", { name: "Past versions" }));
+    fireEvent.click(await screen.findByRole("button", { name: "View version 1" }));
+  } else {
+    fireEvent.click(screen.getByRole("checkbox"));
+    fireEvent.click(screen.getByRole("button", { name: "Approve version 2" }));
+  }
+  await screen.findByText(/private session has been cleared/);
+  assert.equal(screen.getByLabelText("Private access code").value, "");
+  assert.ok(screen.queryByRole("heading", { name: /Current proof|Historical proof/ }) === null);
+  assert.ok(screen.queryByText("PRIVATE_BACKEND_MARKER") === null);
+  assert.match(screen.getByRole("alert").textContent, /No action outcome is confirmed/);
+});
+test("late proof access denial cannot clear a reopened session", async () => {
+  await open();
+  let resolve;
+  const original = global.fetch;
+  global.fetch = () => new Promise((r) => (resolve = r));
+  fireEvent.click(screen.getByRole("button", { name: "Refresh current proof" }));
+  fireEvent.click(screen.getByRole("button", { name: "Close private record" }));
+  global.fetch = original;
+  fireEvent.change(screen.getByLabelText("Proof reference"), { target: { value: "prf_test" } });
+  fireEvent.change(screen.getByLabelText("Private access code"), { target: { value: "synthetic-code" } });
+  fireEvent.submit(document.querySelector("form"));
+  await screen.findByRole("button", { name: "Approve version 2" });
+  await act(async () => resolve(reply({}, 403)));
+  assert.equal(screen.getByLabelText("Private access code").value, "synthetic-code");
+  assert.ok(screen.queryByRole("alert") === null);
+});
