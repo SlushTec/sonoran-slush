@@ -1,4 +1,4 @@
-﻿# Square capability evidence matrix
+# Square capability evidence matrix
 
 RPG-125 / SS-021, SS-023, SS-024, SS-029. Primary documentation checked November 14, 2026. US support pages are the selected research jurisdiction, not proof of the actual merchant country/location. This is documentary evidence, not account or device qualification.
 
@@ -19,11 +19,11 @@ At repository base `06bd37998b9b92d6451597a5fb8541ac45c54015`, the local adapter
 | In-person iPhone | Square documents NFC cards and Apple/Google/Samsung Pay with Tap to Pay on iPhone. Requirements include iPhone XS or newer, latest iOS, passcode and stable internet; iPad is excluded. POS/Appointments device-code login has a restriction, while Retail POS is documented separately. Offline is unsupported. [S5] | Brian's exact hardware, app/mode, login method, staff roles and authorized physical test. Samsung NFC acceptance does not imply a Samsung online checkout button. |
 | In-person Android | Square documents NFC cards and Apple/Google/Samsung Pay. Requirements include compatible Android hardware, Android 9+, NFC and developer options disabled; some models/app combinations and countries differ. Offline is unsupported. [S6] | Exact model/country/app compatibility, settings and physical qualification. No phone settings were changed. |
 | Offline hardware eligibility | The US article lists Register, Terminal, Handheld, supported Stand and Reader generations. Reader first-generation v1/v2 and buyer-facing Terminal API mode are excluded; phone-only Tap to Pay is excluded. [S7] | Identify exact hardware generation and operating mode; terminal ownership alone is insufficient. |
-| Offline timing and risk | Reader/Stand acceptance sessions are limited to24 hours; upload is required within72 hours from session start. Register/Terminal/Handheld text specifies72-hour upload, recommending24 hours. Expired payments cannot be recovered; merchant bears decline/dispute/expiry risk. [S7] | Owner-approved risk limits and exact device guidance. Do not treat pending offline records as paid or authorize supplier/engraving work from them. |
+| Offline timing and risk | Reader/Stand acceptance sessions are limited to 24 hours; upload is required within 72 hours from session start. Register/Terminal/Handheld text specifies 72-hour upload, recommending 24 hours. Expired payments cannot be recovered; merchant bears decline/dispute/expiry risk. [S7] | Owner-approved risk limits and exact device guidance. Do not treat pending offline records as paid or authorize supplier/engraving work from them. |
 
 ### Source ambiguity that must remain visible
 
-S7's subsection heading says24 hours to upload, while its following Register/Terminal/Handheld paragraph says72 hours and recommends24. Preserve this discrepancy; recheck exact hardware guidance with Square before adopting an operational deadline. Pending-payment precautions also prohibit sign-out, app deletion, mode/location switching and factory reset; upload must be verified. S7 describes a2026 automatic-enablement rollout: actual account settings are unknown. These facts do not authorize changing them.
+S7's subsection heading says 24 hours to upload, while its following Register/Terminal/Handheld paragraph says 72 hours and recommends 24. Preserve this discrepancy; recheck exact hardware guidance with Square before adopting an operational deadline. Pending-payment precautions also prohibit sign-out, app deletion, mode/location switching and factory reset; upload must be verified. S7 describes a 2026 automatic-enablement rollout: actual account settings are unknown. These facts do not authorize changing them.
 
 ## Acceptance plan, not completed tests
 
@@ -36,7 +36,7 @@ S7's subsection heading says24 hours to upload, while its following Register/Ter
 
 ## Primary sources
 
-All links below were opened and read November14,2026; this is the observation date, not a guaranteed publication/update date. Recheck before activation or after provider changes.
+All links below were opened and read November 14, 2026; this is the observation date, not a guaranteed publication/update date. Recheck before activation or after provider changes.
 
 - [S1: Checkout API overview](https://developer.squareup.com/docs/checkout-api), highlights and workflow.
 - [S2: Checkout API guidelines and limitations](https://developer.squareup.com/docs/checkout-api/guidelines-and-limitations), device-dependent buttons and Sandbox limitations.
