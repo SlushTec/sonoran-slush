@@ -53,7 +53,7 @@ def square_checkout(fields: dict) -> dict:
         if not all(isinstance(link.get(k), str) and link[k] for k in ("id", "order_id", "url")) or not sandbox_checkout_url(link.get("url")):
             raise ValueError("Unexpected sandbox response")
         return link
-    except (urllib.error.URLError, ValueError, TypeError, AttributeError, OSError):
+    except (urllib.error.URLError, ValueError, TypeError, AttributeError, OSError, RecursionError):
         raise HTTPException(502, "Square did not confirm a sandbox session. Retry the same order.")
 
 
