@@ -608,7 +608,10 @@ export default function Customizer({ product }: { product: Product }) {
                     <input
                       type="checkbox"
                       checked={photoLater}
-                      onChange={(e) => setPhotoLater(e.target.checked)}
+                      onChange={(e) => {
+                        if (e.target.checked) invalidatePhoto();
+                        setPhotoLater(e.target.checked);
+                      }}
                     />
                     <span>I will add artwork later.</span>
                   </label>
