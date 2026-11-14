@@ -322,3 +322,32 @@ test('verified inquiry receipt alone clears saved draft',async()=>{
  assert.ok(screen.getByText(id));
  assert.ok(localStorage.getItem('sonoran:inquiry:contact') === null);
 });
+
+for(const [label,result] of [['empty',{}],['null',null],['wrong kind',{id:'msg_'+'a'.repeat(32),status:'submitted',access_token:'a'.repeat(43)}],['missing token',{id:'quo_'+'a'.repeat(32),status:'submitted'}]]) test('retail quote unverified receipt preserves cart and retry: '+label,async()=>{
+ process.env.NEXT_PUBLIC_COMMERCE_API_URL='https://commerce.qa.invalid';
+ const design={id:'synthetic-design',slug:catalog.products[0].slug,text:'Synthetic',secondary:'',font:'',options:{},quantity:1,notes:'',artworkName:'',gift:false,giftMessage:'',updated:'2026-11-14T00:00:00Z'};
+ writeLocal('cart',[design]);
+ const calls=[];global.fetch=async(url,options)=>{calls.push(JSON.parse(options.body));return {ok:true,json:async()=>result};};
+ wrap(React.createElement(Checkout));
+ fireEvent.change(await screen.findByLabelText('Full name'),{target:{value:'Synthetic Person'}});
+ fireEvent.change(screen.getByLabelText('Email address'),{target:{value:'person@example.test'}});
+ fireEvent.click(document.querySelector('input[type="checkbox"][required]'));
+ const cart=readLocal('cart',[]);
+ fireEvent.submit(document.querySelector('form'));
+ assert.match((await screen.findByRole('alert')).textContent,/could not verify.*receipt/i);
+ assert.equal(screen.queryAllByText('Your request is with the studio.').length,0);
+ assert.deepEqual(readLocal('cart',[]),cart);
+ assert.equal(screen.getByLabelText('Full name').value,'Synthetic Person');
+ await waitFor(()=>assert.equal(document.querySelector('button[type="submit"]').disabled,false));
+ fireEvent.submit(document.querySelector('form'));
+ await waitFor(()=>assert.equal(calls.length,2));
+ assert.deepEqual(calls[1],calls[0]);
+});
+
+test('shared receipt projection preserves supported replay status and drops unrelated response fields',()=>{
+ const {verifiedReceipt}=require('../../apps/storefront/src/lib/receipt.ts');
+ for(const [kind,prefix] of [['retail','quo_'],['bulk','quo_'],['event','evt_'],['contact','msg_']]){
+  const receipt={id:prefix+'a'.repeat(32),status:'reviewed',access_token:'b'.repeat(43)};
+  assert.deepEqual(verifiedReceipt({...receipt,internal_notes:'excluded',message:'excluded'},kind),receipt);
+ }
+});

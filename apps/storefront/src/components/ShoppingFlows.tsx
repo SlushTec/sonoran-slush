@@ -1,4 +1,5 @@
 "use client";
+import { verifiedReceipt, type Receipt } from "@/lib/receipt";
 import { useState } from "react";
 import Link from "next/link";
 import { catalog } from "@/lib/catalog";
@@ -299,17 +300,11 @@ export function Saved() {
     </div>
   );
 }
-type RequestReceipt = {
-  id: string;
-  access_token: string;
-  status: string;
-  message?: string;
-};
 export function Checkout() {
   const store = useStore(),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
-    [receipt, setReceipt] = useState<RequestReceipt | null>(null),
+    [receipt, setReceipt] = useState<Receipt | null>(null),
     [requestID] = useState(() => newId()),
     [delivery, setDelivery] = useState("Ship to an address"),
     [contact, setContact] = useState({
@@ -336,7 +331,7 @@ export function Checkout() {
     setBusy(true);
     setError("");
     try {
-      const result = await commerce<RequestReceipt>("/v1/quotes", {
+      const result = await commerce<unknown>("/v1/quotes", {
         request_id: requestID,
         kind: "retail",
         name: contact.name,
@@ -368,7 +363,7 @@ export function Checkout() {
         gift_message: contact.giftMessage,
         consent: true,
       });
-      setReceipt(result);
+      setReceipt(verifiedReceipt(result, "retail"));
     } catch (err) {
       setError(
         err instanceof Error

@@ -1,0 +1,32 @@
+import { test, expect } from "@playwright/test";
+import fs from "node:fs/promises";
+import catalog from "../../packages/contracts/catalog.reference.json";
+test("retail malformed receipt preserves designs and safe retry downloads only receipt fields", async ({page})=>{
+ const design={id:"synthetic-design",slug:catalog.products[0].slug,text:"Synthetic",secondary:"",font:"",options:{},quantity:1,notes:"",artworkName:"",gift:false,giftMessage:"",updated:"2026-11-14T00:00:00Z"};
+ await page.addInitScript(d=>localStorage.setItem("sonoran:cart",JSON.stringify({value:[d],expires:Date.now()+86400000})),design);
+ const calls: unknown[]=[]; let valid=false;
+ const receipt={id:"quo_"+"a".repeat(32),status:"reviewed",access_token:"b".repeat(43)};
+ await page.route("https://commerce.qa.invalid/**", async route=>{
+  if(route.request().method()==="OPTIONS")return route.fulfill({status:204,headers:{"access-control-allow-origin":"*","access-control-allow-headers":"content-type"}});
+  calls.push(route.request().postDataJSON());
+  await route.fulfill({status:200,contentType:"application/json",headers:{"access-control-allow-origin":"*"},body:JSON.stringify(valid?{...receipt,internal_notes:"must-not-download"}:{})});
+ });
+ await page.goto("/checkout");
+ await page.getByLabel("Full name").fill("Synthetic Person");
+ await page.getByLabel("Email address").fill("person@example.test");
+ await page.locator("input[type=checkbox][required]").check();
+ const cart=await page.evaluate(()=>JSON.parse(localStorage.getItem("sonoran:cart")!).value);
+ await page.getByRole("button",{name:"Request reviewed pricing"}).click();
+ await expect(page.locator("form").getByRole("alert")).toContainText("The studio may have received your request.");
+ await expect(page.getByText("Your request is with the studio.")).toHaveCount(0);
+ await expect(page.getByLabel("Full name")).toHaveValue("Synthetic Person");
+ valid=true;
+ await page.getByRole("button",{name:"Request reviewed pricing"}).click();
+ await expect(page.getByText("Your request is with the studio.")).toBeVisible();
+ expect(calls).toHaveLength(2); expect(calls[1]).toEqual(calls[0]);
+ expect(await page.evaluate(()=>JSON.parse(localStorage.getItem("sonoran:cart")!).value)).toEqual(cart);
+ const download=page.waitForEvent("download");
+ await page.getByRole("button",{name:"Download private receipt"}).click();
+ const file=await (await download).path();
+ expect(JSON.parse(await fs.readFile(file!,"utf8"))).toEqual(receipt);
+});
