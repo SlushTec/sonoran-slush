@@ -165,7 +165,8 @@ export function Bag() {
 export function Saved() {
   const store = useStore(),
     [tab, setTab] = useState("designs"),
-    [clearConfirm, setClearConfirm] = useState(false);
+    [clearConfirm, setClearConfirm] = useState(false),
+    [clearFailed, setClearFailed] = useState(false);
   return (
     <div style={{ paddingBottom: 70 }}>
       <div className="saved-tabs" role="group" aria-label="Saved work">
@@ -257,6 +258,14 @@ export function Saved() {
           </div>
         </div>
       )}
+      {clearFailed && (
+        <p role="alert">
+          Some saved data could not be cleared from this browser. Your current
+          view is empty, but saved details may remain. Try again, or use your
+          browser settings to clear this site's stored data before leaving a
+          shared device.
+        </p>
+      )}
       <div className="clear-section">
         <div>
           <h2>Your device. Your details.</h2>
@@ -273,7 +282,7 @@ export function Saved() {
             <button
               className="danger-button"
               onClick={() => {
-                store.clear();
+                setClearFailed(!store.clear());
                 setClearConfirm(false);
               }}
             >

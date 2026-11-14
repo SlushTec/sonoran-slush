@@ -37,7 +37,7 @@ type StoreState = {
   setQuantity: (id: string, n: number) => void;
   toggleFavorite: (slug: string) => void;
   removeDesign: (id: string) => void;
-  clear: () => void;
+  clear: () => boolean;
   notify: (message: string) => void;
 };
 const Context = createContext<StoreState | null>(null);
@@ -179,12 +179,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setDesigns([]);
     setCart([]);
     setFavorites([]);
+    let cleared = false;
     try {
       Object.keys(localStorage)
         .filter((k) => k.startsWith("sonoran:"))
         .forEach((k) => localStorage.removeItem(k));
+      cleared = !Object.keys(localStorage).some((k) => k.startsWith("sonoran:"));
     } catch {}
-    notify("Saved designs and browsing data cleared from this device.");
+    notify(cleared ? "Saved designs and browsing data cleared from this device." : "");
+    return cleared;
   };
   return (
     <Context.Provider

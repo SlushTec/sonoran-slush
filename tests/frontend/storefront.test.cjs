@@ -444,3 +444,39 @@ for(const failure of [false,true])test('previous inquiry kind cannot apply late 
  assert.equal(screen.queryAllByText('Your request is with the studio.').length,0);
  assert.equal(screen.queryAllByRole('alert').length,0);
 });
+
+test('clear saved work reports denied deletion without claiming privacy cleanup',async()=>{
+ writeLocal('inquiry:contact',{values:{name:'Synthetic private draft'},request_id:'synthetic'});
+ localStorage.setItem('other-app:keep','unrelated');
+ wrap(React.createElement(Saved));
+ const button=await screen.findByRole('button',{name:'Clear data on this device'});
+ const proto=Object.getPrototypeOf(localStorage), original=proto.removeItem;
+ proto.removeItem=function(key){if(key==='sonoran:inquiry:contact')throw new Error('synthetic denial');return original.call(this,key);};
+ try{
+  fireEvent.click(button);fireEvent.click(screen.getByRole('button',{name:'Clear all saved work'}));
+  assert.ok(await screen.findByText(/Some saved data could not be cleared/));
+  assert.ok(localStorage.getItem('sonoran:inquiry:contact'));
+  assert.equal(localStorage.getItem('other-app:keep'),'unrelated');
+  assert.equal(screen.queryAllByText('Saved designs and browsing data cleared from this device.').length,0);
+ }finally{proto.removeItem=original;}
+});
+
+test('clear saved work detects retained keys and successful explicit retry dismisses warning',async()=>{
+ writeLocal('inquiry:bulk',{values:{name:'Synthetic'},request_id:'synthetic'});
+ localStorage.setItem('other-app:keep','unrelated');
+ wrap(React.createElement(Saved));
+ const proto=Object.getPrototypeOf(localStorage), original=proto.removeItem;
+ proto.removeItem=function(key){if(key==='sonoran:inquiry:bulk')return;return original.call(this,key);};
+ try{
+  fireEvent.click(await screen.findByRole('button',{name:'Clear data on this device'}));
+  fireEvent.click(screen.getByRole('button',{name:'Clear all saved work'}));
+  assert.match((await screen.findByRole('alert')).textContent,/Some saved data could not be cleared/);
+  assert.ok(localStorage.getItem('sonoran:inquiry:bulk'));
+ }finally{proto.removeItem=original;}
+ fireEvent.click(screen.getByRole('button',{name:'Clear data on this device'}));
+ fireEvent.click(screen.getByRole('button',{name:'Clear all saved work'}));
+ await waitFor(()=>assert.equal(screen.queryAllByRole('alert').length,0));
+ assert.ok(!localStorage.getItem('sonoran:inquiry:bulk'));
+ assert.equal(localStorage.getItem('other-app:keep'),'unrelated');
+ assert.ok(await screen.findByText('Saved designs and browsing data cleared from this device.'));
+});
