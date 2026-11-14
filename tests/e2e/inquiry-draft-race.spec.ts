@@ -1,0 +1,32 @@
+import {test,expect} from "@playwright/test";
+test("confirmed earlier request preserves newer draft and gives its next submission a distinct identity",async({page})=>{
+ const calls:any[]=[];let release!:()=>void;
+ const pending=new Promise<void>(r=>{release=r});
+ await page.route("https://commerce.qa.invalid/**",async route=>{
+  if(route.request().method()==="OPTIONS")return route.fulfill({status:204,headers:{"access-control-allow-origin":"*","access-control-allow-headers":"content-type"}});
+  calls.push(route.request().postDataJSON());
+  if(calls.length===1)await pending;
+  await route.fulfill({status:200,contentType:"application/json",headers:{"access-control-allow-origin":"*"},body:JSON.stringify({id:"msg_"+(calls.length===1?"a":"b").repeat(32),status:"submitted",access_token:"c".repeat(43)})});
+ });
+ await page.goto("/contact");
+ await page.getByLabel("Your name").fill("Earlier draft");
+ await page.getByLabel("Email address").fill("person@example.test");
+ await page.getByLabel("How can we help?").fill("Synthetic inquiry");
+ await page.locator("form input[type=checkbox]").check();
+ await page.getByRole("button",{name:"Save draft on this device"}).click();
+ await page.locator("form button[type=submit]").click();
+ await expect.poll(()=>calls.length).toBe(1);
+ await page.getByLabel("Your name").fill("Newer unsent draft");
+ await page.getByRole("button",{name:"Save draft on this device"}).click();
+ release();
+ await expect(page.getByText("Your request is with the studio.")).toBeVisible();
+ await expect(page.getByText("A newer saved draft remains on this device. Review it before starting another request.")).toBeVisible();
+ await page.reload();
+ await expect(page.getByLabel("Your name")).toHaveValue("Newer unsent draft");
+ await page.locator("form input[type=checkbox]").check();
+ await page.locator("form button[type=submit]").click();
+ await expect(page.getByText("Your request is with the studio.")).toBeVisible();
+ expect(calls).toHaveLength(2);expect(calls[0].name).toBe("Earlier draft");expect(calls[1].name).toBe("Newer unsent draft");
+ expect(calls[1].request_id).not.toBe(calls[0].request_id);
+ expect(await page.evaluate(()=>localStorage.getItem("sonoran:inquiry:contact"))).toBeNull();
+});
