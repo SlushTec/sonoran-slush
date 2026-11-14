@@ -36,6 +36,18 @@ export default function Customizer({ product }: { product: Product }) {
     [rotation, setRotation] = useState(0),
     [reading, setReading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const photoGeneration = useRef(0);
+  function invalidatePhoto() {
+    photoGeneration.current++;
+    setReading(false);
+  }
+  useEffect(() => {
+    invalidatePhoto();
+    setLocalURL("");
+    setPhotoError("");
+    setPhotoLater(false);
+    return () => { photoGeneration.current++; };
+  }, [product.slug]);
   const isPhoto = info.personalization === "photo",
     allowsPhoto = isPhoto || info.personalization === "either";
   useEffect(() => {
@@ -84,6 +96,8 @@ export default function Customizer({ product }: { product: Product }) {
   async function attach(file: File | undefined) {
     setPhotoError("");
     if (!file) return;
+    const owner = ++photoGeneration.current;
+    setReading(false);
     if (file.size > 10 * 1024 * 1024) {
       setPhotoError("Please choose a file smaller than 10 MB.");
       return;
@@ -91,6 +105,7 @@ export default function Customizer({ product }: { product: Product }) {
     setReading(true);
     try {
       const bytes = new Uint8Array(await file.slice(0, 12).arrayBuffer());
+      if (owner !== photoGeneration.current) return;
       const jpeg = bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255,
         png =
           bytes[0] === 137 &&
@@ -108,6 +123,7 @@ export default function Customizer({ product }: { product: Product }) {
       const w = bitmap.width,
         h = bitmap.height;
       bitmap.close();
+      if (owner !== photoGeneration.current) return;
       if (w * h > 40000000)
         throw new Error(
           "That image is too large to preview. Please resize it below 40 megapixels.",
@@ -124,13 +140,14 @@ export default function Customizer({ product }: { product: Product }) {
           "This photo is small. A higher-resolution original will give us more detail to review.",
         );
     } catch (e) {
+      if (owner !== photoGeneration.current) return;
       setPhotoError(
         e instanceof Error
           ? e.message
           : "This file could not be read. Try another photo.",
       );
     } finally {
-      setReading(false);
+      if (owner === photoGeneration.current) setReading(false);
     }
   }
   function validate() {
@@ -571,6 +588,8 @@ export default function Customizer({ product }: { product: Product }) {
                         className="icon-button"
                         aria-label="Remove artwork"
                         onClick={() => {
+                          invalidatePhoto();
+                          setPhotoError("");
                           setLocalURL("");
                           update({ artworkName: "" });
                           if (fileRef.current) fileRef.current.value = "";
@@ -711,6 +730,8 @@ export default function Customizer({ product }: { product: Product }) {
           className="link-button"
           style={{ display: "block", margin: "12px auto 0" }}
           onClick={() => {
+            invalidatePhoto();
+            setPhotoError("");
             store.saveDesign(design);
             const next = emptyDesign(product.slug);
             for (const o of info.options) next.options[o.label] = o.values[0];
