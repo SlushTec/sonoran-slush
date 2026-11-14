@@ -163,6 +163,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     notify("Design saved on this device.");
   };
   const addToCart = (d: Design) => {
+    if (cart.length >= 100 && !cart.some((x) => x.id === d.id)) {
+      notify("Your bag is full (100 designs). Remove a design before adding another. Your current design is still here.");
+      return;
+    }
     setCart((a) =>
       a.some((x) => x.id === d.id)
         ? a.map((x) => (x.id === d.id ? d : x))

@@ -617,3 +617,22 @@ test('retail recovery read denial blocks form instead of creating another identi
  try{wrap(React.createElement(Checkout));assert.ok(await screen.findByText(/Request recovery storage is unavailable/));assert.equal(screen.queryAllByRole('button',{name:'Request reviewed pricing'}).length,0);}
  finally{global.sessionStorage=original;}
 });
+
+test('full bag rejects new designs without saved-work mutation but permits existing updates',async()=>{
+ const {useStore}=require('../../apps/storefront/src/components/Store.tsx');
+ const base={slug:'makertwist-40oz-tumbler',text:'Synthetic',secondary:'',font:'Classic serif',options:{},quantity:1,notes:'',artworkName:'',gift:false,giftMessage:'',updated:'2026-11-14'};
+ const originals=Array.from({length:100},(_,i)=>({...base,id:'existing-'+i}));
+ writeLocal('cart',originals);writeLocal('designs',[{...base,id:'saved-only'}]);
+ let observed;
+ function Probe(){observed=useStore();return React.createElement('button',{onClick:()=>observed.addToCart({...base,id:'new-design'})},'Add synthetic');}
+ wrap(React.createElement(Probe));await waitFor(()=>assert.equal(observed.cart.length,100));
+ fireEvent.click(screen.getByRole('button',{name:'Add synthetic'}));
+ assert.match(screen.getByRole('status').textContent,/bag is full/);
+ assert.deepEqual(observed.cart,originals);assert.deepEqual(observed.designs.map(d=>d.id),['saved-only']);
+ const {act}=require('@testing-library/react');
+ await act(async()=>observed.addToCart({...originals[0],quantity:3}));
+ assert.equal(observed.cart.length,100);assert.equal(observed.cart[0].quantity,3);assert.match(screen.getByRole('status').textContent,/added to your bag/);
+ await act(async()=>observed.removeCart('existing-1'));
+ fireEvent.click(screen.getByRole('button',{name:'Add synthetic'}));
+ assert.equal(observed.cart.length,100);assert.ok(observed.cart.some(d=>d.id==='new-design'));
+});
