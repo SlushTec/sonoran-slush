@@ -1,6 +1,7 @@
 "use client";
 import { verifiedReceipt, type Receipt } from "@/lib/receipt";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { readRetailAttempt, prepareRetailAttempt, confirmRetailAttempt, clearConfirmedRetailAttempt, type RetailAttempt } from "@/lib/retail-attempt";
 import Link from "next/link";
 import { catalog } from "@/lib/catalog";
 import { infoFor } from "@/lib/shop";
@@ -314,7 +315,9 @@ export function Checkout() {
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [receipt, setReceipt] = useState<Receipt | null>(null),
-    [requestID] = useState(() => newId()),
+    [attempt, setAttempt] = useState<RetailAttempt | null>(null),
+    [recoveryReady, setRecoveryReady] = useState(false),
+    [recoveryError, setRecoveryError] = useState(""),
     [delivery, setDelivery] = useState("Ship to an address"),
     [contact, setContact] = useState({
       name: "",
@@ -331,17 +334,49 @@ export function Checkout() {
       giftMessage: "",
     }),
     [consent, setConsent] = useState(false);
+  const locked = useRef(false);
+  function checkRecovery() {
+    try {
+      setAttempt(readRetailAttempt());
+      setRecoveryError("");
+      setRecoveryReady(true);
+    } catch (err) {
+      setRecoveryReady(false);
+      setRecoveryError(err instanceof Error ? err.message : "Request recovery could not be checked.");
+    }
+  }
+  useEffect(() => { checkRecovery(); }, []);
+  function startAnother() {
+    if (locked.current || !attempt || (!receipt && attempt.state !== "confirmed")) return;
+    try {
+      if (receipt) confirmRetailAttempt(attempt.id);
+      clearConfirmedRetailAttempt(attempt.id);
+      setAttempt(null);
+      setReceipt(null);
+      setConsent(false);
+      setContact({ name: "", email: "", phone: "", address: "", city: "", region: "", postal: "", country: "US", notes: "", gift: false, recipient: "", giftMessage: "" });
+      setDelivery("Ship to an address");
+      setError("");
+      setRecoveryError("");
+      setRecoveryReady(true);
+    } catch (err) {
+      setRecoveryError(err instanceof Error ? err.message : "The previous reference could not be reset.");
+    }
+  }
   function edit(key: keyof typeof contact, value: string | boolean) {
     setContact((v) => ({ ...v, [key]: value }));
   }
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (busy || !consent) return;
+    if (locked.current || busy || !consent || !recoveryReady) return;
+    locked.current = true;
     setBusy(true);
     setError("");
     try {
+      const pending = prepareRetailAttempt(attempt);
+      setAttempt(pending);
       const result = await commerce<unknown>("/v1/quotes", {
-        request_id: requestID,
+        request_id: pending.id,
         kind: "retail",
         name: contact.name,
         email: contact.email,
@@ -373,6 +408,12 @@ export function Checkout() {
         consent: true,
       });
       setReceipt(verifiedReceipt(result, "retail"));
+      try {
+        setAttempt(confirmRetailAttempt(pending.id));
+        setRecoveryError("");
+      } catch {
+        setRecoveryError("Your request is confirmed, but this tab could not save that status. Download your private receipt before leaving.");
+      }
     } catch (err) {
       setError(
         err instanceof Error
@@ -380,6 +421,7 @@ export function Checkout() {
           : "Your request could not be sent. Your designs are still here.",
       );
     } finally {
+      locked.current = false;
       setBusy(false);
     }
   }
@@ -389,6 +431,15 @@ export function Checkout() {
         Preparing your request…
       </p>
     );
+  if (!recoveryReady)
+    return <section><p role={recoveryError ? "alert" : "status"}>{recoveryError || "Checking request recovery…"}</p>{recoveryError && <button onClick={checkRecovery}>Check request recovery again</button>}</section>;
+  if (attempt?.state === "confirmed" && !receipt)
+    return <section>
+      <h2>An earlier request was confirmed in this tab.</h2>
+      <p>Your private receipt and contact details were not saved here. Use your downloaded receipt to open it, or contact the studio before repeating that request.</p>
+      {recoveryError && <p role="alert">{recoveryError}</p>}
+      <button onClick={startAnother}>Start another request</button>
+    </section>;
   if (!store.cart.length)
     return (
       <div className="section" style={{ paddingTop: 0 }}>
@@ -427,12 +478,17 @@ export function Checkout() {
           >
             Download private receipt <Icon name="download" />
           </button>
+          {recoveryError && <p role="alert">{recoveryError}</p>}
+          <p>Starting another request creates a separate request for the designs still in your bag.</p>
+          <button onClick={startAnother}>Start another request</button>
         </div>
       </section>
     );
   return (
     <div className="bag-layout">
       <form onSubmit={submit}>
+        {attempt?.state === "pending" && <p role="status">An earlier submission may have reached the studio. Re-enter the same details and retry explicitly to recover its receipt. Changing details will not reset its request reference.</p>}
+        <p className="small">This tab keeps only an opaque request reference and recovery status. Contact details and private access codes are not saved. Recovery is not shared across tabs or devices.</p>
         <div className="info-banner">
           This private review is not taking payments. This form prepares a
           request for reviewed pricing. No card details are collected.

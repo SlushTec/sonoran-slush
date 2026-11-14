@@ -164,6 +164,7 @@ export function Information({ path }: { path: string }) {
           paragraphs: [
             "Design text, selected options, favorites, and your bag are saved in this browser’s local storage for up to 30 days after the latest save. If you explicitly save an inquiry draft, that draft includes the form details you entered.",
             "Local storage is tied to the browser and device. It is not an online account or a way to move designs across devices. On a shared device, clear your saved work when you are finished.",
+            "Retail pricing requests also keep an opaque request reference and recovery status in this tab’s session storage. Contact details and private access codes are not included. This reduces accidental repeat requests after a reload, but does not guarantee recovery across tabs, devices, browser restarts, or cleared storage. Saved-work cleanup does not reset an unresolved request reference. Browser session restoration may retain this reference.",
           ],
         },
         {
