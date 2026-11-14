@@ -118,7 +118,10 @@ async def payment_webhook(request: Request, x_square_hmacsha256_signature: Annot
     payload = verify_signature(raw, x_square_hmacsha256_signature or "", os.environ["SQUARE_SANDBOX_WEBHOOK_KEY"], os.environ["SQUARE_WEBHOOK_NOTIFICATION_URL"])
     if payload.get("merchant_id") != os.environ["SQUARE_SANDBOX_MERCHANT_ID"]:
         raise HTTPException(400, "The event merchant does not match the configured sandbox merchant.")
-    if payload.get("type") not in {"payment.created", "payment.updated"}:
+    event_type = payload.get("type")
+    if not isinstance(event_type, str) or not event_type:
+        raise HTTPException(400, "The event type is invalid.")
+    if event_type not in {"payment.created", "payment.updated"}:
         return {"received": True, "applied": False}
     data = payload.get("data")
     obj = data.get("object") if isinstance(data, dict) else None
