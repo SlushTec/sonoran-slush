@@ -31,7 +31,7 @@ type StoreState = {
   hydrated: boolean;
   storageAvailable: boolean;
   notice: string;
-  saveDesign: (d: Design) => void;
+  saveDesign: (d: Design) => boolean;
   addToCart: (d: Design) => void;
   removeCart: (id: string) => void;
   setQuantity: (id: string, n: number) => void;
@@ -41,6 +41,13 @@ type StoreState = {
   notify: (message: string) => void;
 };
 const Context = createContext<StoreState | null>(null);
+function persistVerified(key: string, value: unknown): boolean {
+  if (!writeLocal(key, value)) return false;
+  try {
+    const raw = JSON.parse(localStorage.getItem("sonoran:" + key) || "null");
+    return raw?.expires > Date.now() && JSON.stringify(raw.value) === JSON.stringify(value);
+  } catch { return false; }
+}
 export function parseDesign(value: unknown): Design | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const raw = value as Record<string, unknown>;
@@ -144,9 +151,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (hydrated) {
       const ok = [
-        writeLocal("designs", designs),
-        writeLocal("cart", cart),
-        writeLocal("favorites", favorites),
+        persistVerified("designs", designs),
+        persistVerified("cart", cart),
+        persistVerified("favorites", favorites),
       ].every(Boolean);
       setStorageAvailable(ok);
     }
@@ -159,8 +166,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [notice]);
   const notify = useCallback((message: string) => setNotice(message), []);
   const saveDesign = (d: Design) => {
-    setDesigns((a) => [d, ...a.filter((x) => x.id !== d.id)].slice(0, 100));
-    notify("Design saved on this device.");
+    const next = [d, ...designs.filter((x) => x.id !== d.id)].slice(0, 100);
+    const persisted = persistVerified("designs", next);
+    setDesigns(next);
+    setStorageAvailable(persisted);
+    notify(persisted ? "Design saved on this device." : "Design kept for this visit only. Device storage could not be verified; do not close this page if you need this work.");
+    return persisted;
   };
   const addToCart = (d: Design) => {
     if (cart.length >= 100 && !cart.some((x) => x.id === d.id)) {
