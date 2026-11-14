@@ -636,3 +636,19 @@ test('full bag rejects new designs without saved-work mutation but permits exist
  fireEvent.click(screen.getByRole('button',{name:'Add synthetic'}));
  assert.equal(observed.cart.length,100);assert.ok(observed.cart.some(d=>d.id==='new-design'));
 });
+
+for(const mode of ['healthy','denied','noop','read-denied'])test('design save outcome '+mode+' preserves visit work',async()=>{
+ const {useStore}=require('../../apps/storefront/src/components/Store.tsx');let store,result;
+ const d={id:'save-probe',slug:'makertwist-40oz-tumbler',text:'Synthetic',secondary:'',font:'Classic serif',options:{},quantity:1,notes:'',artworkName:'',gift:false,giftMessage:'',updated:'2026-11-14'};
+ function Probe(){store=useStore();return React.createElement('button',{onClick:()=>{result=store.saveDesign(d);}},'Save synthetic');}
+ wrap(React.createElement(Probe));await waitFor(()=>assert.ok(store.hydrated));
+ const proto=Object.getPrototypeOf(localStorage),set=proto.setItem,get=proto.getItem;
+ try{
+  if(mode==='denied'||mode==='noop')proto.setItem=function(k,v){if(k.startsWith('sonoran:')){if(mode==='denied')throw Error('synthetic denial');return;}return set.call(this,k,v);};
+  if(mode==='read-denied')proto.getItem=function(k){if(k.startsWith('sonoran:'))throw Error('synthetic denial');return get.call(this,k);};
+  fireEvent.click(screen.getByRole('button',{name:'Save synthetic'}));
+  assert.equal(result,mode==='healthy');assert.equal(store.designs[0].text,'Synthetic');
+  assert.match(screen.getByRole('status').textContent,mode==='healthy'?/saved on this device/:/visit only/);
+  assert.equal(store.storageAvailable,mode==='healthy');
+ }finally{proto.setItem=set;proto.getItem=get;}
+});

@@ -739,7 +739,7 @@ export default function Customizer({ product }: { product: Product }) {
           onClick={() => {
             invalidatePhoto();
             setPhotoError("");
-            store.saveDesign(design);
+            const persisted = store.saveDesign(design);
             const next = emptyDesign(product.slug);
             for (const o of info.options) next.options[o.label] = o.values[0];
             if (crystal) next.options["Crystal shape"] = crystal.shape;
@@ -748,7 +748,9 @@ export default function Customizer({ product }: { product: Product }) {
             setLocalURL("");
             setPhotoLater(false);
             setError("");
-            store.notify("Previous design saved. A fresh design is ready.");
+            store.notify(persisted
+              ? "Previous design saved on this device. A fresh design is ready."
+              : "Previous design kept for this visit only, not saved on this device. A fresh design is ready; keep this page open to retain your work.");
           }}
         >
           Save & start another design
