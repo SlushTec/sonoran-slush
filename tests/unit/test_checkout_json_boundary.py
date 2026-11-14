@@ -11,7 +11,7 @@ def fake_transport(monkeypatch, raw):
         def __enter__(self): return self
         def __exit__(self, *args): pass
         def read(self, limit):
-            assert limit == 65536
+            assert limit == 65537
             return raw
     opener = Mock()
     opener.open.return_value = Response()

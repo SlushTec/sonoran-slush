@@ -22,7 +22,7 @@ def test_documented_sandbox_checkout_response(connected,monkeypatch,url):
         def __enter__(self): return self
         def __exit__(self,*args): pass
         def read(self,limit):
-            assert limit==65536
+            assert limit==65537
             return json.dumps({'payment_link':{'id':'UO6BJB7EXQOQKIDA','version':1,'order_id':'0mKB0CULaS8SYRAJXaoIp1SUABZZY','url':url}}).encode()
     def open_mock(request,timeout):
         assert request.full_url=='https://connect.squareupsandbox.com/v2/online-checkout/payment-links'

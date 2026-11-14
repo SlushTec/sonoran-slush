@@ -49,7 +49,10 @@ def square_checkout(fields: dict) -> dict:
         headers={"Authorization": "Bearer "+os.environ["SQUARE_SANDBOX_ACCESS_TOKEN"], "Content-Type": "application/json", "Square-Version": "2026-09-16"}, method="POST")
     try:
         with urllib.request.build_opener(RefuseRedirects()).open(request, timeout=12) as response:
-            link = json.loads(response.read(65536)).get("payment_link", {})
+            raw = response.read(65537)
+            if len(raw) > 65536:
+                raise ValueError("Oversize sandbox response")
+            link = json.loads(raw).get("payment_link", {})
         if not all(isinstance(link.get(k), str) and link[k] for k in ("id", "order_id", "url")) or not sandbox_checkout_url(link.get("url")):
             raise ValueError("Unexpected sandbox response")
         return link
