@@ -278,3 +278,47 @@ test('customer portal source has no unreachable legacy portal or legacy transpor
  assert.equal(imports.includes('@/lib/client'),false);
  assert.equal(source.parseDiagnostics.length,0);
 });
+
+for (const [label, result] of [
+ ['null',null],['empty',{}],['array',[]],['missing token',{id:'msg_'+'a'.repeat(32),status:'submitted'}],
+ ['wrong kind',{id:'evt_'+'a'.repeat(32),status:'submitted',access_token:'a'.repeat(43)}],
+ ['invalid token',{id:'msg_'+'a'.repeat(32),status:'submitted',access_token:'private\nmarker'}],
+ ['trailing token newline',{id:'msg_'+'a'.repeat(32),status:'submitted',access_token:'a'.repeat(43)+'\n'}],
+ ['trailing id newline',{id:'msg_'+'a'.repeat(32)+'\n',status:'submitted',access_token:'a'.repeat(43)}],
+ ['trailing status newline',{id:'msg_'+'a'.repeat(32),status:'submitted\n',access_token:'a'.repeat(43)}],
+ ['missing status',{id:'msg_'+'a'.repeat(32),access_token:'a'.repeat(43)}],
+]) test('unverified inquiry receipt preserves draft and retry identity: '+label,async()=>{
+ process.env.NEXT_PUBLIC_COMMERCE_API_URL='https://commerce.qa.invalid';
+ const calls=[];
+ global.fetch=async(url,options)=>{calls.push(JSON.parse(options.body));return {ok:true,json:async()=>result};};
+ wrap(React.createElement(InquiryForm,{kind:'contact'}));
+ fireEvent.change(await screen.findByLabelText('Your name'),{target:{value:'Synthetic Person'}});
+ fireEvent.change(screen.getByLabelText('Email address'),{target:{value:'person@example.test'}});
+ fireEvent.click(screen.getByRole('checkbox'));
+ fireEvent.click(screen.getByRole('button',{name:'Save draft on this device'}));
+ const saved=localStorage.getItem('sonoran:inquiry:contact');
+ fireEvent.submit(document.querySelector('form'));
+ assert.match((await screen.findByRole('alert')).textContent,/could not verify.*receipt/i);
+ assert.equal(screen.queryAllByText('Your request is with the studio.').length,0);
+ assert.equal(localStorage.getItem('sonoran:inquiry:contact'),saved);
+ assert.equal(screen.getByLabelText('Your name').value,'Synthetic Person');
+ await waitFor(()=>assert.equal(document.querySelector('button[type="submit"]').disabled,false));
+ fireEvent.submit(document.querySelector('form'));
+ await waitFor(()=>assert.equal(calls.length,2));
+ assert.deepEqual(calls[1],calls[0]);
+});
+
+test('verified inquiry receipt alone clears saved draft',async()=>{
+ process.env.NEXT_PUBLIC_COMMERCE_API_URL='https://commerce.qa.invalid';
+ const id='msg_'+'b'.repeat(32);
+ global.fetch=async()=>({ok:true,json:async()=>({id,status:'submitted',access_token:'a'.repeat(43)})});
+ wrap(React.createElement(InquiryForm,{kind:'contact'}));
+ fireEvent.change(await screen.findByLabelText('Your name'),{target:{value:'Synthetic Person'}});
+ fireEvent.change(screen.getByLabelText('Email address'),{target:{value:'person@example.test'}});
+ fireEvent.click(screen.getByRole('checkbox'));
+ fireEvent.click(screen.getByRole('button',{name:'Save draft on this device'}));
+ fireEvent.submit(document.querySelector('form'));
+ assert.ok(await screen.findByText('Your request is with the studio.'));
+ assert.ok(screen.getByText(id));
+ assert.ok(localStorage.getItem('sonoran:inquiry:contact') === null);
+});
