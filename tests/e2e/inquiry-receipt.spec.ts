@@ -1,0 +1,30 @@
+import { test, expect } from "@playwright/test";
+test("unverified receipt keeps saved contact and retry identity across reload", async ({ page }) => {
+  const requests: unknown[] = [];
+  let valid = false;
+  await page.route("https://commerce.qa.invalid/**", async route => {
+    if (route.request().method() === "OPTIONS") return route.fulfill({status:204,headers:{"access-control-allow-origin":"*","access-control-allow-headers":"content-type"}});
+    requests.push(route.request().postDataJSON());
+    await route.fulfill({status:200,contentType:"application/json",headers:{"access-control-allow-origin":"*"},body:JSON.stringify(valid ? {id:"msg_"+"a".repeat(32),status:"submitted",access_token:"b".repeat(43)} : {})});
+  });
+  await page.goto("/contact");
+  await page.getByLabel("Your name").fill("Synthetic Person");
+  await page.getByLabel("Email address").fill("person@example.test");
+  await page.getByLabel("How can we help?").fill("Synthetic inquiry only.");
+  await page.locator("form.inquiry-form input[type=checkbox]").check();
+  await page.getByRole("button",{name:"Save draft on this device"}).click();
+  const saved = await page.evaluate(() => localStorage.getItem("sonoran:inquiry:contact"));
+  await page.locator("form.inquiry-form button[type=submit]").click();
+  await expect(page.locator("form.inquiry-form").getByRole("alert")).toContainText("The studio may have received your request.");
+  await expect(page.getByText("Your request is with the studio.")).toHaveCount(0);
+  expect(await page.evaluate(() => localStorage.getItem("sonoran:inquiry:contact"))).toBe(saved);
+  await page.reload();
+  await expect(page.getByLabel("Your name")).toHaveValue("Synthetic Person");
+  await page.locator("form.inquiry-form input[type=checkbox]").check();
+  valid = true;
+  await page.locator("form.inquiry-form button[type=submit]").click();
+  await expect(page.getByText("Your request is with the studio.")).toBeVisible();
+  expect(requests).toHaveLength(2);
+  expect(requests[1]).toEqual(requests[0]);
+  expect(await page.evaluate(() => localStorage.getItem("sonoran:inquiry:contact"))).toBeNull();
+});
