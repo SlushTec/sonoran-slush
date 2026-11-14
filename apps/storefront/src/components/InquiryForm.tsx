@@ -42,6 +42,7 @@ export default function InquiryForm({
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [receipt, setReceipt] = useState<Receipt | null>(null),
+    [newerDraft, setNewerDraft] = useState(false),
     [requestID, setRequestID] = useState(""),
     [step, setStep] = useState(0);
   const event = kind === "event",
@@ -85,6 +86,12 @@ export default function InquiryForm({
     if (busy || !consent) return;
     setBusy(true);
     setError("");
+    const storageKey = "sonoran:inquiry:" + kind;
+    let savedAtSubmission: string | null | undefined;
+    try {
+      savedAtSubmission = localStorage.getItem(storageKey);
+    } catch {}
+    const submittedValues = { ...v };
     try {
       const result = await commerce<unknown>(
         event ? "/v1/events/requests" : contact ? "/v1/contact" : "/v1/quotes",
@@ -92,7 +99,35 @@ export default function InquiryForm({
       );
       setReceipt(verifiedReceipt(result, kind));
       try {
-        localStorage.removeItem("sonoran:inquiry:" + kind);
+        const current = localStorage.getItem(storageKey);
+        if (savedAtSubmission !== undefined && current === savedAtSubmission) {
+          localStorage.removeItem(storageKey);
+        } else if (current !== null) {
+          setNewerDraft(true);
+          const saved = JSON.parse(current);
+          // Only a confirmed successful submission consumes this identity.
+          // Preserve all saved content and expiry; never rotate on an uncertain response.
+          if (
+            saved?.value?.request_id === requestID &&
+            saved.value.values &&
+            typeof saved.value.values === "object" &&
+            !Array.isArray(saved.value.values) &&
+            typeof saved.expires === "number" &&
+            saved.expires > Date.now() &&
+            Object.keys(initial).every(
+              (key) => typeof saved.value.values[key] === "string",
+            ) &&
+            Object.keys(initial).some(
+              (key) =>
+                saved.value.values[key] !==
+                submittedValues[key as keyof Values],
+            )
+          ) {
+            saved.value.request_id = newId();
+            if (localStorage.getItem(storageKey) === current)
+              localStorage.setItem(storageKey, JSON.stringify(saved));
+          }
+        }
       } catch {}
     } catch (err) {
       setError(
@@ -121,6 +156,12 @@ export default function InquiryForm({
             ? "This is an inquiry. Your date is not reserved or confirmed until the studio reviews availability and agrees the booking with you."
             : "The studio will review the details. No payment or production commitment has been made."}
         </p>
+        {newerDraft && (
+          <p>
+            A newer saved draft remains on this device. Review it before
+            starting another request.
+          </p>
+        )}
         <p>
           Save your private receipt to retain the access code for this request.
         </p>

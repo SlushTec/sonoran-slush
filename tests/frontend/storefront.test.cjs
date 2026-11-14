@@ -351,3 +351,50 @@ test('shared receipt projection preserves supported replay status and drops unre
   assert.deepEqual(verifiedReceipt({...receipt,internal_notes:'excluded',message:'excluded'},kind),receipt);
  }
 });
+
+for(const originallySaved of [false,true]) test('inquiry success preserves newer explicit draft saved while request pending: '+originallySaved,async()=>{
+ process.env.NEXT_PUBLIC_COMMERCE_API_URL='https://commerce.qa.invalid';
+ let release; const pending=new Promise(resolve=>{release=resolve;});let sent;
+ global.fetch=async(url,options)=>{sent=JSON.parse(options.body);await pending;return {ok:true,json:async()=>({id:'msg_'+'a'.repeat(32),status:'submitted',access_token:'b'.repeat(43)})};};
+ wrap(React.createElement(InquiryForm,{kind:'contact'}));
+ fireEvent.change(await screen.findByLabelText('Your name'),{target:{value:'Earlier draft'}});
+ fireEvent.change(screen.getByLabelText('Email address'),{target:{value:'person@example.test'}});
+ fireEvent.click(screen.getByRole('checkbox'));
+ if(originallySaved)fireEvent.click(screen.getByRole('button',{name:'Save draft on this device'}));
+ fireEvent.submit(document.querySelector('form'));
+ await waitFor(()=>assert.equal(sent.name,'Earlier draft'));
+ fireEvent.change(screen.getByLabelText('Your name'),{target:{value:'Newer unsent draft'}});
+ fireEvent.click(screen.getByRole('button',{name:'Save draft on this device'}));
+ const newer=localStorage.getItem('sonoran:inquiry:contact');
+ release();
+ assert.ok(await screen.findByText('Your request is with the studio.'));
+ const restored=JSON.parse(localStorage.getItem('sonoran:inquiry:contact'));
+ const before=JSON.parse(newer);
+ assert.deepEqual(restored.value.values,before.value.values);
+ assert.equal(restored.expires,before.expires);
+ assert.notEqual(restored.value.request_id,sent.request_id);
+ assert.ok(await screen.findByText('A newer saved draft remains on this device. Review it before starting another request.'));
+});
+
+for(const variant of ['foreign','malformed','expired','ambiguous']) test('inquiry completion preserves unrelated or uncertain saved draft: '+variant,async()=>{
+ process.env.NEXT_PUBLIC_COMMERCE_API_URL='https://commerce.qa.invalid';
+ let release,sent;const pending=new Promise(resolve=>{release=resolve;});
+ global.fetch=async(url,options)=>{sent=JSON.parse(options.body);await pending;return {ok:true,json:async()=>variant==='ambiguous'?{}:{id:'msg_'+'a'.repeat(32),status:'submitted',access_token:'b'.repeat(43)}};};
+ wrap(React.createElement(InquiryForm,{kind:'contact'}));
+ fireEvent.change(await screen.findByLabelText('Your name'),{target:{value:'Earlier draft'}});
+ fireEvent.change(screen.getByLabelText('Email address'),{target:{value:'person@example.test'}});
+ fireEvent.click(screen.getByRole('checkbox'));
+ fireEvent.submit(document.querySelector('form'));
+ await waitFor(()=>assert.equal(sent.name,'Earlier draft'));
+ fireEvent.change(screen.getByLabelText('Your name'),{target:{value:'New draft'}});
+ fireEvent.click(screen.getByRole('button',{name:'Save draft on this device'}));
+ const saved=JSON.parse(localStorage.getItem('sonoran:inquiry:contact'));
+ if(variant==='foreign')saved.value.request_id='foreign-request';
+ if(variant==='expired')saved.expires=1;
+ const raw=variant==='malformed'?'{broken':JSON.stringify(saved);
+ localStorage.setItem('sonoran:inquiry:contact',raw);
+ release();
+ if(variant==='ambiguous')assert.match((await screen.findByRole('alert')).textContent,/could not verify/);
+ else assert.ok(await screen.findByText('Your request is with the studio.'));
+ assert.equal(localStorage.getItem('sonoran:inquiry:contact'),raw);
+});
