@@ -8,7 +8,7 @@ const fs = require("node:fs"),
   os = require("node:os"),
   net = require("node:net"),
   assert = require("node:assert/strict");
-const { chromium } = require("@playwright/test");
+const { chromium, expect } = require("@playwright/test");
 const root = path.resolve(__dirname, "../.."),
   python = process.env.QUOTE_SMOKE_PYTHON;
 if (!python)
@@ -28,7 +28,7 @@ if (
 const staff = randomBytes(32).toString("hex"),
   access = randomBytes(32).toString("hex"),
   children = [];
-let browser;
+let browser, outcome;
 async function unused() {
   return new Promise((resolve, reject) => {
     const s = net.createServer();
@@ -60,22 +60,24 @@ function start(command, args, env) {
 async function ready(url, logs) {
   for (let n = 0; n < 120; n++) {
     try {
-      if ((await fetch(url)).ok) return;
+      if ((await fetch(url, { redirect: "error" })).ok) return;
     } catch {}
     await new Promise((r) => setTimeout(r, 250));
   }
   throw Error("Owned local server did not become ready: " + logs());
 }
 async function stop(c) {
-  if (c.exitCode !== null) return;
+  if (c.exitCode !== null || c.signalCode !== null) return;
+  if (!Number.isSafeInteger(c.pid) || c.pid <= 0) throw Error("Owned PID unavailable");
   if (process.platform === "win32")
     spawnSync("taskkill", ["/pid", String(c.pid), "/T", "/F"], {
       windowsHide: true,
       stdio: "ignore",
     });
   else c.kill("SIGTERM");
-  for (let n = 0; n < 30 && c.exitCode === null; n++)
+  for (let n = 0; n < 30 && c.exitCode === null && c.signalCode === null; n++)
     await new Promise((r) => setTimeout(r, 100));
+  if (c.exitCode === null && c.signalCode === null) throw Error("Owned child stop unverified");
 }
 (async () => {
   const apiPort = await unused(),
@@ -85,6 +87,7 @@ async function stop(c) {
   const env = {
     ...process.env,
     PYTHONUTF8: "1",
+    PYTHONPATH: root,
     SONORAN_STAGE: "scaffold",
     SONORAN_REQUESTS_ENABLED: "true",
     SONORAN_RETAIL_TEST_ENABLED: "true",
@@ -96,9 +99,13 @@ async function stop(c) {
   };
   // Explicitly disable real provider/payment activation; no production data is used.
   env.SONORAN_TEST_PAYMENTS_ENABLED = "false";
+  for (const key of Object.keys(env)) {
+    if (/^(SQUARE_|STRIPE_|PAYPAL_|OPENAI_|ANTHROPIC_|AWS_)/i.test(key)) delete env[key];
+  }
   const backendLogs = start(
     python,
     [
+      "-B",
       "-m",
       "uvicorn",
       "services.commerce.app.main:app",
@@ -125,6 +132,7 @@ async function stop(c) {
     await ready(ui + "/api/health", frontendLogs);
     async function request(route, body, token) {
       const r = await fetch(api + route, {
+        redirect: "error",
         method: body ? "POST" : "GET",
         headers: {
           "Content-Type": "application/json",
@@ -172,52 +180,100 @@ async function stop(c) {
       consent: true,
       items: [],
     });
-    browser = await chromium.launch({ headless: true });
-    const page = await browser.newPage({
-      viewport: { width: 1280, height: 900 },
+    browser = await chromium.launch({
+      headless: true,
+      ...(process.env.QUOTE_SMOKE_BROWSER ? { executablePath: process.env.QUOTE_SMOKE_BROWSER } : {}),
     });
-    let relayed = 0;
-    await page.route("https://commerce.qa.invalid/**", async (route) => {
-      const req = route.request(),
-        u = new URL(req.url());
+    const context = await browser.newContext({
+      serviceWorkers: "block", viewport: { width: 1280, height: 900 },
+    });
+    const page = await context.newPage();
+    let relayed = 0, externalAttempts = 0, loseAcceptedResponse = false;
+    const acceptanceCalls = [];
+    await context.route("**/*", async (route) => {
+      const req = route.request(), u = new URL(req.url());
+      if (u.origin === ui || u.protocol === "blob:" || u.href === "about:blank")
+        return route.continue();
+      if (u.origin !== "https://commerce.qa.invalid") {
+        externalAttempts++;
+        return route.abort();
+      }
       const response = await fetch(api + u.pathname + u.search, {
+        redirect: "error",
         method: req.method(),
         headers: {
           "Content-Type": "application/json",
-          ...(req.headers().authorization
-            ? { Authorization: req.headers().authorization }
-            : {}),
+          ...(req.headers().authorization ? { Authorization: req.headers().authorization } : {}),
         },
         body: req.postData() || undefined,
       });
       relayed++;
-      await route.fulfill({
-        status: response.status,
-        body: await response.text(),
-        contentType: "application/json",
-      });
+      const body = await response.text();
+      if (u.pathname.endsWith("/accept")) {
+        acceptanceCalls.push({ body: req.postDataJSON(), status: response.status });
+        if (loseAcceptedResponse) {
+          loseAcceptedResponse = false;
+          assert.equal(response.status, 200);
+          const committed = JSON.parse(body);
+          assert.equal(committed.status, "accepted");
+          assert.equal(committed.accepted_version, 3);
+          // Commit has happened in the real temporary ledger. Only its browser response is discarded.
+          return route.abort("failed");
+        }
+      }
+      await route.fulfill({ status: response.status, body, contentType: "application/json" });
     });
     await page.goto(ui + "/quotes");
     await page.getByLabel("Request reference").fill(quote.id);
     await page.getByLabel("Private access code").fill(quote.access_token);
     await page.getByRole("button", { name: "Open securely" }).click();
+    await expect(page.getByRole("button", { name: "Accept quote version 2", exact: true })).toBeVisible();
+    // Staff setup is a real local API call, not proof of a live staff/customer service.
+    await request("/v1/admin/quotes/" + quote.id + "/offer",
+      { version: 2, total_minor: 2345, message: "Revised synthetic terms, version three" }, staff);
+    const revised = await request("/v1/quotes/" + quote.id, undefined, quote.access_token);
+    assert.equal(revised.version, 3);
+    assert.equal(revised.status, "offered");
     await page.getByRole("checkbox").check();
-    await page.getByRole("button", { name: "Accept quote version 2" }).click();
-    await page.locator(".form-success[role=status]").waitFor();
-    const accepted = await request(
-      "/v1/quotes/" + quote.id,
-      undefined,
-      quote.access_token,
-    );
+    await page.getByRole("button", { name: "Accept quote version 2", exact: true }).click();
+    await expect(page.locator(".form-error[role=alert]")).toContainText("Acceptance could not be verified");
+    await expect(page.getByRole("region", { name: "Current request" })).toHaveCount(0);
+    await expect(page.locator(".form-success[role=status]")).toHaveCount(0);
+    assert.deepEqual(acceptanceCalls, [{ body: { version: 2, decision: "accept" }, status: 409 }]);
+    assert.deepEqual(await request("/v1/quotes/" + quote.id, undefined, quote.access_token), revised,
+      "Stale acceptance must not mutate the newer offered record");
+
+    await page.getByRole("button", { name: "Open securely", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Accept quote version 3", exact: true })).toBeVisible();
+    await expect(page.getByText("Revised synthetic terms, version three", { exact: true })).toBeVisible();
+    loseAcceptedResponse = true;
+    await page.getByRole("checkbox").check();
+    await page.getByRole("button", { name: "Accept quote version 3", exact: true }).click();
+    await expect(page.locator(".form-error[role=alert]")).toContainText("no acceptance is confirmed here");
+    await expect(page.getByRole("region", { name: "Current request" })).toHaveCount(0);
+    await expect(page.locator(".form-success[role=status]")).toHaveCount(0);
+    const accepted = await request("/v1/quotes/" + quote.id, undefined, quote.access_token);
     assert.equal(accepted.status, "accepted");
-    assert.equal(accepted.accepted_version, 2);
-    assert.equal(accepted.total_minor, 1234);
-    assert.equal(accepted.message, "Synthetic reviewed offer\nSecond line");
-    const replay = await request(
-      "/v1/quotes/" + quote.id + "/accept",
-      { version: 2, decision: "accept" },
-      quote.access_token,
-    );
+    assert.equal(accepted.accepted_version, 3);
+    assert.equal(accepted.total_minor, 2345);
+    assert.equal(accepted.message, revised.message);
+    assert.deepEqual(acceptanceCalls, [
+      { body: { version: 2, decision: "accept" }, status: 409 },
+      { body: { version: 3, decision: "accept" }, status: 200 },
+    ]);
+    // Reload clears in-memory private credentials, makes no automatic acceptance attempt.
+    await page.reload();
+    await expect(page.getByLabel("Private access code")).toHaveValue("");
+    await expect(page.getByRole("region", { name: "Current request" })).toHaveCount(0);
+    await page.getByLabel("Request reference").fill(quote.id);
+    await page.getByLabel("Private access code").fill(quote.access_token);
+    await page.getByRole("button", { name: "Open securely", exact: true }).click();
+    await expect(page.getByText(/The studio record shows acceptance of this exact quote version/)).toBeVisible();
+    await expect(page.getByRole("checkbox")).toHaveCount(0);
+    assert.equal(acceptanceCalls.length, 2, "Explicit recovery lookup does not replay acceptance");
+    assert.deepEqual(await request("/v1/quotes/" + quote.id, undefined, quote.access_token), accepted);
+    const replay = await request("/v1/quotes/" + quote.id + "/accept",
+      { version: 3, decision: "accept" }, quote.access_token);
     assert.deepEqual(replay, accepted);
     fs.mkdirSync(path.join(root, "artifacts"), { recursive: true });
     await page.evaluate(() => window.scrollTo(0, 0));
@@ -234,26 +290,28 @@ async function stop(c) {
     await page.getByRole("button", { name: "Close private record" }).click();
     assert.equal(await page.getByLabel("Private access code").inputValue(), "");
     assert.ok(relayed >= 3);
-    console.log(
-      JSON.stringify({
-        result: "PASS",
-        source:
-          "real loopback ASGI and isolated synthetic database; no provider calls",
-        relayed_requests: relayed,
-        accepted_version: accepted.accepted_version,
-        replay_identical: true,
-        contact_readonly: true,
-        owned_pids: children.map((c) => c.pid),
-        ports: [apiPort, uiPort],
-      }),
-    );
+    assert.equal(externalAttempts, 0);
+    outcome = {
+      result: "PASS",
+      source: "real loopback ASGI and isolated synthetic database; provider disabled",
+      relayed_requests: relayed,
+      outside_origin_attempts: externalAttempts,
+      stale_offer_rejected_without_mutation: true,
+      committed_acceptance_response_loss: true,
+      reload_explicit_lookup_without_auto_accept: true,
+      accepted_version: accepted.accepted_version,
+      replay_identical: true,
+      contact_readonly: true,
+      owned_pids: children.map((c) => c.pid),
+      ports: [apiPort, uiPort],
+    };
   } finally {
     if (browser) await browser.close();
     for (const c of children.reverse()) await stop(c);
     for (const port of [apiPort, uiPort]) {
       let closed = false;
       try {
-        await fetch("http://127.0.0.1:" + port + "/health");
+        await fetch("http://127.0.0.1:" + port + "/health", { redirect: "error" });
       } catch {
         closed = true;
       }
@@ -266,6 +324,7 @@ async function stop(c) {
       "Owned browser/server processes stopped; loopback ports closed; synthetic temporary database removed.",
     );
   }
+  console.log(JSON.stringify(outcome));
 })().catch((e) => {
   console.error(e);
   process.exitCode = 1;
