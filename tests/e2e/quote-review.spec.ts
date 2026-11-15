@@ -149,3 +149,16 @@ test("contact request is readable without offer acceptance", async ({
   ).toBeVisible();
   await expect(page.getByRole("checkbox")).toHaveCount(0);
 });
+for (const status of [401,403,404,410]) test(`explicit quote denial ${status} clears credentials and requires reopen`, async ({page}) => {
+  let deny = false;
+  await page.route('https://commerce.qa.invalid/**', r => r.fulfill(deny ? {status,json:{}} : {json:quote()}));
+  await open(page); deny = true;
+  await page.getByRole('checkbox').check();
+  await page.getByRole('button',{name:'Accept quote version 2'}).click();
+  await expect(page.locator('.form-error[role=alert]')).toHaveText('Acceptance could not be verified against the displayed quote. Reopen the current request or contact the studio; no acceptance is confirmed here.');
+  await expect(page.getByLabel('Request reference')).toHaveValue('');
+  await expect(page.getByLabel('Private access code')).toHaveValue('');
+  await expect(page.getByRole('heading',{name:'Current request'})).toHaveCount(0);
+  deny = false; await open(page);
+  await expect(page.getByRole('heading',{name:'Current request'})).toBeVisible();
+});

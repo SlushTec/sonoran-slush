@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { commerce } from "@/lib/client";
+import { commerce, ServiceError } from "@/lib/client";
 type Item = {
   product_slug: string;
   quantity: number;
@@ -183,11 +183,13 @@ export default function QuoteReviewPortal() {
         s.id,
       );
       if (active(s)) setData(q);
-    } catch {
-      if (active(s))
+    } catch (failure) {
+      if (active(s)) {
+        if (failure instanceof ServiceError && [401, 403, 404, 410].includes(failure.status)) close();
         setError(
           "This request could not be verified. Check your reference and private access code, then retry.",
         );
+      }
     } finally {
       if (active(s)) {
         locked.current = false;
@@ -235,8 +237,9 @@ export default function QuoteReviewPortal() {
           q.version +
           " is recorded for the holder of this private access code. Payment and booking are separate.",
       );
-    } catch {
+    } catch (failure) {
       if (active(s)) {
+        if (failure instanceof ServiceError && [401, 403, 404, 410].includes(failure.status)) close();
         setData(null);
         setConfirm(false);
         setError(
