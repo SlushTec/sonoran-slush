@@ -155,7 +155,7 @@ for (const status of [401,403,404,410]) test(`explicit quote denial ${status} cl
   await open(page); deny = true;
   await page.getByRole('checkbox').check();
   await page.getByRole('button',{name:'Accept quote version 2'}).click();
-  await expect(page.getByRole('alert')).toBeVisible();
+  await expect(page.locator('.form-error[role=alert]')).toHaveText('Acceptance could not be verified against the displayed quote. Reopen the current request or contact the studio; no acceptance is confirmed here.');
   await expect(page.getByLabel('Request reference')).toHaveValue('');
   await expect(page.getByLabel('Private access code')).toHaveValue('');
   await expect(page.getByRole('heading',{name:'Current request'})).toHaveCount(0);
