@@ -347,3 +347,38 @@ test("ordinary pageshow preserves entry", () => {
   );
   assert.equal(screen.getByLabelText("Request reference").value, "quo_test");
 });
+const cases = [401,403,404,410];
+for (const status of cases) for (const phase of ['open','accept']) test(`explicit ${phase} denial ${status} clears private session`, async () => {
+  if (phase === 'accept') await open(); else render(React.createElement(Portal));
+  handler = () => reply({}, status);
+  if (phase === 'accept') accept(); else enter();
+  await screen.findByRole('alert');
+  assert.equal(screen.getByLabelText('Request reference').value, '');
+  assert.equal(screen.getByLabelText('Private access code').value, '');
+  assert.ok(screen.queryByRole('heading',{name:'Current request'}) === null);
+  assert.ok(screen.queryByRole('checkbox') === null);
+  assert.equal(calls.length, phase === 'accept' ? 2 : 1);
+  handler = null; enter();
+  await screen.findByRole('heading',{name:'Current request'});
+});
+for (const phase of ['open','accept']) test(`transient ${phase} failure preserves explicit retry credentials`, async () => {
+  if (phase === 'accept') await open(); else render(React.createElement(Portal));
+  handler = () => reply({}, 500);
+  if (phase === 'accept') accept(); else enter();
+  await screen.findByRole('alert');
+  assert.equal(screen.getByLabelText('Request reference').value,'quo_test');
+  assert.equal(screen.getByLabelText('Private access code').value,'synthetic-code');
+  handler = null; enter();
+  await screen.findByRole('heading',{name:'Current request'});
+});
+test('late denied acceptance cannot clear a newly opened session', async () => {
+  await open(); let release;
+  handler = () => new Promise(r => {release=r}); accept();
+  await waitFor(() => assert.ok(release));
+  fireEvent.click(screen.getByRole('button',{name:'Close private record'}));
+  handler = null; enter(); await screen.findByRole('heading',{name:'Current request'});
+  await act(async () => release(reply({},403)));
+  assert.ok(screen.getByRole('heading',{name:'Current request'}));
+  assert.equal(screen.getByLabelText('Private access code').value,'synthetic-code');
+  assert.ok(screen.queryByRole('alert') === null);
+});
