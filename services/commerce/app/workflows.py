@@ -18,6 +18,7 @@ import os
 import re
 import secrets
 import sqlite3
+import unicodedata
 from time import monotonic, sleep
 
 from fastapi import APIRouter, Depends, Header, HTTPException
@@ -559,6 +560,9 @@ class Shipment(StrictModel):
         whitespace = "\u0009\u000a\u000b\u000c\u000d\u0020\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000\ufeff"
         if not value.strip(whitespace):
             raise ValueError("Enter a nonblank carrier and tracking reference.")
+        # Customer order readback requires single-line Unicode text.
+        if any(unicodedata.category(char) in {"Cc", "Cs"} for char in value):
+            raise ValueError("Enter a carrier and tracking reference without control characters.")
         return value
 
 
