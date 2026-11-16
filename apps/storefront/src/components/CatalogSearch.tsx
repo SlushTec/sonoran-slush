@@ -27,6 +27,9 @@ export default function CatalogSearch({
     [material, setMaterial] = useState("All materials"),
     [sort, setSort] = useState("featured");
   useEffect(() => {
+    // A delayed subscription snapshot must not overwrite a newer local edit.
+    if (query !== new URLSearchParams(window.location.search).toString())
+      return;
     const p = new URLSearchParams(query);
     setQ(p.get("q") || "");
     const requested = p.get("category");

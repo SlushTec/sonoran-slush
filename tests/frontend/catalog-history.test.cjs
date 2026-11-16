@@ -39,6 +39,7 @@ Object.defineProperty(global, "navigator", {
 global.IS_REACT_ACT_ENVIRONMENT = true;
 dom.window.HTMLElement.prototype.scrollIntoView = () => {};
 const React = require("react");
+let navigationQuery;
 const originalLoad = Module._load,
   originalResolve = Module._resolveFilename;
 Module._load = function (request, parent, main) {
@@ -55,7 +56,8 @@ Module._load = function (request, parent, main) {
   if (request === "next/navigation")
     return {
       usePathname: () => location.pathname,
-      useSearchParams: () => new URLSearchParams(location.search),
+      useSearchParams: () =>
+        new URLSearchParams(navigationQuery ?? location.search),
     };
   return originalLoad.apply(this, arguments);
 };
@@ -102,6 +104,7 @@ const wrap = (props = {}) =>
     ),
   );
 test.afterEach(() => {
+  navigationQuery = undefined;
   cleanup();
   localStorage.clear();
   sessionStorage.clear();
@@ -226,4 +229,15 @@ test("category routes retain explicit All gifts override across reload", async (
   view.unmount();
   wrap({ category: "photo-crystals" });
   await waitFor(() => assert.ok(screen.getByText("41 thoughtful gifts")));
+});
+
+test("delayed initial navigation effect cannot erase a newer typed query", async () => {
+  window.history.replaceState({}, "", "/shop?campaign=test");
+  navigationQuery = "";
+  wrap();
+  await screen.findByRole("searchbox");
+  navigationQuery = "campaign=test";
+  fireEvent.change(screen.getByRole("searchbox"), { target: { value: "d" } });
+  await waitFor(() => assert.equal(screen.getByRole("searchbox").value, "d"));
+  assert.equal(new URLSearchParams(location.search).get("q"), "d");
 });
