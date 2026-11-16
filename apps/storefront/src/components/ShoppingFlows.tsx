@@ -15,6 +15,17 @@ function itemProduct(d: Design) {
 export function Bag() {
   const store = useStore();
   const [downloadStatus, setDownloadStatus] = useState("");
+  const removalFocus = useRef<number | null>(null), removeButtons = useRef(new Map<string, HTMLButtonElement>()), emptyBagLink = useRef<HTMLAnchorElement>(null);
+  function removeItem(id: string) {
+    removalFocus.current = store.cart.findIndex(item => item.id === id);
+    store.removeCart(id);
+  }
+  useEffect(() => {
+    if (removalFocus.current === null) return;
+    const index = removalFocus.current; removalFocus.current = null;
+    const item = store.cart[Math.min(index, store.cart.length - 1)];
+    (item ? removeButtons.current.get(item.id) : emptyBagLink.current)?.focus();
+  }, [store.cart]);
   useEffect(() => setDownloadStatus(""), [store.cart]);
   function downloadDesigns() {
     try {
@@ -43,7 +54,7 @@ export function Bag() {
             add a few details, and keep your ideas together.
           </p>
           <div className="actions">
-            <Link className="button primary" href="/shop">
+            <Link ref={emptyBagLink} className="button primary" href="/shop">
               Find their gift <Icon name="arrow" />
             </Link>
             <Link className="button outline" href="/saved">
@@ -115,7 +126,8 @@ export function Bag() {
                   </Link>
                   <button
                     className="link-button"
-                    onClick={() => store.removeCart(d.id)}
+                    ref={node => { if (node) removeButtons.current.set(d.id, node); else removeButtons.current.delete(d.id); }}
+                    onClick={() => removeItem(d.id)}
                   >
                     Remove
                   </button>
