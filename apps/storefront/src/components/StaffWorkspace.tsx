@@ -520,7 +520,7 @@ export default function StaffWorkspace() {
           {doc && (
             <section className="lookup-card">
               <p className="eyebrow">
-                {doc.kind} Â· Version {doc.version}
+                {doc.kind} · Version {doc.version}
               </p>
               <h2 style={{ marginTop: 12 }}>
                 {doc.status.replaceAll("_", " ")}
@@ -530,7 +530,7 @@ export default function StaffWorkspace() {
               </p>
               {doc.name && (
                 <p>
-                  {doc.name} Â· {doc.email}
+                  {doc.name} · {doc.email}
                 </p>
               )}
               {doc.details && (
@@ -539,13 +539,13 @@ export default function StaffWorkspace() {
               {doc.notes && <p>{doc.notes}</p>}
               {doc.location && (
                 <p>
-                  {doc.location} Â· {doc.date}
+                  {doc.location} · {doc.date}
                 </p>
               )}
               {doc.design_type && (
                 <p>
                   {doc.design_type}
-                  {doc.quantity ? " Â· " + doc.quantity + " pieces" : ""}
+                  {doc.quantity ? " · " + doc.quantity + " pieces" : ""}
                 </p>
               )}
               <RecordedPersonalization key={doc.id} record={doc} />
