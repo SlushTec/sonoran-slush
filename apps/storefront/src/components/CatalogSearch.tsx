@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { catalog } from "@/lib/catalog";
 import { infoFor, categoryShort, occasions } from "@/lib/shop";
+import { suggestSearchTerms } from "@/lib/search-recovery";
 import ProductCard from "./ProductCard";
 import Icon from "./Icon";
 const materials = [
@@ -112,6 +113,20 @@ export default function CatalogSearch({
         ),
     [q, family, occasion, material, sort],
   );
+  const suggestions = useMemo(() => {
+    if (result.length) return [];
+    const eligibleNames = catalog.products
+      .filter((p) => {
+        const i = infoFor(p);
+        return (
+          (!family || p.category === family) &&
+          (occasion === "All occasions" || i.occasions.includes(occasion)) &&
+          (material === "All materials" || i.material === material)
+        );
+      })
+      .flatMap((p) => [p.name, infoFor(p).title]);
+    return suggestSearchTerms(q, eligibleNames);
+  }, [result.length, q, family, occasion, material]);
   const active =
     !!q ||
     !!family ||
@@ -255,6 +270,26 @@ export default function CatalogSearch({
                 Try a broader search or a different occasion. Your idea may also
                 be a great fit for a custom order.
               </p>
+              {suggestions.length > 0 && (
+                <div role="group" aria-label="Search suggestions">
+                  <p>Try searching for:</p>
+                  <div className="actions">
+                    {suggestions.map((term) => (
+                      <button
+                        key={term}
+                        className="button outline"
+                        aria-label={"Search for " + term}
+                        onClick={() => {
+                          change({ q: term });
+                          searchInput.current?.focus();
+                        }}
+                      >
+                        {term}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div className="actions">
                 <button className="button primary" onClick={reset}>
                   Clear filters

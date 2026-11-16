@@ -284,3 +284,44 @@ for (const action of ["Clear search", "Reset filters", "Clear filters"]) {
     assert.equal(location.hash, "#results");
   });
 }
+
+test("single-word typo offers an explicit eligible recovery without changing filters or history", async () => {
+  window.history.replaceState({fixture:"preserve"}, "", "/shop?category=drinkware&q=tumblre&sort=za&campaign=test#results");
+  wrap();
+  await screen.findByText("No gifts found, just yet.");
+  assert.equal(screen.getByRole("searchbox").value, "tumblre");
+  const length = window.history.length;
+  const suggestion = screen.getByRole("button", {name:"Search for tumbler",exact:true});
+  suggestion.focus();
+  fireEvent.click(suggestion);
+  assert.equal(screen.getByRole("searchbox").value, "tumbler");
+  assert.ok(document.activeElement === screen.getByRole("searchbox"), "recovery keeps typing focus");
+  assert.ok(!screen.queryByText("No gifts found, just yet."));
+  assert.equal(new URLSearchParams(location.search).get("category"), "drinkware");
+  assert.equal(new URLSearchParams(location.search).get("sort"), "za");
+  assert.equal(new URLSearchParams(location.search).get("campaign"), "test");
+  assert.equal(location.hash, "#results");
+  assert.equal(window.history.length, length);
+  assert.equal(window.history.state.fixture, "preserve");
+});
+
+test("typo recovery never suggests products outside selected filters", async () => {
+  window.history.replaceState({}, "", "/shop?category=photo-crystals&material=Wood&q=tumblre");
+  wrap();
+  await screen.findByText("No gifts found, just yet.");
+  assert.equal(screen.queryAllByRole("button", {name:/^Search for /}).length, 0);
+  assert.equal(screen.getByRole("searchbox").value, "tumblre");
+});
+
+test("search hints cover one edit and adjacent swaps with bounded deterministic vocabulary", () => {
+  const { suggestSearchTerms } = require("../../apps/storefront/src/lib/search-recovery.ts");
+  for (const query of ["tumblre", "tumblr", "tumblerr", "tumblerx", "xumbler", "TUMBLRE "]) {
+    assert.deepEqual(suggestSearchTerms(query, ["A Tumbler", "Tumbler"]), ["tumbler"], query);
+  }
+  for (const query of ["tumbler", "tu", "blue tumbler", "tumzzler", "", "🌵", "éclair", "a".repeat(33)]) {
+    assert.deepEqual(suggestSearchTerms(query, ["Tumbler"]), [], query);
+  }
+  assert.deepEqual(suggestSearchTerms("tumbler", ["TUMBLER"]), []);
+  assert.deepEqual(suggestSearchTerms("carts", ["parts darts carts tarts carts marts"]), ["darts", "marts", "parts"]);
+  assert.deepEqual(suggestSearchTerms("tumblre", []), []);
+});
