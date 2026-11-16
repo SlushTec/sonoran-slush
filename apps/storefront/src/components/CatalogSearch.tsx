@@ -1,31 +1,79 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { catalog } from "@/lib/catalog";
 import { infoFor, categoryShort, occasions } from "@/lib/shop";
 import ProductCard from "./ProductCard";
 import Icon from "./Icon";
+const materials = [
+  "All materials",
+  ...new Set(catalog.products.map((p) => infoFor(p).material)),
+];
+function CatalogQuery({ onChange }: { onChange: (query: string) => void }) {
+  const query = useSearchParams().toString();
+  useEffect(() => onChange(query), [query, onChange]);
+  return null;
+}
 export default function CatalogSearch({
   category = "",
 }: {
   category?: string;
 }) {
-  const [q, setQ] = useState(""),
+  const [query, setQuery] = useState(""),
+    [q, setQ] = useState(""),
     [family, setFamily] = useState(category),
     [occasion, setOccasion] = useState("All occasions"),
     [material, setMaterial] = useState("All materials"),
     [sort, setSort] = useState("featured");
   useEffect(() => {
-    const p = new URLSearchParams(window.location.search);
+    const p = new URLSearchParams(query);
     setQ(p.get("q") || "");
-    const o = p.get("occasion");
-    if (o && occasions.includes(o)) setOccasion(o);
-    if (
-      !category &&
-      catalog.categories.some((c) => c.slug === p.get("category"))
-    )
-      setFamily(p.get("category")!);
-  }, [category]);
+    const requested = p.get("category");
+    setFamily(
+      p.has("category") &&
+        (requested === "" ||
+          catalog.categories.some((c) => c.slug === requested))
+        ? requested!
+        : category,
+    );
+    const o = p.get("occasion"),
+      m = p.get("material"),
+      s = p.get("sort");
+    setOccasion(o && occasions.includes(o) ? o : "All occasions");
+    setMaterial(m && materials.includes(m) ? m : "All materials");
+    setSort(s === "az" || s === "za" ? s : "featured");
+  }, [category, query]);
+  function change(
+    patch: Partial<{
+      q: string;
+      family: string;
+      occasion: string;
+      material: string;
+      sort: string;
+    }>,
+  ) {
+    const next = { q, family, occasion, material, sort, ...patch };
+    setQ(next.q);
+    setFamily(next.family);
+    setOccasion(next.occasion);
+    setMaterial(next.material);
+    setSort(next.sort);
+    const url = new URL(window.location.href);
+    for (const [key, value, defaultValue] of [
+      ["q", next.q, ""],
+      ["category", next.family, category],
+      ["occasion", next.occasion, "All occasions"],
+      ["material", next.material, "All materials"],
+      ["sort", next.sort, "featured"],
+    ]) {
+      if (value === defaultValue) url.searchParams.delete(key);
+      else url.searchParams.set(key, value);
+    }
+    // Update the current catalog entry, not one Back entry per keystroke.
+    // Preserve Next's history state, unrelated query parameters and fragment.
+    window.history.replaceState(window.history.state, "", url);
+  }
   const result = useMemo(
     () =>
       catalog.products
@@ -66,27 +114,32 @@ export default function CatalogSearch({
     occasion !== "All occasions" ||
     material !== "All materials";
   function reset() {
-    setQ("");
-    setFamily(category);
-    setOccasion("All occasions");
-    setMaterial("All materials");
+    change({
+      q: "",
+      family: category,
+      occasion: "All occasions",
+      material: "All materials",
+    });
   }
   return (
     <>
+      <Suspense fallback={null}>
+        <CatalogQuery onChange={setQuery} />
+      </Suspense>
       <div className="shop-layout">
         <aside className="shop-sidebar">
           <p className="eyebrow">The collections</p>
           <nav aria-label="Gift categories">
             <button
               className={!family ? "active" : ""}
-              onClick={() => setFamily("")}
+              onClick={() => change({ family: "" })}
             >
               All gifts <span>{catalog.products.length}</span>
             </button>
             {catalog.categories.map((c) => (
               <button
                 key={c.slug}
-                onClick={() => setFamily(c.slug)}
+                onClick={() => change({ family: c.slug })}
                 className={family === c.slug ? "active" : ""}
               >
                 {categoryShort[c.slug]}
@@ -114,13 +167,13 @@ export default function CatalogSearch({
             <input
               type="search"
               value={q}
-              onChange={(e) => setQ(e.target.value)}
+              onChange={(e) => change({ q: e.target.value })}
               placeholder="A name, an occasion, a little inspiration…"
             />
             {q && (
               <button
                 className="icon-button"
-                onClick={() => setQ("")}
+                onClick={() => change({ q: "" })}
                 aria-label="Clear search"
               >
                 <Icon name="close" size={17} />
@@ -132,7 +185,7 @@ export default function CatalogSearch({
               Occasion
               <select
                 value={occasion}
-                onChange={(e) => setOccasion(e.target.value)}
+                onChange={(e) => change({ occasion: e.target.value })}
               >
                 {occasions.map((o) => (
                   <option key={o}>{o}</option>
@@ -143,7 +196,7 @@ export default function CatalogSearch({
               Material
               <select
                 value={material}
-                onChange={(e) => setMaterial(e.target.value)}
+                onChange={(e) => change({ material: e.target.value })}
               >
                 {[
                   "All materials",
@@ -155,7 +208,10 @@ export default function CatalogSearch({
             </label>
             <label className="sort-select">
               Sort by
-              <select value={sort} onChange={(e) => setSort(e.target.value)}>
+              <select
+                value={sort}
+                onChange={(e) => change({ sort: e.target.value })}
+              >
                 <option value="featured">Collection order</option>
                 <option value="az">Name: A–Z</option>
                 <option value="za">Name: Z–A</option>

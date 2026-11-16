@@ -17,7 +17,7 @@ const React = require('react');
 const originalLoad=Module._load,originalResolve=Module._resolveFilename;
 Module._load=function(request,parent,main){
  if(request==='next/link')return {__esModule:true,default:React.forwardRef(function Link({href,children,prefetch,...props},ref){return React.createElement('a',{href,ref,...props},children);})};
- if(request==='next/navigation')return {usePathname:()=>location.pathname};
+ if(request==='next/navigation')return {usePathname:()=>location.pathname,useSearchParams:()=>new URLSearchParams(location.search)};
  return originalLoad.apply(this,arguments);
 };
 Module._resolveFilename=function(request,parent,...rest){if(request.startsWith('@/'))request=path.join(__dirname,'../../apps/storefront/src',request.slice(2));return originalResolve.call(this,request,parent,...rest);};
