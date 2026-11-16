@@ -4413,3 +4413,11 @@ main:focus {
     min-height: 73px;
   }
 }
+
+/* Keep the selected font distinguishable when system colors replace fills. */
+@media (forced-colors: active) {
+  .font-picker button[aria-pressed="true"] {
+    border: 3px double ButtonText;
+    padding: 6px 1px;
+  }
+}
