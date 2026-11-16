@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 for (const width of [1280, 390]) for (const forcedColors of ['none', 'active'] as const) {
-  test(`selected font remains distinct from keyboard focus ${width} ${forcedColors}`, async ({ page }) => {
+  test(`selected font remains distinct from keyboard focus ${width} ${forcedColors}`, async ({ page, baseURL }) => {
     let outside = 0;
-    await page.route('**/*', route => { if (new URL(route.request().url()).origin === 'http://127.0.0.1:4193') return route.continue(); outside++; return route.abort(); });
+    await page.route('**/*', route => { if (new URL(route.request().url()).origin === new URL(baseURL!).origin) return route.continue(); outside++; return route.abort(); });
     await page.setViewportSize({ width, height: 900 });
     await page.emulateMedia({ forcedColors, reducedMotion: 'reduce' });
     await page.goto('/products/makertwist-40oz-tumbler');
