@@ -174,6 +174,14 @@ export function Saved() {
     [tab, setTab] = useState("designs"),
     [clearConfirm, setClearConfirm] = useState(false),
     [clearFailed, setClearFailed] = useState(false);
+  const clearTrigger = useRef<HTMLButtonElement>(null), keepButton = useRef<HTMLButtonElement>(null), focusClear = useRef(false);
+  function showClear(value: boolean) { focusClear.current = true; setClearConfirm(value); }
+  useEffect(() => {
+    if (focusClear.current) {
+      focusClear.current = false;
+      (clearConfirm ? keepButton.current : clearTrigger.current)?.focus();
+    }
+  }, [clearConfirm]);
   return (
     <div style={{ paddingBottom: 70 }}>
       <div className="saved-tabs" role="group" aria-label="Saved work">
@@ -285,25 +293,26 @@ export function Saved() {
           </p>
         </div>
         {clearConfirm ? (
-          <div className="form-actions">
+          <div className="form-actions" role="group" aria-label="Clear saved work confirmation" onKeyDown={event => { if (event.key === "Escape") { event.stopPropagation(); showClear(false); } }}>
             <button
               className="danger-button"
               onClick={() => {
                 setClearFailed(!store.clear());
-                setClearConfirm(false);
+                showClear(false);
               }}
             >
               Clear all saved work
             </button>
             <button
               className="link-button"
-              onClick={() => setClearConfirm(false)}
+              ref={keepButton}
+              onClick={() => showClear(false)}
             >
               Keep it
             </button>
           </div>
         ) : (
-          <button className="link-button" onClick={() => setClearConfirm(true)}>
+          <button ref={clearTrigger} className="link-button" aria-expanded={false} onClick={() => showClear(true)}>
             Clear data on this device
           </button>
         )}
