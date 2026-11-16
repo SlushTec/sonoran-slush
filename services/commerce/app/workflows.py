@@ -552,6 +552,15 @@ class Shipment(StrictModel):
     carrier: str = Field(min_length=1, max_length=100)
     tracking: str = Field(min_length=1, max_length=200)
 
+    @field_validator("carrier", "tracking")
+    @classmethod
+    def nonblank_dispatch_reference(cls, value):
+        # Match the staff form's trim check without normalizing stored values.
+        whitespace = "\u0009\u000a\u000b\u000c\u000d\u0020\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000\ufeff"
+        if not value.strip(whitespace):
+            raise ValueError("Enter a nonblank carrier and tracking reference.")
+        return value
+
 
 @router.post("/v1/admin/orders/{record_id}/ship", dependencies=[Depends(staff)], tags=["staff"])
 def ship_order(record_id: str, body: Shipment):
