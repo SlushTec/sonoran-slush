@@ -342,6 +342,7 @@ export function Checkout() {
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [receipt, setReceipt] = useState<Receipt | null>(null),
+    [receiptDownloadStatus, setReceiptDownloadStatus] = useState(""),
     [attempt, setAttempt] = useState<RetailAttempt | null>(null),
     [recoveryReady, setRecoveryReady] = useState(false),
     [recoveryError, setRecoveryError] = useState(""),
@@ -362,6 +363,15 @@ export function Checkout() {
     }),
     [consent, setConsent] = useState(false);
   const locked = useRef(false);
+  function downloadReceipt() {
+    if (!receipt) return;
+    try {
+      downloadJSON("sonoran-slush-private-receipt.json", receipt);
+      setReceiptDownloadStatus("Receipt download started. Check your browser downloads and keep the file private.");
+    } catch {
+      setReceiptDownloadStatus("Receipt download could not start. Try again before leaving this page. Your request is already confirmed; do not resubmit it.");
+    }
+  }
   function checkRecovery() {
     try {
       setAttempt(readRetailAttempt());
@@ -380,6 +390,7 @@ export function Checkout() {
       clearConfirmedRetailAttempt(attempt.id);
       setAttempt(null);
       setReceipt(null);
+      setReceiptDownloadStatus("");
       setConsent(false);
       setContact({ name: "", email: "", phone: "", address: "", city: "", region: "", postal: "", country: "US", notes: "", gift: false, recipient: "", giftMessage: "" });
       setDelivery("Ship to an address");
@@ -499,12 +510,11 @@ export function Checkout() {
           <button
             className="button primary"
             style={{ marginTop: 20 }}
-            onClick={() =>
-              downloadJSON("sonoran-slush-private-receipt.json", receipt)
-            }
+            onClick={downloadReceipt}
           >
             Download private receipt <Icon name="download" />
           </button>
+          <p role="status">{receiptDownloadStatus}</p>
           {recoveryError && <p role="alert">{recoveryError}</p>}
           <p>Starting another request creates a separate request for the designs still in your bag.</p>
           <button onClick={startAnother}>Start another request</button>
