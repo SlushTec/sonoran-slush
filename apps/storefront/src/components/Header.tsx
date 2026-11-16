@@ -18,6 +18,7 @@ const links = [
 export default function Header() {
   const path = usePathname(),
     { cart, favorites } = useStore();
+  const cartQuantity = cart.reduce((total, design) => total + design.quantity, 0);
   const [q, setQ] = useState("");
   const search = useRef<HTMLDialogElement>(null),
     menu = useRef<HTMLDialogElement>(null);
@@ -110,13 +111,13 @@ export default function Header() {
               className="icon-button"
               href="/cart"
               aria-label={
-                "Shopping bag" + (cart.length ? " (" + cart.length + ")" : "")
+                "Shopping bag" + (cartQuantity ? " (" + cartQuantity + ")" : "")
               }
             >
               <Icon name="bag" />
               {cart.length > 0 && (
                 <span className="count-dot">
-                  {cart.reduce((a, d) => a + d.quantity, 0)}
+                  {cartQuantity}
                 </span>
               )}
             </Link>

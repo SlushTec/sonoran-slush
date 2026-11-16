@@ -721,3 +721,25 @@ for (const [route, label] of [['/saved', 'Saved designs'], ['/account', 'Your ac
     }
   });
 }
+
+test('header shopping bag label matches visible quantity through changes and removal', async () => {
+  const oldClose = HTMLDialogElement.prototype.close;
+  HTMLDialogElement.prototype.close = function () { this.removeAttribute('open'); };
+  try {
+    const Header = require('../../apps/storefront/src/components/Header.tsx').default;
+    const base = {slug:'makertwist-40oz-tumbler',text:'Synthetic',secondary:'',font:'Classic serif',options:{},quantity:3,notes:'',artworkName:'',gift:false,giftMessage:'',updated:'2026-11-16'};
+    writeLocal('cart', [{...base,id:'count-one'}, {...base,id:'count-two',quantity:2}]);
+    wrap(React.createElement(React.Fragment,null,React.createElement(Header),React.createElement(Bag)));
+    const badge = () => document.querySelector('.header-tools a[href="/cart"]');
+    await waitFor(() => assert.equal(badge().textContent, '5'));
+    assert.equal(badge().getAttribute('aria-label'), 'Shopping bag (5)');
+    fireEvent.click(screen.getAllByRole('button', {name:/Increase quantity for/})[0]);
+    assert.equal(badge().getAttribute('aria-label'), 'Shopping bag (6)');
+    assert.equal(badge().textContent, '6');
+    fireEvent.click(screen.getAllByRole('button', {name:'Remove',exact:true})[0]);
+    assert.equal(badge().getAttribute('aria-label'), 'Shopping bag (2)');
+    fireEvent.click(screen.getByRole('button', {name:'Remove',exact:true}));
+    assert.equal(badge().getAttribute('aria-label'), 'Shopping bag');
+    assert.ok(badge().querySelector('.count-dot') === null, 'empty bag has no count badge');
+  } finally { HTMLDialogElement.prototype.close = oldClose; }
+});
