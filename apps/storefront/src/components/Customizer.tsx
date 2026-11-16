@@ -77,7 +77,10 @@ export default function Customizer({ product }: { product: Product }) {
     setRestored(true);
   }, [product.slug, store.hydrated]);
   useEffect(() => {
-    if (design && restored) writeLocal("config:" + product.slug, design);
+    // A product transition renders once with the former product's design.
+    // Never persist that stale state into the destination product's draft.
+    if (design && restored && design.slug === product.slug)
+      writeLocal("config:" + product.slug, design);
   }, [design, product.slug, restored]);
   useEffect(
     () => () => {
