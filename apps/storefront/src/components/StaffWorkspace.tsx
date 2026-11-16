@@ -307,6 +307,11 @@ export default function StaffWorkspace() {
     }
     const [whole, fraction = ""] = price.split(".");
     const minor = Number(whole) * 100 + Number(fraction.padEnd(2, "0"));
+    // Mirror the existing Offer contract; invalid totals never start an action.
+    if (!Number.isSafeInteger(minor) || minor < 1 || minor > 99999999) {
+      setError("Enter a reviewed USD total from $0.01 to $999,999.99.");
+      return;
+    }
     action("/v1/admin/quotes/" + doc.id + "/offer", {
       version: doc.version,
       total_minor: minor,
