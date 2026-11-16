@@ -4379,3 +4379,36 @@ main:focus {
 .tone-photo-crystals.has-product-photo {
   background: #18231f;
 }
+
+/* Let enlarged mobile wordmarks wrap without pushing navigation offscreen. */
+@media (max-width: 900px) {
+  .site-header .header-inner {
+    height: auto;
+    min-height: 80px;
+    padding-block: 10px;
+  }
+  .site-header .southwest-brand {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .site-header .brand-wordmark {
+    min-width: 0;
+  }
+  .site-header .southwest-brand .brand-name {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .site-header .southwest-brand .brand-sub {
+    overflow-wrap: anywhere;
+  }
+  .site-header .mobile-menu,
+  .site-header .header-tools,
+  .site-header .southwest-brand > img {
+    flex-shrink: 0;
+  }
+}
+@media (max-width: 767px) {
+  .site-header .header-inner {
+    min-height: 73px;
+  }
+}
