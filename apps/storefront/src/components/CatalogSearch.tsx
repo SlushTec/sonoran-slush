@@ -1,5 +1,5 @@
 "use client";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { catalog } from "@/lib/catalog";
@@ -20,6 +20,7 @@ export default function CatalogSearch({
 }: {
   category?: string;
 }) {
+  const searchInput = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState(""),
     [q, setQ] = useState(""),
     [family, setFamily] = useState(category),
@@ -116,6 +117,10 @@ export default function CatalogSearch({
     !!family ||
     occasion !== "All occasions" ||
     material !== "All materials";
+  function clearSearch() {
+    change({ q: "" });
+    searchInput.current?.focus();
+  }
   function reset() {
     change({
       q: "",
@@ -123,6 +128,7 @@ export default function CatalogSearch({
       occasion: "All occasions",
       material: "All materials",
     });
+    searchInput.current?.focus();
   }
   return (
     <>
@@ -170,6 +176,7 @@ export default function CatalogSearch({
             <Icon name="search" />
             <span className="sr-only">Search the collection</span>
             <input
+              ref={searchInput}
               type="search"
               value={q}
               onChange={(e) => change({ q: e.target.value })}
@@ -178,7 +185,7 @@ export default function CatalogSearch({
             {q && (
               <button
                 className="icon-button"
-                onClick={() => change({ q: "" })}
+                onClick={clearSearch}
                 aria-label="Clear search"
               >
                 <Icon name="close" size={17} />

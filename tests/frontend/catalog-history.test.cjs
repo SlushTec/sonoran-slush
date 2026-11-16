@@ -266,3 +266,21 @@ test("pressed category follows restored URL and category-route reset", async () 
   wrap({ category: "photo-crystals" });
   await waitFor(() => assert.match(screen.getByRole("button", { pressed: true }).textContent, /Photo crystals/));
 });
+
+for (const action of ["Clear search", "Reset filters", "Clear filters"]) {
+  test(action + " returns focus to search after removing the recovery control", async () => {
+    window.history.replaceState({}, "", "/shop?q=zznomatch&campaign=test&sort=za#results");
+    wrap();
+    await screen.findByText("No gifts found, just yet.");
+    const button = screen.getByRole("button", { name: action });
+    button.focus();
+    assert.equal(document.activeElement, button);
+    fireEvent.click(button);
+    await waitFor(() => assert.equal(screen.getByRole("searchbox").value, ""));
+    assert.ok(document.activeElement === screen.getByRole("searchbox"), "search retains focus");
+    assert.equal(new URLSearchParams(location.search).has("q"), false);
+    assert.equal(new URLSearchParams(location.search).get("sort"), "za");
+    assert.equal(new URLSearchParams(location.search).get("campaign"), "test");
+    assert.equal(location.hash, "#results");
+  });
+}
