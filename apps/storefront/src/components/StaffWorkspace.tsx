@@ -48,6 +48,7 @@ export default function StaffWorkspace() {
     [tracking, setTracking] = useState(""),
     [carrier, setCarrier] = useState(""),
     [receipt, setReceipt] = useState<Receipt | null>(null),
+    [receiptDownloadStatus, setReceiptDownloadStatus] = useState(""),
     [outcome, setOutcome] = useState("");
   const generation = useRef(0),
     context = useRef(0),
@@ -56,6 +57,7 @@ export default function StaffWorkspace() {
   function clearDrafts() {
     setDoc(null);
     setReceipt(null);
+    setReceiptDownloadStatus("");
     setPrice("");
     setMessage("");
     setProof("");
@@ -241,6 +243,7 @@ export default function StaffWorkspace() {
     setError("");
     setOutcome("");
     setReceipt(null);
+    setReceiptDownloadStatus("");
     let confirmed = false;
     try {
       const result = await commerce<Doc | Receipt>(path, body, s.token);
@@ -259,7 +262,7 @@ export default function StaffWorkspace() {
           r.access_token.length > 1000
         )
           throw Error("Receipt mismatch");
-        setReceipt(r);
+        setReceipt({ id: r.id, status: r.status, access_token: r.access_token });
       } else {
         if (
           !validDoc(result) ||
@@ -285,6 +288,7 @@ export default function StaffWorkspace() {
         else {
           setDoc(null);
           setReceipt(null);
+          setReceiptDownloadStatus("");
           setError(
             "The action could not be confirmed. Reopen the record to reconcile before retrying.",
           );
@@ -491,12 +495,19 @@ export default function StaffWorkspace() {
                     session.current &&
                     active(session.current, context.current) &&
                     receipt
-                  )
-                    downloadJSON("sonoran-slush-private-receipt.json", receipt);
+                  ) {
+                    try {
+                      downloadJSON("sonoran-slush-private-receipt.json", receipt);
+                      setReceiptDownloadStatus("Receipt download started. Check your browser downloads and keep the file private.");
+                    } catch {
+                      setReceiptDownloadStatus("Receipt download could not start. Try again before locking or leaving. The action is already confirmed; do not repeat it.");
+                    }
+                  }
                 }}
               >
                 Download receipt <Icon name="download" size={16} />
               </button>
+              <p role="status">{receiptDownloadStatus}</p>
               <button
                 className="link-button"
                 style={{ display: "block", marginTop: 10 }}
@@ -509,7 +520,7 @@ export default function StaffWorkspace() {
           {doc && (
             <section className="lookup-card">
               <p className="eyebrow">
-                {doc.kind} · Version {doc.version}
+                {doc.kind} Â· Version {doc.version}
               </p>
               <h2 style={{ marginTop: 12 }}>
                 {doc.status.replaceAll("_", " ")}
@@ -519,7 +530,7 @@ export default function StaffWorkspace() {
               </p>
               {doc.name && (
                 <p>
-                  {doc.name} · {doc.email}
+                  {doc.name} Â· {doc.email}
                 </p>
               )}
               {doc.details && (
@@ -528,13 +539,13 @@ export default function StaffWorkspace() {
               {doc.notes && <p>{doc.notes}</p>}
               {doc.location && (
                 <p>
-                  {doc.location} · {doc.date}
+                  {doc.location} Â· {doc.date}
                 </p>
               )}
               {doc.design_type && (
                 <p>
                   {doc.design_type}
-                  {doc.quantity ? " · " + doc.quantity + " pieces" : ""}
+                  {doc.quantity ? " Â· " + doc.quantity + " pieces" : ""}
                 </p>
               )}
               <RecordedPersonalization key={doc.id} record={doc} />
