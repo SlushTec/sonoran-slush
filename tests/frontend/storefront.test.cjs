@@ -695,3 +695,29 @@ test('header dialogs expose names and mobile current route matches desktop', () 
     HTMLDialogElement.prototype.showModal = oldShow;
   }
 });
+
+for (const [route, label] of [['/saved', 'Saved designs'], ['/account', 'Your account']]) {
+  test('same-route mobile ' + label + ' dismisses navigation repeatedly', () => {
+    const oldClose = HTMLDialogElement.prototype.close;
+    const oldShow = HTMLDialogElement.prototype.showModal;
+    HTMLDialogElement.prototype.close = function () { this.removeAttribute('open'); };
+    HTMLDialogElement.prototype.showModal = function () { this.setAttribute('open', ''); };
+    try {
+      window.history.replaceState({}, '', route);
+      const Header = require('../../apps/storefront/src/components/Header.tsx').default;
+      wrap(React.createElement(Header));
+      for (let i = 0; i < 2; i++) {
+        fireEvent.click(screen.getByRole('button', { name: 'Open navigation' }));
+        const dialog = screen.getByRole('dialog', { name: 'Site navigation' });
+        const link = Array.from(dialog.querySelectorAll('a')).find(a => a.getAttribute('href') === route);
+        link.addEventListener("click", event => event.preventDefault(), { once: true });
+        fireEvent.click(link);
+        assert.equal(dialog.hasAttribute('open'), false);
+        assert.equal(location.pathname, route);
+      }
+    } finally {
+      HTMLDialogElement.prototype.close = oldClose;
+      HTMLDialogElement.prototype.showModal = oldShow;
+    }
+  });
+}

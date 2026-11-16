@@ -203,11 +203,11 @@ export default function Header() {
               <Icon name="arrow" />
             </Link>
           ))}
-          <Link href="/saved">
+          <Link href="/saved" onClick={() => menu.current?.close()}>
             Saved designs
             <Icon name="heart" />
           </Link>
-          <Link href="/account">
+          <Link href="/account" onClick={() => menu.current?.close()}>
             Your account
             <Icon name="user" />
           </Link>
