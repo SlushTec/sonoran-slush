@@ -43,6 +43,7 @@ export default function InquiryForm({
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [receipt, setReceipt] = useState<Receipt | null>(null),
+    [receiptDownloadStatus, setReceiptDownloadStatus] = useState(""),
     [newerDraft, setNewerDraft] = useState(false),
     [requestID, setRequestID] = useState(""),
     [step, setStep] = useState(0);
@@ -53,6 +54,7 @@ export default function InquiryForm({
     setBusy(false);
     setError("");
     setReceipt(null);
+    setReceiptDownloadStatus("");
     setNewerDraft(false);
     setConsent(false);
     setStep(0);
@@ -71,6 +73,15 @@ export default function InquiryForm({
       lifecycle.current += 1;
     };
   }, [kind]);
+  function downloadReceipt() {
+    if (!receipt) return;
+    try {
+      downloadJSON("sonoran-slush-private-receipt.json", receipt);
+      setReceiptDownloadStatus("Receipt download started. Check your browser downloads and keep the file private.");
+    } catch {
+      setReceiptDownloadStatus("Receipt download could not start. Try again before leaving this page. The studio has already received your request; do not resubmit it.");
+    }
+  }
   function field(k: keyof Values, val: string) {
     setV((a) => ({ ...a, [k]: val }));
   }
@@ -185,12 +196,11 @@ export default function InquiryForm({
         <button
           className="button primary"
           style={{ marginTop: 20 }}
-          onClick={() =>
-            downloadJSON("sonoran-slush-private-receipt.json", receipt)
-          }
+          onClick={downloadReceipt}
         >
           Download private receipt <Icon name="download" />
         </button>
+        <p role="status">{receiptDownloadStatus}</p>
       </div>
     );
   const minimumDate = new Intl.DateTimeFormat("en-CA", {
