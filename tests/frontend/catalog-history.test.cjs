@@ -325,3 +325,29 @@ test("search hints cover one edit and adjacent swaps with bounded deterministic 
   assert.deepEqual(suggestSearchTerms("carts", ["parts darts carts tarts carts marts"]), ["darts", "marts", "parts"]);
   assert.deepEqual(suggestSearchTerms("tumblre", []), []);
 });
+
+test("listed process uses existing metadata, persists and resets without excluding unlisted products by default", async () => {
+  wrap();
+  const process = screen.getByLabelText("Listed process");
+  assert.equal(process.value, "All processes");
+  assert.ok(screen.getByText("41 thoughtful gifts"));
+  fireEvent.change(process, {target:{value:"Laser-revealed electroplating"}});
+  assert.equal(new URLSearchParams(location.search).get("process"), "Laser-revealed electroplating");
+  assert.ok(document.querySelectorAll(".product-card").length > 0);
+  cleanup(); wrap();
+  await waitFor(() => assert.equal(screen.getByLabelText("Listed process").value, "Laser-revealed electroplating"));
+  fireEvent.change(screen.getByRole("searchbox"), {target:{value:"tumblre"}});
+  assert.ok(screen.getByRole("button", {name:"Search for tumbler",exact:true}));
+  fireEvent.change(screen.getByLabelText("Listed process"), {target:{value:"Surface engraving on wood"}});
+  assert.equal(screen.queryAllByRole("button", {name:/^Search for /}).length, 0);
+  fireEvent.click(screen.getByRole("button", {name:"Reset filters"}));
+  assert.equal(screen.getByLabelText("Listed process").value, "All processes");
+  assert.equal(new URLSearchParams(location.search).has("process"), false);
+  assert.ok(screen.getByText("41 thoughtful gifts"));
+});
+test("unknown process URL falls back without inventing a process", async () => {
+  window.history.replaceState({}, "", "/shop?process=__proto__");
+  wrap();
+  await waitFor(() => assert.equal(screen.getByLabelText("Listed process").value, "All processes"));
+  assert.ok(screen.getByText("41 thoughtful gifts"));
+});

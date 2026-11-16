@@ -11,6 +11,12 @@ const materials = [
   "All materials",
   ...new Set(catalog.products.map((p) => infoFor(p).material)),
 ];
+const listedProcess = (p: (typeof catalog.products)[number]) =>
+  infoFor(p).details.find(([label]) => label === "Process")?.[1];
+const processes = ["All processes", ...new Set(catalog.products.flatMap((p) => {
+  const value = listedProcess(p);
+  return value ? [value] : [];
+}))];
 function CatalogQuery({ onChange }: { onChange: (query: string) => void }) {
   const query = useSearchParams().toString();
   useEffect(() => onChange(query), [query, onChange]);
@@ -27,6 +33,7 @@ export default function CatalogSearch({
     [family, setFamily] = useState(category),
     [occasion, setOccasion] = useState("All occasions"),
     [material, setMaterial] = useState("All materials"),
+    [process, setProcess] = useState("All processes"),
     [sort, setSort] = useState("featured");
   useEffect(() => {
     // A delayed subscription snapshot must not overwrite a newer local edit.
@@ -47,6 +54,8 @@ export default function CatalogSearch({
       s = p.get("sort");
     setOccasion(o && occasions.includes(o) ? o : "All occasions");
     setMaterial(m && materials.includes(m) ? m : "All materials");
+    const technique = p.get("process");
+    setProcess(technique && processes.includes(technique) ? technique : "All processes");
     setSort(s === "az" || s === "za" ? s : "featured");
   }, [category, query]);
   function change(
@@ -55,15 +64,17 @@ export default function CatalogSearch({
       family: string;
       occasion: string;
       material: string;
+      process: string;
       sort: string;
     }>,
   ) {
-    const next = { q, family, occasion, material, sort, ...patch };
+    const next = { q, family, occasion, material, process, sort, ...patch };
     setQ(next.q);
     setFamily(next.family);
     setOccasion(next.occasion);
     setMaterial(next.material);
     setSort(next.sort);
+    setProcess(next.process);
     const url = new URL(window.location.href);
     for (const [key, value, defaultValue] of [
       ["q", next.q, ""],
@@ -71,6 +82,7 @@ export default function CatalogSearch({
       ["occasion", next.occasion, "All occasions"],
       ["material", next.material, "All materials"],
       ["sort", next.sort, "featured"],
+      ["process", next.process, "All processes"],
     ]) {
       if (value === defaultValue) url.searchParams.delete(key);
       else url.searchParams.set(key, value);
@@ -101,7 +113,8 @@ export default function CatalogSearch({
                 .toLowerCase()
                 .includes(q.trim().toLowerCase())) &&
             (occasion === "All occasions" || i.occasions.includes(occasion)) &&
-            (material === "All materials" || i.material === material)
+            (material === "All materials" || i.material === material) &&
+            (process === "All processes" || listedProcess(p) === process)
           );
         })
         .sort((a, b) =>
@@ -111,7 +124,7 @@ export default function CatalogSearch({
               ? infoFor(b).title.localeCompare(infoFor(a).title)
               : 0,
         ),
-    [q, family, occasion, material, sort],
+    [q, family, occasion, material, process, sort],
   );
   const suggestions = useMemo(() => {
     if (result.length) return [];
@@ -121,17 +134,19 @@ export default function CatalogSearch({
         return (
           (!family || p.category === family) &&
           (occasion === "All occasions" || i.occasions.includes(occasion)) &&
-          (material === "All materials" || i.material === material)
+          (material === "All materials" || i.material === material) &&
+            (process === "All processes" || listedProcess(p) === process)
         );
       })
       .flatMap((p) => [p.name, infoFor(p).title]);
     return suggestSearchTerms(q, eligibleNames);
-  }, [result.length, q, family, occasion, material]);
+  }, [result.length, q, family, occasion, material, process]);
   const active =
     !!q ||
     !!family ||
     occasion !== "All occasions" ||
-    material !== "All materials";
+    material !== "All materials" ||
+    process !== "All processes";
   function clearSearch() {
     change({ q: "" });
     searchInput.current?.focus();
@@ -142,6 +157,7 @@ export default function CatalogSearch({
       family: category,
       occasion: "All occasions",
       material: "All materials",
+      process: "All processes",
     });
     searchInput.current?.focus();
   }
@@ -233,6 +249,12 @@ export default function CatalogSearch({
                 ))}
               </select>
             </label>
+            <label>
+              Listed process
+              <select value={process} onChange={(e) => change({ process: e.target.value })} aria-describedby="listed-process-help">
+                {processes.map((value) => <option key={value}>{value}</option>)}
+              </select>
+            </label>
             <label className="sort-select">
               Sort by
               <select
@@ -245,6 +267,7 @@ export default function CatalogSearch({
               </select>
             </label>
           </div>
+          <p id="listed-process-help">Process filters use listed product details only. Some products have no listed process; All processes includes them.</p>
           <div className="result-bar">
             <p aria-live="polite">
               {result.length} thoughtful{" "}
