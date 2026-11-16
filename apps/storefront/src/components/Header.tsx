@@ -125,13 +125,14 @@ export default function Header() {
       </header>
       <dialog
         ref={search}
+        aria-labelledby="site-search-title"
         className="search-dialog"
         onClick={(e) => {
           if (e.target === e.currentTarget) search.current?.close();
         }}
       >
         <div className="dialog-top">
-          <h2>Find something personal.</h2>
+          <h2 id="site-search-title">Find something personal.</h2>
           <button
             className="icon-button"
             aria-label="Close search"
@@ -179,7 +180,7 @@ export default function Header() {
           Browse all results <Icon name="arrow" />
         </Link>
       </dialog>
-      <dialog ref={menu} className="menu-dialog">
+      <dialog ref={menu} className="menu-dialog" aria-label="Site navigation">
         <div className="dialog-top">
           <span className="eyebrow">Sonoran Slush</span>
           <button
@@ -192,7 +193,12 @@ export default function Header() {
         </div>
         <nav aria-label="Mobile navigation">
           {links.map(([label, url]) => (
-            <Link href={url} key={url} onClick={() => menu.current?.close()}>
+            <Link
+              href={url}
+              key={url}
+              aria-current={path === url || path.startsWith(url + "/") ? "page" : undefined}
+              onClick={() => menu.current?.close()}
+            >
               {label}
               <Icon name="arrow" />
             </Link>

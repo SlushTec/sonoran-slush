@@ -671,3 +671,27 @@ test('switching product never writes the former design under the destination dra
   assert.equal(readLocal('config:pet-tags',null).text,'First pet');
  } finally {dom.window.Storage.prototype.setItem=original;}
 });
+
+test('header dialogs expose names and mobile current route matches desktop', () => {
+  const oldClose = HTMLDialogElement.prototype.close;
+  const oldShow = HTMLDialogElement.prototype.showModal;
+  HTMLDialogElement.prototype.close = function () { this.removeAttribute('open'); };
+  HTMLDialogElement.prototype.showModal = function () { this.setAttribute('open', ''); };
+  try {
+    window.history.replaceState({}, '', '/shop/drinkware');
+    const Header = require('../../apps/storefront/src/components/Header.tsx').default;
+    wrap(React.createElement(Header));
+    fireEvent.click(screen.getByRole('button', { name: 'Search gifts' }));
+    assert.ok(screen.getByRole('dialog', { name: 'Find something personal.' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Close search' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Open navigation' }));
+    assert.ok(screen.getByRole('dialog', { name: 'Site navigation' }));
+    const mobile = screen.getByRole('navigation', { name: 'Mobile navigation' });
+    const current = mobile.querySelectorAll('[aria-current="page"]');
+    assert.equal(current.length, 1);
+    assert.equal(current[0].getAttribute('href'), '/shop');
+  } finally {
+    HTMLDialogElement.prototype.close = oldClose;
+    HTMLDialogElement.prototype.showModal = oldShow;
+  }
+});
