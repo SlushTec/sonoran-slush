@@ -652,3 +652,22 @@ for(const mode of ['healthy','denied','noop','read-denied'])test('design save ou
   assert.equal(store.storageAvailable,mode==='healthy');
  }finally{proto.setItem=set;proto.getItem=get;}
 });
+
+test('switching product never writes the former design under the destination draft key', async()=>{
+ const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');
+ const first={...emptyDesign('pet-tags'),text:'First pet'};
+ const second={...emptyDesign('makertwist-40oz-tumbler'),text:'Second gift'};
+ writeLocal('config:pet-tags',first);writeLocal('config:makertwist-40oz-tumbler',second);
+ const original=dom.window.Storage.prototype.setItem, writes=[];
+ dom.window.Storage.prototype.setItem=function(key,value){if(key.startsWith('sonoran:config:'))writes.push({key,value:JSON.parse(value).value});return original.call(this,key,value);};
+ try {
+  const view=wrap(React.createElement(Customizer,{product:product('pet-tags')}));
+  await waitFor(()=>assert.equal(readLocal('config:pet-tags',null).text,'First pet'));
+  writes.length=0;
+  view.rerender(React.createElement(StoreProvider,null,React.createElement(Customizer,{product:product('makertwist-40oz-tumbler')})));
+  await waitFor(()=>assert.equal(readLocal('config:makertwist-40oz-tumbler',null).text,'Second gift'));
+  assert.ok(writes.length>0);
+  for(const write of writes)assert.equal(write.key,'sonoran:config:'+write.value.slug,'every persisted draft must belong to its storage key');
+  assert.equal(readLocal('config:pet-tags',null).text,'First pet');
+ } finally {dom.window.Storage.prototype.setItem=original;}
+});
