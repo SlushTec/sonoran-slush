@@ -118,7 +118,7 @@ export default function InquiryForm({
   }
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (busy || !consent) return;
+    if (busy || !consent || !requestID) return;
     const owner = lifecycle.current;
     setBusy(true);
     setError("");
@@ -220,7 +220,9 @@ export default function InquiryForm({
     day: "2-digit",
   }).format(new Date());
   return (
-    <form className="inquiry-form" onSubmit={submit}>
+    <form className="inquiry-form" onSubmit={submit} aria-busy={!requestID}>
+      {!requestID && <p role="status">Preparing your form and saved draft...</p>}
+      <fieldset disabled={!requestID} aria-label={event ? "Event inquiry" : contact ? "Contact inquiry" : "Bulk inquiry"} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
       <h3>
         {event
           ? "Tell us about your occasion."
@@ -537,6 +539,7 @@ export default function InquiryForm({
           does not submit a request.
         </p>
       </div>
+      </fieldset>
     </form>
   );
 }
