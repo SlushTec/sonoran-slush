@@ -1,0 +1,21 @@
+import {test,expect} from "@playwright/test";
+for(const width of [1280,390]) test("header Enter submits exact query at "+width,async({page})=>{
+ await page.setViewportSize({width,height:900}); await page.goto("/help");
+ const trigger=page.getByRole("button",{name:"Search gifts",exact:true});
+ await trigger.click();
+ const dialog=page.getByRole("dialog",{name:"Find something personal."});
+ const input=dialog.getByLabel("Search products");
+ await input.fill("tumbler"); await input.press("Enter");
+ await expect(page).toHaveURL(/\/shop\?q=tumbler$/);
+ await expect(page.getByRole("searchbox",{name:"Search the collection"})).toHaveValue("tumbler");
+ await expect(dialog).not.toBeVisible();
+ await page.goBack(); await expect(page).toHaveURL(/\/help$/);
+ await trigger.click(); await input.fill("caf\u00e9 & gift"); await input.press("Enter");
+ await expect.poll(()=>new URL(page.url()).searchParams.get("q")).toBe("caf\u00e9 & gift");
+ await expect(page.getByRole("searchbox",{name:"Search the collection"})).toHaveValue("caf\u00e9 & gift");
+ await trigger.click(); await input.fill(""); await input.press("Enter");
+ await expect(page.getByRole("searchbox",{name:"Search the collection"})).toHaveValue("");
+ await expect(page.locator(".catalog-grid .product-card").first()).toBeVisible();
+ await trigger.click(); await page.keyboard.press("Escape"); await expect(dialog).not.toBeVisible();
+ await expect(trigger).toBeFocused();
+});

@@ -142,16 +142,19 @@ export default function Header() {
             <Icon name="close" />
           </button>
         </div>
+        <form action="/shop" method="get" role="search" aria-label="Product search" onSubmit={() => search.current?.close()}>
         <label className="search-field">
           <Icon name="search" />
           <span className="sr-only">Search products</span>
           <input
             autoFocus
+            name="q"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Try a tumbler, a wedding gift, a crystal…"
           />
         </label>
+        </form>
         <p className="eyebrow">
           {q ? "Matching gifts" : "A few places to start"}
         </p>
