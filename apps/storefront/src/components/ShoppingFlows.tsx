@@ -14,6 +14,18 @@ function itemProduct(d: Design) {
 }
 export function Bag() {
   const store = useStore();
+  const [downloadStatus, setDownloadStatus] = useState("");
+  useEffect(() => setDownloadStatus(""), [store.cart]);
+  function downloadDesigns() {
+    try {
+      downloadJSON("sonoran-slush-designs.json", {
+        type: "design_request", created_at: new Date().toISOString(), items: store.cart, paid: false,
+      });
+      setDownloadStatus("Download started. Check your browser downloads. Your bag is unchanged.");
+    } catch {
+      setDownloadStatus("Download could not start. Try again. Your bag is unchanged.");
+    }
+  }
   if (!store.hydrated)
     return (
       <p className="loading-panel" role="status">
@@ -144,17 +156,11 @@ export function Bag() {
         </Link>
         <button
           className="link-button"
-          onClick={() =>
-            downloadJSON("sonoran-slush-designs.json", {
-              type: "design_request",
-              created_at: new Date().toISOString(),
-              items: store.cart,
-              paid: false,
-            })
-          }
+          onClick={downloadDesigns}
         >
           Download your designs
         </button>
+        <p role="status">{downloadStatus}</p>
         <p className="small">
           <Icon name="shield" size={15} /> No charge or reservation is made by
           saving a design.
