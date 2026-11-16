@@ -135,6 +135,7 @@ export default function CatalogSearch({
           <nav aria-label="Gift categories">
             <button
               className={!family ? "active" : ""}
+              aria-pressed={!family}
               onClick={() => change({ family: "" })}
             >
               All gifts <span>{catalog.products.length}</span>
@@ -144,6 +145,7 @@ export default function CatalogSearch({
                 key={c.slug}
                 onClick={() => change({ family: c.slug })}
                 className={family === c.slug ? "active" : ""}
+                aria-pressed={family === c.slug}
               >
                 {categoryShort[c.slug]}
                 <span>

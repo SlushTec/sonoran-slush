@@ -241,3 +241,28 @@ test("delayed initial navigation effect cannot erase a newer typed query", async
   await waitFor(() => assert.equal(screen.getByRole("searchbox").value, "d"));
   assert.equal(new URLSearchParams(location.search).get("q"), "d");
 });
+
+test("category buttons expose exactly one pressed choice through selection and reset", async () => {
+  wrap();
+  const selected = () => screen.getAllByRole("button", { pressed: true });
+  await waitFor(() => assert.equal(selected().length, 1));
+  assert.match(selected()[0].textContent, /All gifts/);
+  fireEvent.click(screen.getByRole("button", { name: /Bar & glassware/ }));
+  assert.equal(selected().length, 1);
+  assert.match(selected()[0].textContent, /Bar & glassware/);
+  assert.equal(screen.getByRole("button", { name: /All gifts/ }).getAttribute("aria-pressed"), "false");
+  fireEvent.click(screen.getByRole("button", { name: "Reset filters" }));
+  assert.equal(selected().length, 1);
+  assert.match(selected()[0].textContent, /All gifts/);
+});
+
+test("pressed category follows restored URL and category-route reset", async () => {
+  window.history.replaceState({}, "", "/shop/photo-crystals?category=glassware-bar");
+  const view = wrap({ category: "photo-crystals" });
+  await waitFor(() => assert.match(screen.getByRole("button", { pressed: true }).textContent, /Bar & glassware/));
+  fireEvent.click(screen.getByRole("button", { name: "Reset filters" }));
+  assert.match(screen.getByRole("button", { pressed: true }).textContent, /Photo crystals/);
+  view.unmount();
+  wrap({ category: "photo-crystals" });
+  await waitFor(() => assert.match(screen.getByRole("button", { pressed: true }).textContent, /Photo crystals/));
+});
