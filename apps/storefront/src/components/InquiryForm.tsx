@@ -44,6 +44,7 @@ export default function InquiryForm({
     [error, setError] = useState(""),
     [receipt, setReceipt] = useState<Receipt | null>(null),
     [receiptDownloadStatus, setReceiptDownloadStatus] = useState(""),
+    [draftDownloadStatus, setDraftDownloadStatus] = useState(""),
     [newerDraft, setNewerDraft] = useState(false),
     [requestID, setRequestID] = useState(""),
     [step, setStep] = useState(0);
@@ -73,6 +74,15 @@ export default function InquiryForm({
       lifecycle.current += 1;
     };
   }, [kind]);
+  useEffect(() => setDraftDownloadStatus(""), [v, kind]);
+  function downloadDraft() {
+    try {
+      downloadJSON("sonoran-slush-" + kind + "-draft.json", { ...payload(), status: "unsent_draft", consent: false });
+      setDraftDownloadStatus("Draft download started. Check your browser downloads and keep the file private. Nothing was submitted.");
+    } catch {
+      setDraftDownloadStatus("Draft download could not start. Your details are still in this form. Try again before leaving; nothing was submitted.");
+    }
+  }
   function downloadReceipt() {
     if (!receipt) return;
     try {
@@ -515,17 +525,12 @@ export default function InquiryForm({
           <button
             type="button"
             className="button outline"
-            onClick={() =>
-              downloadJSON("sonoran-slush-" + kind + "-draft.json", {
-                ...payload(),
-                status: "unsent_draft",
-                consent: false,
-              })
-            }
+            onClick={downloadDraft}
           >
             <Icon name="download" size={14} /> Download draft
           </button>
         </div>
+        <p role="status">{draftDownloadStatus}</p>
         <p className="field-help" style={{ marginTop: 12 }}>
           Saving a draft stores your form details in this browser for 30 days.{" "}
           <Link href="/saved">Clear device data</Link> any time. Downloading
