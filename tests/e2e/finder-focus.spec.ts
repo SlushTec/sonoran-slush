@@ -1,0 +1,23 @@
+import {test,expect} from "@playwright/test";
+for(const width of [1280,390])test("gift finder owns explicit step focus at "+width,async({page})=>{
+ await page.setViewportSize({width,height:900});await page.goto("/gift-finder");
+ const heading=page.locator(".finder-heading h2");
+ await page.getByRole("button",{name:"A friend",exact:true}).click();
+ await page.getByRole("button",{name:"Next little detail",exact:true}).focus();await page.keyboard.press("Enter");
+ await expect(heading).toHaveText("What is the occasion?");await expect(heading).toBeFocused();
+ await page.getByRole("button",{name:"Wedding",exact:true}).click();
+ await page.getByRole("button",{name:"Next little detail",exact:true}).click();
+ await expect(heading).toHaveText("What feels most like them?");await expect(heading).toBeFocused();
+ await page.getByRole("button",{name:"Back",exact:true}).click();await expect(heading).toBeFocused();
+ await expect(page.getByRole("button",{name:"Wedding",exact:true})).toHaveAttribute("aria-pressed","true");
+ await page.getByRole("button",{name:"Next little detail",exact:true}).click();
+ await page.getByRole("button",{name:"Find their gifts",exact:true}).focus();await page.keyboard.press("Enter");
+ await expect(heading).toHaveText("A few gifts that feel like them.");await expect(heading).toBeFocused();
+ await expect(page.locator(".finder .product-card")).toHaveCount(3);
+ await page.getByRole("button",{name:"Change your answers",exact:true}).focus();await page.keyboard.press("Enter");
+ await expect(heading).toHaveText("Who are we thinking of?");await expect(heading).toBeFocused();
+ await expect(page.getByRole("button",{name:"A friend",exact:true})).toHaveAttribute("aria-pressed","true");
+ await page.getByRole("button",{name:"Family",exact:true}).click();
+ await expect(page.getByRole("button",{name:"Family",exact:true})).toBeFocused();
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
