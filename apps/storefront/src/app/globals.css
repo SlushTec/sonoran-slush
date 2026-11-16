@@ -720,6 +720,7 @@ main:focus {
   margin-bottom: 7px;
 }
 .product-card h3 {
+  overflow-wrap: anywhere;
   font-size: 20px;
   line-height: 1.15;
   letter-spacing: -0.025em;
