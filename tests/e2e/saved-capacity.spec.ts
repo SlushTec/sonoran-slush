@@ -1,16 +1,17 @@
 import {test,expect} from '@playwright/test';
 for(const width of [1280,390])for(const action of ['save','another','bag'])test('full saved collection '+action+' '+width,async({page})=>{
  await page.setViewportSize({width,height:900});
- await page.goto('/products/makertwist-40oz-tumbler');
- await page.evaluate(()=>{
+ await page.addInitScript(()=>{
+  if(localStorage.getItem('sonoran:designs')!==null)return;
   const d={slug:'makertwist-40oz-tumbler',text:'Synthetic kept',secondary:'',font:'Classic serif',options:{},quantity:1,notes:'',artworkName:'',gift:false,giftMessage:'',updated:'2026-11-17'};
   localStorage.setItem('sonoran:designs',JSON.stringify({expires:Date.now()+86400000,value:Array.from({length:100},(_,i)=>({...d,id:'kept-'+i}))}));
  });
- await page.reload();await page.getByRole('tab',{name:'Make it personal'}).click();
+ await page.goto('/products/makertwist-40oz-tumbler');await page.getByRole('tab',{name:'Make it personal'}).click();
  const input=page.getByLabel('Name, initials, or message'),text='Synthetic caf\u00e9 capacity';
  await input.fill(text);
  const before=await page.evaluate(()=>localStorage.getItem('sonoran:designs'));
  const values=JSON.parse(before!).value;
+ expect(values).toHaveLength(100);expect(values.map((d:any)=>d.id)).toEqual(Array.from({length:100},(_,i)=>'kept-'+i));
  if(action==='bag')await page.getByRole('tab',{name:'Finishing touches'}).click();
  const button=page.getByRole('button',{name:action==='another'?'Save & start another design':action==='bag'?'Add design to bag':'Save this design for later',exact:true});
  for(let i=0;i<2;i++){
@@ -31,11 +32,12 @@ for(const width of [1280,390])for(const action of ['save','another','bag'])test(
 });
 
 test('capacity rejection preserves pending photo ownership and draft',async({page})=>{
- await page.goto('/products/photo-crystal-heart');
- await page.evaluate(()=>{
+ await page.addInitScript(()=>{
+  if(localStorage.getItem('sonoran:designs')!==null)return;
   const d={slug:'makertwist-40oz-tumbler',text:'Synthetic',secondary:'',font:'Classic serif',options:{},quantity:1,notes:'',artworkName:'',gift:false,giftMessage:'',updated:'2026-11-17'};
   localStorage.setItem('sonoran:designs',JSON.stringify({expires:Date.now()+86400000,value:Array.from({length:100},(_,i)=>({...d,id:'kept-'+i}))}));
- });await page.reload();await page.getByRole('button',{name:'Add your personal touch'}).click();
+ });await page.goto('/products/photo-crystal-heart');await page.getByRole('button',{name:'Add your personal touch'}).click();
+ expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('sonoran:designs')!).value.map((d:any)=>d.id))).toEqual(Array.from({length:100},(_,i)=>'kept-'+i));
  await page.evaluate(()=>{const w=window as any;w.__closed=0;w.__created=0;const create=URL.createObjectURL;URL.createObjectURL=function(b:Blob){w.__created++;return create.call(URL,b);};window.createImageBitmap=async()=>new Promise<any>(resolve=>{w.__release=()=>resolve({width:1000,height:1000,close:()=>w.__closed++});});});
  await page.locator('input[type=file]').setInputFiles({name:'capacity-pending.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWQAAAABJRU5ErkJggg==','base64')});
  await expect.poll(()=>page.evaluate(()=>!!(window as any).__release)).toBe(true);
