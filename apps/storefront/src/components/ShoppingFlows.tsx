@@ -136,9 +136,11 @@ export function Bag() {
             </article>
           );
         })}
-        <p className="device-note">
-          <Icon name="lock" size={14} /> This bag saves on this device for 30
-          days. Original artwork files are not stored.{" "}
+        <p className="device-note" aria-live="polite">
+          <Icon name="lock" size={14} /> {store.cartStorageAvailable
+            ? "This bag was verified saved on this device for 30 days."
+            : "This bag could not be verified on this device. Keep this page open and download your designs before leaving; current changes may last for this visit only."}{" "}
+          Original artwork files are not stored.{" "}
           <Link href="/saved">Manage your saved work.</Link>
         </p>
         <Link href="/shop" className="text-link" style={{ marginTop: 15 }}>
