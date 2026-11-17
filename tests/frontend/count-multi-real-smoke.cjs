@@ -169,7 +169,7 @@ async function stop(c) {
       await page.goto(ui+"/admin");await page.getByLabel("Staff access code").fill(staff);await page.getByRole("button",{name:"Open workspace"}).click();
       await page.getByLabel("Count lot reference").fill("lot");await page.getByLabel("Count location reference",{exact:true}).fill("shop");await page.getByLabel("Observed test units",{exact:true}).fill("5");
       const storage=await page.evaluate(()=>({...localStorage}));
-      await page.getByRole("button",{name:"Add count bucket",exact:true}).click();await page.getByLabel("Count location reference 2",{exact:true}).fill("market");await page.getByLabel("Count condition 2",{exact:true}).selectOption("damaged");await page.getByLabel("Observed test units 2",{exact:true}).fill("4");
+      await page.getByRole("button",{name:"Add count bucket",exact:true}).click();await page.getByLabel("Count location reference 2",{exact:true}).fill("market");await page.getByRole("combobox",{name:"Count condition 2",exact:true}).selectOption("damaged");await page.getByLabel("Observed test units 2",{exact:true}).fill("4");
       await page.getByRole("button",{name:"Compare test count",exact:true}).focus();await page.keyboard.press("Enter");const view=page.getByLabel("Verified test count comparison");await view.waitFor();
       assert.match(await view.innerText(),/Recorded units\s+7/);assert.match(await view.innerText(),/Recorded units\s+3/);assert.match(await view.innerText(),/\+1/);assert.match(await view.innerText(),/-2/);
       assert.deepEqual(requests.filter(r=>r.body).map(r=>r.body),[{expected_version:2,observations:[{location_id:"shop",condition:"available",observed_units:5},{location_id:"market",condition:"damaged",observed_units:4}]}]);

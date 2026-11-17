@@ -229,7 +229,7 @@ for (const width of [320, 1280])
         .getByLabel("Count location reference 2", { exact: true })
         .fill("shop");
       await page
-        .getByLabel("Count condition 2", { exact: true })
+        .getByRole("combobox", { name: "Count condition 2", exact: true })
         .selectOption("damaged");
       await page.getByLabel("Observed test units 2", { exact: true }).fill("3");
       await page
@@ -254,7 +254,7 @@ for (const width of [320, 1280])
         page.getByLabel("Count location reference", { exact: true }),
       ).toBeFocused();
       await expect(
-        page.getByLabel("Count condition", { exact: true }),
+        page.getByRole("combobox", { name: "Count condition", exact: true }),
       ).toHaveValue("damaged");
       await expect(view).toHaveCount(0);
       await add.click();
@@ -262,7 +262,7 @@ for (const width of [320, 1280])
         .getByLabel("Count location reference 2", { exact: true })
         .fill(" shop ");
       await page
-        .getByLabel("Count condition 2", { exact: true })
+        .getByRole("combobox", { name: "Count condition 2", exact: true })
         .selectOption("damaged");
       await page.getByLabel("Observed test units 2", { exact: true }).fill("0");
       await page
