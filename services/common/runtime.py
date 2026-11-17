@@ -46,9 +46,9 @@ def create_app(name: str) -> FastAPI:
     async def validation_problem(request: Request, exc: RequestValidationError):
         # Pydantic's default error includes the rejected input. Never echo private
         # inscriptions, contact details, or credentials in an error response.
-        fields = [".".join(str(p) for p in error["loc"] if p != "body") for error in exc.errors()[:4]]
+        # Error locations can contain attacker-controlled keys, not only schema fields.
         return JSONResponse(status_code=422, content=ProblemResponse(
-            error=Problem(code="VALIDATION_ERROR", message="Please check these fields: " + ", ".join(fields)),
+            error=Problem(code="VALIDATION_ERROR", message="Please check the request fields and try again."),
             request_id=getattr(request.state, "request_id", str(uuid4()))).model_dump())
 
     @app.middleware("http")
