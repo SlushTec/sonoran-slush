@@ -1,0 +1,1451 @@
+{
+  "schema_version": 1,
+  "kind": "approval_evidence_inventory_not_approval",
+  "baseline_commit": "9cb9a6073fb0619ee931c42e1e315d82ce5f8f78",
+  "scope": "Derived only from the five listed repository inputs and their registered asset bytes. Does not query external rights, stock or prices; does not close Linear acceptance or authorize publication.",
+  "input_sha256": {
+    "docs/assets/product-sources.json": "40248486cd41042b125966d36913d06253197100ad7d5fde59a6bfb6b8fb61f5",
+    "packages/contracts/catalog.reference.json": "d03d27a17d7e506a612ff2e321e39b2dd3d4d78309f62f3bee691071b4155829",
+    "docs/assets/SUPPLIER-AND-PHOTO-REGISTER.md": "f68b6290796af140ca6c6b843d6048bcd2776f0f61fe435bd86f80027d549489",
+    "docs/business/SOURCE-REGISTER.md": "f8540986dec2f54743ba435a450a88f71f9572af6ee3c1dc85324b28c7d86665",
+    "docs/requirements/CUSTOMER-EXPERIENCE.md": "a92e29a9d9ff86d1215b6dea8a048e26b6e0d77decf9fe9c086832ebe15235f5"
+  },
+  "counts": {
+    "catalog_rows": 41,
+    "registered_images": 40,
+    "held_without_image": 1,
+    "missing_prices": 41,
+    "purchasable": 0
+  },
+  "rows": [
+    {
+      "slug": "acacia-cutting-boards",
+      "name": "Acacia cutting boards & sets",
+      "category": "kitchen",
+      "facts": {
+        "source_url": "https://woodartsupply.com/collections/kitchen-tools/products/glikceil-12-pcs-thick-acacia-wood-cutting-boards-for-kitchen-reversible-wooden-chopping-board-set-double-sided-charcuterie-boards-for-meat-cheese-meal-14-x-11-inches-10-x-8-inches-8-x-5-5-inches",
+        "source_paths": [
+          "docs/products/ACACIA-CUTTING-BOARDS.md"
+        ],
+        "match_as_recorded": "documented_brand",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "Brand matches retained notes; original purchase URL is not recovered. Photo shows bulk blanks; selling units remain individual/quoted sets.",
+        "source_row_sha256": "4b9f0caacd0a0b3e58a7d559a942804ad1bdd4be3c529df069aeb713472de642",
+        "asset": {
+          "path": "apps/storefront/public/products/acacia-cutting-boards.webp",
+          "sha256": "9d5455cdc69b4009ef641f39a676a173505c15759af2dcc830ee70dace757ff7",
+          "width_px": 600,
+          "height_px": 600
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Identify and verify the exact offered blank, including dimensions and contents; candidate or brand match is insufficient."
+      ]
+    },
+    {
+      "slug": "aluminum-rfid-money-clip",
+      "name": "RFID money clip",
+      "category": "small-gifts",
+      "facts": {
+        "source_url": "https://lockconnection.net/the-notch-all-aluminum-rfid-blocking-wallets-blank/",
+        "source_paths": [
+          "docs/products/ALUMINUM-RFID-MONEY-CLIP.md"
+        ],
+        "match_as_recorded": "representative_blank",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "Matching material/type found; original supplier is not documented.",
+        "source_row_sha256": "c56408846bfe82565ebf3017791a380ae904963c4148f00c0f3c9cf6bbe842c1",
+        "asset": {
+          "path": "apps/storefront/public/products/aluminum-rfid-money-clip.webp",
+          "sha256": "49c07e09215d5c9ee6f17902fa446b90b935e3eac4c701e6f54a811ca6387fbe",
+          "width_px": 900,
+          "height_px": 900
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Identify and verify the exact offered blank, including dimensions and contents; candidate or brand match is insufficient."
+      ]
+    },
+    {
+      "slug": "balsa-earrings",
+      "name": "Earrings concept — material and finish unverified",
+      "category": "jewelry-pets",
+      "facts": {
+        "source_url": "https://alteregobeadingsupplies.com/products/copy-of-3pcs-geometric-shapes-wooden-blanks-choose-size-and-quantity-bulk-with-or-without-holes-unfinished-wood-laser-cutout-circle-round-dangle-earring-jewelry-blanks-shape-5",
+        "source_paths": [
+          "docs/FAQ.md"
+        ],
+        "match_as_recorded": "held_material_mismatch",
+        "rights_as_recorded": "Not displayed",
+        "display_as_recorded": null,
+        "source_note_as_recorded": "Candidate is an unfinished wooden earring blank. Balsa species and the studio hand-painted finish are unverified, so this photo is held rather than displayed.",
+        "source_row_sha256": "1822b034a95be23e02308b533e7329d3ed6b04bc3ee4a7f3b421e789a3a72b3f",
+        "asset": null,
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide the actual balsa/painted-finish product photo and matching material/finish evidence; do not substitute the held blank.",
+        "Confirm the actual offered product/shape and supported specifications; recorded match classification alone is not manufacturing qualification."
+      ]
+    },
+    {
+      "slug": "bamboo-cutting-board",
+      "name": "Bamboo cutting board",
+      "category": "kitchen",
+      "facts": {
+        "source_url": "https://www.cnsuncha.com/suncha-engraved-bamboo-cutting-boards-for-mom-gifts-product/",
+        "source_paths": [
+          "docs/products/BAMBOO-CUTTING-BOARD.md"
+        ],
+        "match_as_recorded": "representative_blank",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "Source describes 11 × 8.6 × 0.4 in bamboo board with handle. Candidate is not the documented supplier brand.",
+        "source_row_sha256": "a690d64c02eb0235841507c9d8f67358b92d550f6c53bf8c932af30c09122235",
+        "asset": {
+          "path": "apps/storefront/public/products/bamboo-cutting-board.webp",
+          "sha256": "d8e92d66551c95bd6d6d5880b0829099c984057d92cb501f3c2e79bb62a63243",
+          "width_px": 800,
+          "height_px": 800
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Identify and verify the exact offered blank, including dimensions and contents; candidate or brand match is insufficient."
+      ]
+    },
+    {
+      "slug": "cocktail-smoker-kit",
+      "name": "Cocktail smoker kit",
+      "category": "glassware-bar",
+      "facts": {
+        "source_url": "https://www.zyxwoodencraft.com/wooden-cocktail-smoker/cocktail-smoker-kit-with-torch",
+        "source_paths": [
+          "docs/products/COCKTAIL-SMOKER-KIT.md"
+        ],
+        "match_as_recorded": "representative_blank",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "No original supplier is named in source. Candidate kit for visual review only.",
+        "source_row_sha256": "de5cd17bc1da2f6c493acdc6a227b270fa3a172a8eb27b8a24bc4b793d637adc",
+        "asset": {
+          "path": "apps/storefront/public/products/cocktail-smoker-kit.webp",
+          "sha256": "ab795144f724c78f402ffbd5d00d6bb8c4f59a96406fd41158657bb4bfd3efad",
+          "width_px": 600,
+          "height_px": 600
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Identify and verify the exact offered blank, including dimensions and contents; candidate or brand match is insufficient."
+      ]
+    },
+    {
+      "slug": "credit-card-bottle-opener",
+      "name": "Card bottle opener",
+      "category": "small-gifts",
+      "facts": {
+        "source_url": "https://www.stealthsteel.com/products/customized-bottle-opener",
+        "source_paths": [
+          "docs/products/CREDIT-CARD-BOTTLE-OPENER.md"
+        ],
+        "match_as_recorded": "representative_blank",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "Matching stainless card opener type; original supplier is not documented.",
+        "source_row_sha256": "99f71fa3f382df7808665ee90ccd242202b7bb38ee7eb2c614ef252d3f1ddf69",
+        "asset": {
+          "path": "apps/storefront/public/products/credit-card-bottle-opener.webp",
+          "sha256": "2162db54818049b9ac51acfa0a4f5ce84a537d0b21469a676c796e5e2aa588d9",
+          "width_px": 1100,
+          "height_px": 825
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Identify and verify the exact offered blank, including dimensions and contents; candidate or brand match is insufficient."
+      ]
+    },
+    {
+      "slug": "crystal-bases",
+      "name": "Crystal light & wood bases",
+      "category": "photo-crystals",
+      "facts": {
+        "source_url": "https://3dcrystal.com/light-bases/index/index",
+        "source_paths": [
+          "docs/PRICING-3D-CRYSTAL.md"
+        ],
+        "match_as_recorded": "documented_shape",
+        "rights_as_recorded": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "",
+        "source_row_sha256": "fdfae837282e7b145ef4bec0bf66373cdfaa2a4aa10328d0777a04a60a863183",
+        "asset": {
+          "path": "apps/storefront/public/products/crystal-bases.webp",
+          "sha256": "a80701d3feba1e04f4589769586b7075324c61282e8aa0f28c34412c5f7a3a47",
+          "width_px": 380,
+          "height_px": 277
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Confirm the actual offered product/shape and supported specifications; recorded match classification alone is not manufacturing qualification."
+      ]
+    },
+    {
+      "slug": "crystal-heart-ornament",
+      "name": "Surface-engraved heart ornament",
+      "category": "ornaments",
+      "facts": {
+        "source_url": "https://custom-eeze.com/accessories/christmas-blank-h",
+        "source_paths": [
+          "docs/products/CRYSTAL-HEART-ORNAMENT.md"
+        ],
+        "match_as_recorded": "representative_blank",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "Blank heart photo, not the 2D subsurface ornament. Supplier dimension differs slightly from historical approximate notes.",
+        "source_row_sha256": "b2b782598e49ae69b121e83d3266a4fa6b9187c0bec2607aa4f35d9d9cd04ac3",
+        "asset": {
+          "path": "apps/storefront/public/products/crystal-heart-ornament.webp",
+          "sha256": "37df6c100322f1bd59ab91ab1b80a67a90b49f271428e0525337a4feefd1ec1a",
+          "width_px": 928,
+          "height_px": 928
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Identify and verify the exact offered blank, including dimensions and contents; candidate or brand match is insufficient."
+      ]
+    },
+    {
+      "slug": "crystal-round-ornament-60-80",
+      "name": "Surface-engraved round ornament",
+      "category": "ornaments",
+      "facts": {
+        "source_url": "https://www.laserbeastlab.com/products/blank-crystal-ornament",
+        "source_paths": [
+          "docs/products/CRYSTAL-ROUND-ORNAMENT-60-80.md"
+        ],
+        "match_as_recorded": "representative_blank",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "Matching material/type found; original supplier is not documented.",
+        "source_row_sha256": "a43596cf32c2cf01d2499be77e6a0552c30266044cfe6575598f4602d67e01a1",
+        "asset": {
+          "path": "apps/storefront/public/products/crystal-round-ornament-60-80.webp",
+          "sha256": "a1a4be89bd108311632231ae08514c52def1437314cfaad7f0fd914c5f5a6ade",
+          "width_px": 825,
+          "height_px": 1100
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Identify and verify the exact offered blank, including dimensions and contents; candidate or brand match is insufficient."
+      ]
+    },
+    {
+      "slug": "crystal-wine-stopper",
+      "name": "Surface-engraved wine stopper",
+      "category": "glassware-bar",
+      "facts": {
+        "source_url": "https://www.e-corporategifts.com/Crystal-Rosetta-Wine-Stopper.html",
+        "source_paths": [
+          "docs/products/CRYSTAL-WINE-STOPPER.md"
+        ],
+        "match_as_recorded": "representative_blank",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "New matching blank source, not a recovered original purchase link.",
+        "source_row_sha256": "88fabbdb1946a4ff05f76c6035315e89188adf2e159cf430bb72d0548edc915f",
+        "asset": {
+          "path": "apps/storefront/public/products/crystal-wine-stopper.webp",
+          "sha256": "c604a2df04b5bd16ddf1c4be580a70a1e2d7bfb581f4a4f1e01b8d38ec165220",
+          "width_px": 960,
+          "height_px": 960
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Identify and verify the exact offered blank, including dimensions and contents; candidate or brand match is insufficient."
+      ]
+    },
+    {
+      "slug": "laserette-journal",
+      "name": "Personalized journal",
+      "category": "small-gifts",
+      "facts": {
+        "source_url": "https://makerflo.com/products/laserette-notebook-journal",
+        "source_paths": [
+          "docs/products/LASERETTE-JOURNAL.md"
+        ],
+        "match_as_recorded": "documented_product",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "MakerFlo provides product-image downloads in its reseller resources. Use and current stock still need release review.",
+        "source_row_sha256": "5339d3b1acd00b9bf3cc205d3b448f22310d4b80df4ca30ea967a85669795729",
+        "asset": {
+          "path": "apps/storefront/public/products/laserette-journal.webp",
+          "sha256": "318ad2ee39e2908036a1168f15b4a83d80f1e252d6abef6ce502e80ccefbb097",
+          "width_px": 1100,
+          "height_px": 1100
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Confirm the actual offered product/shape and supported specifications; recorded match classification alone is not manufacturing qualification."
+      ]
+    },
+    {
+      "slug": "libbey-1639-mixing-glass",
+      "name": "Libbey mixing glass",
+      "category": "glassware-bar",
+      "facts": {
+        "source_url": "https://libbeyfoodservice.com/product/libbey/restaurant-basics-heat-treated-mixing-glass/1639ht",
+        "source_paths": [
+          "docs/products/LIBBEY-1639-MIXING-GLASS.md"
+        ],
+        "match_as_recorded": "documented_product",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "1639HT is the current manufacturer listing; the retained source uses 1639.",
+        "source_row_sha256": "7508188e0c2543954e7b87663395d4b47f2bf949bd69163b2561834633bd3153",
+        "asset": {
+          "path": "apps/storefront/public/products/libbey-1639-mixing-glass.webp",
+          "sha256": "1bd31aaade45626fb2438c39e9054d353e294b6a24cedcae789c7ed20c4d7cad",
+          "width_px": 1100,
+          "height_px": 1100
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Confirm the actual offered product/shape and supported specifications; recorded match classification alone is not manufacturing qualification."
+      ]
+    },
+    {
+      "slug": "libbey-2339-dof",
+      "name": "Libbey rocks glass",
+      "category": "glassware-bar",
+      "facts": {
+        "source_url": "https://libbeyfoodservice.com/product/libbey/lexington-double-old-fashioned/2339",
+        "source_paths": [
+          "docs/products/LIBBEY-2339-DOF.md"
+        ],
+        "match_as_recorded": "documented_product",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "",
+        "source_row_sha256": "e74fb33dcaaa99c0ce5f84a3fc8dc6c9e9b130f599fe3d1ace91290dbeac79f5",
+        "asset": {
+          "path": "apps/storefront/public/products/libbey-2339-dof.webp",
+          "sha256": "700a15ef5f0326dfcf63405dd91a5a8b008510dc0b4cfcea4231ae14ba0bec1b",
+          "width_px": 1100,
+          "height_px": 1100
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Confirm the actual offered product/shape and supported specifications; recorded match classification alone is not manufacturing qualification."
+      ]
+    },
+    {
+      "slug": "makerflo-32oz-water-bottle",
+      "name": "32 oz water bottle",
+      "category": "drinkware",
+      "facts": {
+        "source_url": "https://makerflo.com/products/32oz-hydro-water-bottle-powder-coated",
+        "source_paths": [
+          "docs/products/MAKERFLO-32OZ-WATER-BOTTLE.md"
+        ],
+        "match_as_recorded": "documented_product",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "",
+        "source_row_sha256": "0063dc3457f184189547954629bd334efbf810141c230129b0a24f264e49e011",
+        "asset": {
+          "path": "apps/storefront/public/products/makerflo-32oz-water-bottle.webp",
+          "sha256": "cae387fd92080ed402eb9065cdeaa0d7afd958125806a6eec766fd99829d2459",
+          "width_px": 1100,
+          "height_px": 1100
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Confirm the actual offered product/shape and supported specifications; recorded match classification alone is not manufacturing qualification."
+      ]
+    },
+    {
+      "slug": "makerflo-40oz-electroplated",
+      "name": "Electroplated 40 oz tumbler",
+      "category": "drinkware",
+      "facts": {
+        "source_url": "https://makerflo.com/products/40oz-electroplated-tumbler",
+        "source_paths": [
+          "docs/products/MAKERFLO-40OZ-ELECTROPLATED.md"
+        ],
+        "match_as_recorded": "documented_product",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "MakerFlo provides product-image downloads in its reseller resources. Use and current stock still need release review.",
+        "source_row_sha256": "865c3315c2542adba25d58dcce222d610628a38193a31a09b03e87d7cc459109",
+        "asset": {
+          "path": "apps/storefront/public/products/makerflo-40oz-electroplated.webp",
+          "sha256": "155a046c838619e1ed8894456728d2a7e1d1f410591b5566c936b1507d12ec28",
+          "width_px": 1100,
+          "height_px": 1100
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Confirm the actual offered product/shape and supported specifications; recorded match classification alone is not manufacturing qualification."
+      ]
+    },
+    {
+      "slug": "makertwist-40oz-tumbler",
+      "name": "MakerTwist 40 oz tumbler",
+      "category": "drinkware",
+      "facts": {
+        "source_url": "https://makerflo.com/products/40oz-tumbler-with-handle",
+        "source_paths": [
+          "docs/products/MAKERTWIST-40OZ-TUMBLER.md"
+        ],
+        "match_as_recorded": "documented_product",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "MakerFlo provides product-image downloads in its reseller resources. Use and current stock still need release review.",
+        "source_row_sha256": "e8e10a5b86074fb833fd667da1bcc1f62cf32cc6ed1979ec8b160e75e6223280",
+        "asset": {
+          "path": "apps/storefront/public/products/makertwist-40oz-tumbler.webp",
+          "sha256": "bea6af3ab965abe5b43287c99d15667d29ff4005ec4a9ebb7f33740f1f691e8e",
+          "width_px": 1100,
+          "height_px": 1100
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Confirm the actual offered product/shape and supported specifications; recorded match classification alone is not manufacturing qualification."
+      ]
+    },
+    {
+      "slug": "pet-bowls",
+      "name": "Engraved pet bowls",
+      "category": "jewelry-pets",
+      "facts": {
+        "source_url": "https://fmblaserdesigns.com/product/blank-32-oz-insulated-stainless-steel-pet-bowl/",
+        "source_paths": [
+          "docs/FAQ.md"
+        ],
+        "match_as_recorded": "representative_blank",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "Matching material/type found; original supplier is not documented.",
+        "source_row_sha256": "dca04d697ea6896305d828aed1451cdf5a171cdcd0112ac788e67b21807f4175",
+        "asset": {
+          "path": "apps/storefront/public/products/pet-bowls.webp",
+          "sha256": "6a96213a218633393f101ca7d9b67f65921fcac8d7d30236cc9463d027b90f1d",
+          "width_px": 800,
+          "height_px": 800
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Identify and verify the exact offered blank, including dimensions and contents; candidate or brand match is insufficient."
+      ]
+    },
+    {
+      "slug": "pet-tags",
+      "name": "Personalized pet tags",
+      "category": "jewelry-pets",
+      "facts": {
+        "source_url": "https://www.ballchain.com/blank-pet-id-tags-various-colors-bone-shaped/",
+        "source_paths": [
+          "docs/FAQ.md"
+        ],
+        "match_as_recorded": "representative_blank",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "Matching blank style found. No original purchasing supplier recovered.",
+        "source_row_sha256": "48319acfaa334e54e3a2997751901f4acb72488cd0091dbf2fc3edf099f6cb2f",
+        "asset": {
+          "path": "apps/storefront/public/products/pet-tags.webp",
+          "sha256": "74af002001fec47e7cd621965d5484ab393b96e7d093490b3851db25780527ca",
+          "width_px": 500,
+          "height_px": 500
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Identify and verify the exact offered blank, including dimensions and contents; candidate or brand match is insufficient."
+      ]
+    },
+    {
+      "slug": "photo-crystal-candle",
+      "name": "Candle photo crystal",
+      "category": "photo-crystals",
+      "facts": {
+        "source_url": "https://3dcrystal.com/3d-crystal-candle",
+        "source_paths": [
+          "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+        ],
+        "match_as_recorded": "documented_shape",
+        "rights_as_recorded": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "",
+        "source_row_sha256": "375ff3b627469ab98c8fe007b97066de11690d976cc8c198b4af45bdec070943",
+        "asset": {
+          "path": "apps/storefront/public/products/photo-crystal-candle.webp",
+          "sha256": "f562a9a7bb101afb0bce51d657a691336f4e669fa5a039c79d9ff7b0c70cb7c4",
+          "width_px": 515,
+          "height_px": 811
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Confirm the actual offered product/shape and supported specifications; recorded match classification alone is not manufacturing qualification."
+      ]
+    },
+    {
+      "slug": "photo-crystal-circle-ornament",
+      "name": "Round crystal photo ornament",
+      "category": "photo-crystals",
+      "facts": {
+        "source_url": "https://3dcrystal.com/sun-catcher",
+        "source_paths": [
+          "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+        ],
+        "match_as_recorded": "documented_shape",
+        "rights_as_recorded": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "",
+        "source_row_sha256": "fe254e20d57ae61642f90f67deb0c24d9df90058bd9eed9318c592a1ad6704a0",
+        "asset": {
+          "path": "apps/storefront/public/products/photo-crystal-circle-ornament.webp",
+          "sha256": "d5e44f280601e10150ec58a58175d6ec5595be33a346e28f144ab312e945c737",
+          "width_px": 452,
+          "height_px": 424
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Confirm the actual offered product/shape and supported specifications; recorded match classification alone is not manufacturing qualification."
+      ]
+    },
+    {
+      "slug": "photo-crystal-cut-corner-diamond",
+      "name": "Cut-corner diamond photo crystal",
+      "category": "photo-crystals",
+      "facts": {
+        "source_url": "https://3dcrystal.com/3d-crystal-cut-corner-diamond",
+        "source_paths": [
+          "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+        ],
+        "match_as_recorded": "documented_shape",
+        "rights_as_recorded": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "",
+        "source_row_sha256": "b7391762aab4f4a802ec0742c0d9d28925edf581c206491b0afc76bd0824eb09",
+        "asset": {
+          "path": "apps/storefront/public/products/photo-crystal-cut-corner-diamond.webp",
+          "sha256": "48d51e81810041ec5c79f2fa3445638879d7c829e1e82d4d9a4b960eeb2a11ee",
+          "width_px": 728,
+          "height_px": 727
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Confirm the actual offered product/shape and supported specifications; recorded match classification alone is not manufacturing qualification."
+      ]
+    },
+    {
+      "slug": "photo-crystal-dog-bone",
+      "name": "Dog bone photo crystal",
+      "category": "photo-crystals",
+      "facts": {
+        "source_url": "https://3dcrystal.com/3d-crystal-dog-bone-horizontal",
+        "source_paths": [
+          "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+        ],
+        "match_as_recorded": "documented_shape",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "",
+        "source_row_sha256": "aa2c1f2669e907b39e86acacf742c8fa4e2f9980fb1342c1f73a3c756c850e34",
+        "asset": {
+          "path": "apps/storefront/public/products/photo-crystal-dog-bone.webp",
+          "sha256": "2a76ec4804cdb77cb3907015f73dcd222db5c8aa1716bc937eaf65f42ee0ab01",
+          "width_px": 265,
+          "height_px": 265
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Confirm the actual offered product/shape and supported specifications; recorded match classification alone is not manufacturing qualification."
+      ]
+    },
+    {
+      "slug": "photo-crystal-heart",
+      "name": "Heart photo crystal",
+      "category": "photo-crystals",
+      "facts": {
+        "source_url": "https://3dcrystal.com/3d-crystal-heart",
+        "source_paths": [
+          "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+        ],
+        "match_as_recorded": "documented_shape",
+        "rights_as_recorded": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "",
+        "source_row_sha256": "16f0bc2509718927aff7371b02dbd862e119e018a3fb58e36859f5283f148655",
+        "asset": {
+          "path": "apps/storefront/public/products/photo-crystal-heart.webp",
+          "sha256": "007ad97d86834aa2371e149320a28860befef3e9db557a2ee110c457381f76d4",
+          "width_px": 405,
+          "height_px": 381
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Confirm the actual offered product/shape and supported specifications; recorded match classification alone is not manufacturing qualification."
+      ]
+    },
+    {
+      "slug": "photo-crystal-heart-keychain",
+      "name": "Heart crystal photo keychain",
+      "category": "photo-crystals",
+      "facts": {
+        "source_url": "https://3dcrystal.com/3d-crystal-heart-keychains",
+        "source_paths": [
+          "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+        ],
+        "match_as_recorded": "documented_shape",
+        "rights_as_recorded": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "",
+        "source_row_sha256": "a0e4f83c497a8c63ab33ad484c52decb86ed9d4059572785cb3dcab018755f13",
+        "asset": {
+          "path": "apps/storefront/public/products/photo-crystal-heart-keychain.webp",
+          "sha256": "c4560d739085ae68bd712cccf8bdfa85f6060767cd1d214eb53f9774805ca725",
+          "width_px": 398,
+          "height_px": 524
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Confirm the actual offered product/shape and supported specifications; recorded match classification alone is not manufacturing qualification."
+      ]
+    },
+    {
+      "slug": "photo-crystal-heart-necklace",
+      "name": "Heart crystal photo necklace",
+      "category": "photo-crystals",
+      "facts": {
+        "source_url": "https://3dcrystal.com/2d-crystal-heart-necklaces",
+        "source_paths": [
+          "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+        ],
+        "match_as_recorded": "documented_shape",
+        "rights_as_recorded": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "",
+        "source_row_sha256": "814f260af8d7291023252276e817a190dc49bb6f802dc49fd555e028ee82534f",
+        "asset": {
+          "path": "apps/storefront/public/products/photo-crystal-heart-necklace.webp",
+          "sha256": "aeb16a7cd3479d90a098c796ae5a7695bce2e5b8acdeb6a9897edb6251446db0",
+          "width_px": 589,
+          "height_px": 568
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Confirm the actual offered product/shape and supported specifications; recorded match classification alone is not manufacturing qualification."
+      ]
+    },
+    {
+      "slug": "photo-crystal-notched",
+      "name": "Notched photo crystal",
+      "category": "photo-crystals",
+      "facts": {
+        "source_url": "https://3dcrystal.com/3d-notched-crystal-tall",
+        "source_paths": [
+          "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+        ],
+        "match_as_recorded": "documented_shape",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "",
+        "source_row_sha256": "e5b8a16b3a9e56633c70f7fca1e3100b3974946013b5b2cee663de072ca80147",
+        "asset": {
+          "path": "apps/storefront/public/products/photo-crystal-notched.webp",
+          "sha256": "53f257f758e7a4f06bf647c5341b9b0e884d52102be42fc5e2e1456efbf6a4ef",
+          "width_px": 265,
+          "height_px": 265
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Confirm the actual offered product/shape and supported specifications; recorded match classification alone is not manufacturing qualification."
+      ]
+    },
+    {
+      "slug": "photo-crystal-prestige",
+      "name": "Prestige iceberg photo crystal",
+      "category": "photo-crystals",
+      "facts": {
+        "source_url": "https://3dcrystal.com/3d-crystal-prestige",
+        "source_paths": [
+          "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+        ],
+        "match_as_recorded": "documented_shape",
+        "rights_as_recorded": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "",
+        "source_row_sha256": "ea819077d28127e8d9cd5d49e7ae81426be08f1a1081735747543448be6d61bf",
+        "asset": {
+          "path": "apps/storefront/public/products/photo-crystal-prestige.webp",
+          "sha256": "7ede6a845078336d1842645a81ade567d646cb36c7504cdc1a239e1c133a60e8",
+          "width_px": 433,
+          "height_px": 533
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Confirm the actual offered product/shape and supported specifications; recorded match classification alone is not manufacturing qualification."
+      ]
+    },
+    {
+      "slug": "photo-crystal-rectangle-keychain",
+      "name": "Rectangle crystal photo keychain",
+      "category": "photo-crystals",
+      "facts": {
+        "source_url": "https://3dcrystal.com/3d-crystal-rectangle-keychains",
+        "source_paths": [
+          "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+        ],
+        "match_as_recorded": "documented_shape",
+        "rights_as_recorded": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "",
+        "source_row_sha256": "11fca948f7f472e43ab302298a0a15e8f4eebc357bef74ed58dbb4532f260fa8",
+        "asset": {
+          "path": "apps/storefront/public/products/photo-crystal-rectangle-keychain.webp",
+          "sha256": "ff61df1157a29584684985edc645154dd632d010da255fbe0674c3c1d0f67e1e",
+          "width_px": 444,
+          "height_px": 620
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Confirm the actual offered product/shape and supported specifications; recorded match classification alone is not manufacturing qualification."
+      ]
+    },
+    {
+      "slug": "photo-crystal-rectangle-necklace",
+      "name": "Rectangle crystal photo necklace",
+      "category": "photo-crystals",
+      "facts": {
+        "source_url": "https://3dcrystal.com/2d-crystal-rectangle-necklaces",
+        "source_paths": [
+          "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+        ],
+        "match_as_recorded": "documented_shape",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "",
+        "source_row_sha256": "0c597e4a2a71eb9526e6c94cb7b4570d6662b62ffe0ed573a8d309a2cc698bc3",
+        "asset": {
+          "path": "apps/storefront/public/products/photo-crystal-rectangle-necklace.webp",
+          "sha256": "538b4b736226b019a1d74e8ff8a56926f6c050c9924aec95aa0daf701fc698d3",
+          "width_px": 265,
+          "height_px": 265
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Confirm the actual offered product/shape and supported specifications; recorded match classification alone is not manufacturing qualification."
+      ]
+    },
+    {
+      "slug": "photo-crystal-rectangle-tall",
+      "name": "Tall rectangle photo crystal",
+      "category": "photo-crystals",
+      "facts": {
+        "source_url": "https://3dcrystal.com/3d-crystal-rectangle-tall",
+        "source_paths": [
+          "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+        ],
+        "match_as_recorded": "documented_shape",
+        "rights_as_recorded": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "",
+        "source_row_sha256": "cb7b88fb6e0a302927f5c3a06ffec88d0cc951fe416aaf357080a0f923174d94",
+        "asset": {
+          "path": "apps/storefront/public/products/photo-crystal-rectangle-tall.webp",
+          "sha256": "461d2169961edc66e36f728458305f31872d2f749cff871a8061552dcc4ad606",
+          "width_px": 240,
+          "height_px": 342
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Confirm the actual offered product/shape and supported specifications; recorded match classification alone is not manufacturing qualification."
+      ]
+    },
+    {
+      "slug": "photo-crystal-rectangle-wide",
+      "name": "Wide rectangle photo crystal",
+      "category": "photo-crystals",
+      "facts": {
+        "source_url": "https://3dcrystal.com/3d-crystal-rectangle-wide",
+        "source_paths": [
+          "docs/CRYSTAL-SIZE-KEEP-LIST.md"
+        ],
+        "match_as_recorded": "documented_shape",
+        "rights_as_recorded": "Owner-authorized business-brochure image; original photographer/license not reconstructed.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "",
+        "source_row_sha256": "da99fc09831b0c91eed289a072c8f7136255e744f0fb7bb7f76d8077b64cf8e3",
+        "asset": {
+          "path": "apps/storefront/public/products/photo-crystal-rectangle-wide.webp",
+          "sha256": "fe61dcc11df4acc842f66c016d28b04bd9b584b830b84779d662ced29e0e8d10",
+          "width_px": 595,
+          "height_px": 424
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Confirm the actual offered product/shape and supported specifications; recorded match classification alone is not manufacturing qualification."
+      ]
+    },
+    {
+      "slug": "salt-rimmer-acacia",
+      "name": "Acacia salt rimmer",
+      "category": "kitchen",
+      "facts": {
+        "source_url": "https://www.ebay.com/itm/137750552150",
+        "source_paths": [
+          "docs/products/SALT-RIMMER-ACACIA.md"
+        ],
+        "match_as_recorded": "documented_brand",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "Ziliny brand is named in retained notes. Marketplace images and diameter vary by listing; exact 5.9-inch blank still needs confirmation.",
+        "source_row_sha256": "38809e494a5e4c0257ecb6d81807b551bc2c4c0f7c972b621a5b2d827aeb894f",
+        "asset": {
+          "path": "apps/storefront/public/products/salt-rimmer-acacia.webp",
+          "sha256": "7a7c0462c59e6b9b08b312b4723aa37998ccb4b5e72c3f932e91e4d8745386a7",
+          "width_px": 500,
+          "height_px": 500
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Identify and verify the exact offered blank, including dimensions and contents; candidate or brand match is insufficient."
+      ]
+    },
+    {
+      "slug": "shot-glass-2oz-square",
+      "name": "Square shot glasses",
+      "category": "glassware-bar",
+      "facts": {
+        "source_url": "https://www.metro-textile.com/productdetail.aspx?id=927",
+        "source_paths": [
+          "docs/products/SHOT-GLASS-2OZ-SQUARE.md"
+        ],
+        "match_as_recorded": "representative_blank",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "Square 2 oz glass reference; confirm the actual blank before production.",
+        "source_row_sha256": "c9f98d3531ea550eeb7177d2fd6a37a29b192fd10bbaa50dac103d28e5285961",
+        "asset": {
+          "path": "apps/storefront/public/products/shot-glass-2oz-square.webp",
+          "sha256": "03067e029d5b2a80ba0a6f0467cb133739d34ab1ced039e5b77937bdd2dbe7e5",
+          "width_px": 900,
+          "height_px": 846
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Identify and verify the exact offered blank, including dimensions and contents; candidate or brand match is insufficient."
+      ]
+    },
+    {
+      "slug": "shot-glass-2oz-wood-box",
+      "name": "Boxed shot glass set",
+      "category": "glassware-bar",
+      "facts": {
+        "source_url": "https://glassware.en.made-in-china.com/product/kGYpeqMvEyWI/China-Wholesale-Personalised-Shot-Glass-Set-with-Wooden-Box.html",
+        "source_paths": [
+          "docs/products/SHOT-GLASS-2OZ-WOOD-BOX.md"
+        ],
+        "match_as_recorded": "representative_blank",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "New matching blank source, not a recovered original purchase link.",
+        "source_row_sha256": "27162dad753198c45c4224a42081ed4b5ec56c8dba9da79c404e05d438f8ebbb",
+        "asset": {
+          "path": "apps/storefront/public/products/shot-glass-2oz-wood-box.webp",
+          "sha256": "cfd152df6746520369d49126e49ba833d8811fc4d7bfb4f7d9dd271e8c9b9b36",
+          "width_px": 800,
+          "height_px": 800
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Identify and verify the exact offered blank, including dimensions and contents; candidate or brand match is insufficient."
+      ]
+    },
+    {
+      "slug": "stainless-pendants",
+      "name": "Stainless steel pendants",
+      "category": "jewelry-pets",
+      "facts": {
+        "source_url": "https://metaza.com/en-us/products/premium-long-rectangle-pendant-st-steel-10pcs",
+        "source_paths": [
+          "docs/FAQ.md"
+        ],
+        "match_as_recorded": "representative_blank",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "Matching material/type found; original supplier is not documented.",
+        "source_row_sha256": "ee72cbb823d6343041237706564363214a5e8d745c05d317ce41b67a8372cb8b",
+        "asset": {
+          "path": "apps/storefront/public/products/stainless-pendants.webp",
+          "sha256": "40e4431286d3b4cac18e2ab11677f4fed7dec1f6db15f54668c8c76df5bd5671",
+          "width_px": 1100,
+          "height_px": 1100
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Identify and verify the exact offered blank, including dimensions and contents; candidate or brand match is insufficient."
+      ]
+    },
+    {
+      "slug": "steel-flat-bottle-opener",
+      "name": "Steel bottle opener",
+      "category": "small-gifts",
+      "facts": {
+        "source_url": "https://www.nellisauction.com/p/60-Pieces-Stainless-Steel-Flat-Bottle-Opener-with-Keychain-3-5-x/64509641",
+        "source_paths": [
+          "docs/products/STEEL-FLAT-BOTTLE-OPENER.md"
+        ],
+        "match_as_recorded": "representative_blank",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "Matching blank style found. No original purchasing supplier recovered.",
+        "source_row_sha256": "bf544380fe88e9a7e9918cfbdcf595634d9566138bc7c22275cc596a0c66e40d",
+        "asset": {
+          "path": "apps/storefront/public/products/steel-flat-bottle-opener.webp",
+          "sha256": "3fce1442b4c2e3cabe9aee724eac597d3809e1f4f3f059feb824a91a16d60a69",
+          "width_px": 1100,
+          "height_px": 1100
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Identify and verify the exact offered blank, including dimensions and contents; candidate or brand match is insufficient."
+      ]
+    },
+    {
+      "slug": "whiskey-decanter-26oz-set",
+      "name": "Whiskey decanter set",
+      "category": "glassware-bar",
+      "facts": {
+        "source_url": "https://www.xhhglass.com/index.php?c=show&id=25",
+        "source_paths": [
+          "docs/products/WHISKEY-DECANTER-26OZ-SET.md"
+        ],
+        "match_as_recorded": "documented_brand",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "Supplier matches named brand. Supplier listing is 700 ml/25 oz rather than historical ~26 oz; exact capacity and set contents await blank verification.",
+        "source_row_sha256": "a06f4771a10a669a2738a7d9e6218054394097a670cc8f871377c5978f96b6f7",
+        "asset": {
+          "path": "apps/storefront/public/products/whiskey-decanter-26oz-set.webp",
+          "sha256": "958f90688d674cf7c5283f5e44ca6ace1c848c60a5e19ae9ba8c6b0835ef9908",
+          "width_px": 800,
+          "height_px": 800
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Identify and verify the exact offered blank, including dimensions and contents; candidate or brand match is insufficient."
+      ]
+    },
+    {
+      "slug": "whiskey-decanter-4-glass-stones",
+      "name": "Decanter, four glasses & stones",
+      "category": "glassware-bar",
+      "facts": {
+        "source_url": "https://www.xhhglass.com/index.php?c=show&id=25",
+        "source_paths": [
+          "docs/products/WHISKEY-DECANTER-4-GLASS-STONES.md"
+        ],
+        "match_as_recorded": "representative_blank",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "Supplier gallery photo shows four glasses with stones in the wooden case. Original purchase supplier is not recovered; this remains a reference set.",
+        "source_row_sha256": "ab8cc515e06b05c9939b3dce33773902a49284d1e31517f99774a14288c58f5b",
+        "asset": {
+          "path": "apps/storefront/public/products/whiskey-decanter-4-glass-stones.webp",
+          "sha256": "958f90688d674cf7c5283f5e44ca6ace1c848c60a5e19ae9ba8c6b0835ef9908",
+          "width_px": 800,
+          "height_px": 800
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Identify and verify the exact offered blank, including dimensions and contents; candidate or brand match is insufficient."
+      ]
+    },
+    {
+      "slug": "wood-bottle-opener-keychain",
+      "name": "Wood bottle-opener keychain",
+      "category": "small-gifts",
+      "facts": {
+        "source_url": "https://www.4custompromo.com/custom-wooden-bottle-opener-keychain.html",
+        "source_paths": [
+          "docs/products/WOOD-BOTTLE-OPENER-KEYCHAIN.md"
+        ],
+        "match_as_recorded": "representative_blank",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "New matching blank source, not a recovered original purchase link.",
+        "source_row_sha256": "835f12e32377d2f3e6432ee043d39c970d3d2484047f61017d0d7e4845ac6b60",
+        "asset": {
+          "path": "apps/storefront/public/products/wood-bottle-opener-keychain.webp",
+          "sha256": "d69d75de2c61ea20220259a2ab6233b5541e97c66ced0ecea89b40cefb221fb2",
+          "width_px": 265,
+          "height_px": 265
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Identify and verify the exact offered blank, including dimensions and contents; candidate or brand match is insufficient."
+      ]
+    },
+    {
+      "slug": "wood-keychain-rectangle",
+      "name": "Rectangle wood keychain",
+      "category": "small-gifts",
+      "facts": {
+        "source_url": "https://us.laserpecker.net/products/blank-rectangle-wood-keychain",
+        "source_paths": [
+          "docs/products/WOOD-KEYCHAIN-RECTANGLE.md"
+        ],
+        "match_as_recorded": "representative_blank",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "Matching material/type found; original supplier is not documented.",
+        "source_row_sha256": "e5063748dedcd5fbb29b66ddac9f1408b3fc6f51ed6b3161f722c6c45513cffb",
+        "asset": {
+          "path": "apps/storefront/public/products/wood-keychain-rectangle.webp",
+          "sha256": "22c4dc1de628101c612a81871f1635f4a0a4ba1250326ae2da1c5c0425c7449a",
+          "width_px": 1100,
+          "height_px": 1100
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Identify and verify the exact offered blank, including dimensions and contents; candidate or brand match is insufficient."
+      ]
+    },
+    {
+      "slug": "wood-keychain-round",
+      "name": "Round wood keychain",
+      "category": "small-gifts",
+      "facts": {
+        "source_url": "https://www.xstron.com/wood-key-chain-blank-laser-engraving-material/",
+        "source_paths": [
+          "docs/products/WOOD-KEYCHAIN-ROUND.md"
+        ],
+        "match_as_recorded": "representative_blank",
+        "rights_as_recorded": "Supplier reference image for owner-private review; public commercial reuse not verified.",
+        "display_as_recorded": "owner_private_review",
+        "source_note_as_recorded": "New matching blank source, not a recovered original purchase link.",
+        "source_row_sha256": "3eab312d97b55fe6009ba6d4c82aa2aaf8140fb1bbe04278d456d8dde21f6d41",
+        "asset": {
+          "path": "apps/storefront/public/products/wood-keychain-round.webp",
+          "sha256": "d25e17e8b969e7c9845538d37c04712d75dcd774ad249d924d228ed055f6a8bc",
+          "width_px": 1059,
+          "height_px": 1059
+        },
+        "price_minor": null,
+        "purchasable": false
+      },
+      "not_established_by_reviewed_register": {
+        "commercial_permission": "Not established; no permission approval is inferred from the recorded rights statement.",
+        "physical_scale_proof": "Not established by this register's asset dimensions; no claim is made about evidence outside reviewed inputs.",
+        "retail_price_approval": "No price supplied in the navigation catalog."
+      },
+      "decision_or_evidence_needed": [
+        "Supply an approved current price/options record before retail totals or price filtering.",
+        "Provide evidence permitting this exact image's commercial publication, or an approved replacement; private-review status is not that permission.",
+        "Provide a verified physical-scale reference for the actual offered blank; pixel dimensions alone do not establish scale.",
+        "Identify and verify the exact offered blank, including dimensions and contents; candidate or brand match is insufficient."
+      ]
+    }
+  ]
+}
