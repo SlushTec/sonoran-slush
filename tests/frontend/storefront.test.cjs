@@ -857,3 +857,13 @@ test('customizer step buttons preserve keyboard context without changing draft',
  const actions=[['Back',0],['Add your personal touch',1],['Finishing touches',2],['Edit personalization',1]];
  for(const [name,index] of actions){const button=screen.getByRole('button',{name,exact:true});button.focus();fireEvent.click(button);assert.equal(document.activeElement===screen.getByRole('tab',{selected:true}),true);assert.equal(document.activeElement.id,'config-tab-'+index);assert.equal(localStorage.getItem('sonoran:config:pet-tags'),raw);}
 });
+
+for(const step of [0,1,2])test('confirmed current options return focus to current step '+step,async()=>{
+ const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');writeLocal('config:photo-crystal-heart',{...emptyDesign('photo-crystal-heart'),id:'review-focus',text:'Keep words',options:{'Crystal shape':'Heart',Size:'Retired'}});
+ wrap(React.createElement(Customizer,{product:product('photo-crystal-heart')}));const confirm=await screen.findByRole('button',{name:'Use these current choices'});fireEvent.click(document.getElementById('config-tab-'+step));confirm.focus();fireEvent.click(confirm);
+ assert.equal(screen.queryAllByRole('button',{name:'Use these current choices'}).length,0);assert.equal(document.activeElement===document.getElementById('config-tab-'+step),true);assert.equal(document.activeElement.getAttribute('aria-selected'),'true');assert.equal(readLocal('config:photo-crystal-heart',{}).text,'Keep words');assert.deepEqual(readLocal('designs',[]),[]);
+});
+test('pending option review mount and remount do not steal focus',async()=>{
+ const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');writeLocal('config:photo-crystal-heart',{...emptyDesign('photo-crystal-heart'),id:'review-focus',options:{'Crystal shape':'Heart',Size:'Retired'}});const outside=document.createElement('button');outside.textContent='Outside focus';document.body.appendChild(outside);outside.focus();
+ try{let mounted=wrap(React.createElement(Customizer,{product:product('photo-crystal-heart')}));await screen.findByRole('button',{name:'Use these current choices'});assert.equal(document.activeElement===outside,true);mounted.unmount();mounted=wrap(React.createElement(Customizer,{product:product('photo-crystal-heart')}));await screen.findByRole('button',{name:'Use these current choices'});assert.equal(document.activeElement===outside,true);}finally{outside.remove();}
+});

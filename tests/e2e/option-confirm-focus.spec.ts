@@ -1,0 +1,8 @@
+import {test,expect} from '@playwright/test';
+for(const width of [1280,390])test('option confirmation preserves current step focus '+width,async({page})=>{
+ await page.setViewportSize({width,height:900});await page.addInitScript(()=>{if(!localStorage.getItem('sonoran:config:photo-crystal-heart'))localStorage.setItem('sonoran:config:photo-crystal-heart',JSON.stringify({expires:Date.now()+86400000,value:{id:'review-focus',slug:'photo-crystal-heart',text:'Keep caf\u00e9 words',secondary:'',font:'Classic serif',options:{'Crystal shape':'Heart',Size:'Retired'},quantity:1,notes:'Keep notes',artworkName:'',gift:false,giftMessage:'',updated:'2026-11-17'}}));});
+ await page.goto('/products/photo-crystal-heart');const confirm=page.getByRole('button',{name:'Use these current choices'});await expect(confirm).toBeVisible();await expect(page.locator('[role=tab]:focus')).toHaveCount(0);
+ const step=width===1280?1:2;const tab=page.locator('#config-tab-'+step);await tab.click();await confirm.focus();await page.keyboard.press('Enter');await expect(confirm).toHaveCount(0);await expect(tab).toBeFocused();await expect(tab).toHaveAttribute('aria-selected','true');
+ expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('sonoran:config:photo-crystal-heart')!).value.text)).toBe('Keep caf\u00e9 words');expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('sonoran:designs')!).value)).toEqual([]);await page.screenshot({path:'artifacts/option-confirm-focus-'+width+'.png',fullPage:true});
+ await page.reload();await expect(page.getByRole('button',{name:'Add your personal touch'})).toBeEnabled();await expect(confirm).toHaveCount(0);await expect(page.locator('[role=tab]:focus')).toHaveCount(0);
+});

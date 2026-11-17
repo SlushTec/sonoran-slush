@@ -435,7 +435,7 @@ export default function Customizer({ product }: { product: Product }) {
             </div>)}</dl>
             <p>Edits and previews are not saved while this review is pending. Reloading will restore your previous draft.</p>
             <button className="button" onClick={() => {
-              if (design.slug === product.slug && choiceReview.original.slug === product.slug && choiceReview.original.id === design.id) setChoiceReview(null);
+              if (design.slug === product.slug && choiceReview.original.slug === product.slug && choiceReview.original.id === design.id) { setChoiceReview(null); selectStep(step); }
             }}>Use these current choices</button>
           </section>
         )}
