@@ -17,6 +17,30 @@ const processes = ["All processes", ...new Set(catalog.products.flatMap((p) => {
   const value = listedProcess(p);
   return value ? [value] : [];
 }))];
+type Filters = {q: string; family: string; occasion: string; material: string; process: string};
+function matchesProduct(p: (typeof catalog.products)[number], {q, family, occasion, material, process}: Filters) {
+          const i = infoFor(p);
+          return (
+            (!family || p.category === family) &&
+            (!q ||
+              (
+                p.name +
+                " " +
+                i.title +
+                " " +
+                i.description +
+                " " +
+                i.occasions.join(" ") +
+                " " +
+                i.material
+              )
+                .toLowerCase()
+                .includes(q.trim().toLowerCase())) &&
+            (occasion === "All occasions" || i.occasions.includes(occasion)) &&
+            (material === "All materials" || i.material === material) &&
+            (process === "All processes" || listedProcess(p) === process)
+          );
+}
 function CatalogQuery({ onChange }: { onChange: (query: string) => void }) {
   const query = useSearchParams().toString();
   useEffect(() => onChange(query), [query, onChange]);
@@ -94,29 +118,7 @@ export default function CatalogSearch({
   const result = useMemo(
     () =>
       catalog.products
-        .filter((p) => {
-          const i = infoFor(p);
-          return (
-            (!family || p.category === family) &&
-            (!q ||
-              (
-                p.name +
-                " " +
-                i.title +
-                " " +
-                i.description +
-                " " +
-                i.occasions.join(" ") +
-                " " +
-                i.material
-              )
-                .toLowerCase()
-                .includes(q.trim().toLowerCase())) &&
-            (occasion === "All occasions" || i.occasions.includes(occasion)) &&
-            (material === "All materials" || i.material === material) &&
-            (process === "All processes" || listedProcess(p) === process)
-          );
-        })
+        .filter((p) => matchesProduct(p, {q, family, occasion, material, process}))
         .sort((a, b) =>
           sort === "az"
             ? infoFor(a).title.localeCompare(infoFor(b).title)
@@ -129,18 +131,21 @@ export default function CatalogSearch({
   const suggestions = useMemo(() => {
     if (result.length) return [];
     const eligibleNames = catalog.products
-      .filter((p) => {
-        const i = infoFor(p);
-        return (
-          (!family || p.category === family) &&
-          (occasion === "All occasions" || i.occasions.includes(occasion)) &&
-          (material === "All materials" || i.material === material) &&
-            (process === "All processes" || listedProcess(p) === process)
-        );
-      })
+      .filter((p) => matchesProduct(p, {q: "", family, occasion, material, process}))
       .flatMap((p) => [p.name, infoFor(p).title]);
     return suggestSearchTerms(q, eligibleNames);
   }, [result.length, q, family, occasion, material, process]);
+  const recoveries = result.length ? [] : ([
+    {key: "family", value: "", label: "All categories"},
+    {key: "occasion", value: "All occasions", label: "All occasions"},
+    {key: "material", value: "All materials", label: "All materials"},
+    {key: "process", value: "All processes", label: "All processes"},
+  ] as const).flatMap(({key, value, label}) => {
+    const current = {q, family, occasion, material, process};
+    if (current[key] === value) return [];
+    const count = catalog.products.filter(p => matchesProduct(p, {...current, [key]: value})).length;
+    return count ? [{key, value, label, count}] : [];
+  });
   const active =
     !!q ||
     !!family ||
@@ -293,6 +298,18 @@ export default function CatalogSearch({
                 Try a broader search or a different occasion. Your idea may also
                 be a great fit for a custom order.
               </p>
+              {recoveries.length > 0 && (
+                <div role="group" aria-label="Filter recovery">
+                  <p>Keep your search and other choices. Change just one filter:</p>
+                  <div className="actions">
+                    {recoveries.map(({key, value, label, count}) => (
+                      <button key={key} className="button outline" onClick={() => {
+                        change({[key]: value}); searchInput.current?.focus();
+                      }}>{label}: {count} {count === 1 ? "match" : "matches"}</button>
+                    ))}
+                  </div>
+                </div>
+              )}
               {suggestions.length > 0 && (
                 <div role="group" aria-label="Search suggestions">
                   <p>Try searching for:</p>

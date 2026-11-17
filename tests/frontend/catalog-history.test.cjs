@@ -351,3 +351,22 @@ test("unknown process URL falls back without inventing a process", async () => {
   await waitFor(() => assert.equal(screen.getByLabelText("Listed process").value, "All processes"));
   assert.ok(screen.getByText("41 thoughtful gifts"));
 });
+
+for(const [key,value,label] of [['material','Wood','All materials'],['process','Surface engraving on wood','All processes'],['category','photo-crystals','All categories'],['occasion','Pet gifts','All occasions']]) test('single filter recovery preserves remaining state '+key,async()=>{
+ const params=new URLSearchParams({q:'tumbler',sort:'za',campaign:'test',[key]:value});
+ window.history.replaceState({fixture:'keep'},'', '/shop?'+params+'#results');wrap();
+ await screen.findByText('No gifts found, just yet.');
+ const button=screen.getByRole('button',{name:new RegExp('^'+label+': [1-9]')});
+ const before=new URLSearchParams(location.search),length=window.history.length;
+ fireEvent.click(button);
+ const after=new URLSearchParams(location.search);assert.equal(after.has(key),false);
+ for(const [k,v] of before)if(k!==key)assert.equal(after.get(k),v);
+ assert.equal(location.hash,'#results');assert.equal(window.history.length,length);assert.equal(window.history.state.fixture,'keep');
+ assert.equal(document.activeElement,screen.getByRole('searchbox'));assert.ok(document.querySelectorAll('.product-card').length>0);
+ assert.equal(screen.queryByRole('group',{name:'Filter recovery'}),null);
+ cleanup();wrap();await waitFor(()=>assert.ok(document.querySelectorAll('.product-card').length>0));assert.equal(screen.getByRole('searchbox').value,'tumbler');
+});
+test('no single-filter action invents matches or automatically changes impossible query',async()=>{
+ window.history.replaceState({},'', '/shop?q=impossiblenomatch&material=Wood&category=photo-crystals');wrap();
+ await screen.findByText('No gifts found, just yet.');assert.equal(screen.queryByRole('group',{name:'Filter recovery'}),null);assert.equal(screen.getByRole('searchbox').value,'impossiblenomatch');assert.equal(screen.getByLabelText('Material').value,'Wood');
+});
