@@ -1,0 +1,9 @@
+# Current configuration persistence disclosure (UX03)
+
+Autosave previously ignored the current configuration write result and used the Store's independent named-design/bag/favorites status for its saved caption. An external predecessor reproduction retained new visible text and old stored text after a selective configuration quota failure while still claiming 30-day saving.
+
+The existing guarded write now verifies its own unexpired exact-value readback and records the result against the exact immutable design object. Caption success requires that same current object, restored matching product and no pending choice review. Skipped/unverified saves never inherit another edit or product's success. Named Save and bag semantics, source/storage format, expiration interval, editor content and photo ownership are unchanged. No automatic retry loop, deletion or rollback is added. Polite live text announces uncertainty without moving focus or sharing the toast role.
+
+Throwing writes and silent drops leave previous persisted bytes untouched; readback denial can mean a write succeeded but cannot be confirmed, so wording says unverified, not definitely lost. A later actual successful edit/save clears the warning; an unrelated successful named Save does not. This is point-in-time verification, not cross-tab conflict protection or a guarantee against subsequent browser eviction.
+
+Focused five-case proof passes: throwing/silent/readback failure, successful later edit then newer failure and reload, product transition and pending option-review preservation, server-rendered hydration and unavailable-design guards. Original external red store-config-storage-red is retained; new focused receipt store-config-focused. Aggregate/native remain pending independent source review. No commerce, security, remote or model changes.

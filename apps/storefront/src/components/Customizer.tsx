@@ -37,6 +37,7 @@ export default function Customizer({ product }: { product: Product }) {
     [offsetY, setOffsetY] = useState(0),
     [rotation, setRotation] = useState(0),
     [reading, setReading] = useState(false);
+  const [draftPersistence, setDraftPersistence] = useState<{ design: Design; saved: boolean } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const photoGeneration = useRef(0);
   const newDesignFocus = useRef<{ slug: string; id: string } | null>(null);
@@ -94,8 +95,16 @@ export default function Customizer({ product }: { product: Product }) {
   useEffect(() => {
     // A product transition renders once with the former product's design.
     // Never persist that stale state into the destination product's draft.
-    if (design && restored && design.slug === product.slug && !choiceReview && !missingDesign)
-      writeLocal("config:" + product.slug, design);
+    if (design && restored && design.slug === product.slug && !choiceReview && !missingDesign) {
+      let saved = writeLocal("config:" + product.slug, design);
+      if (saved) {
+        try {
+          const raw = JSON.parse(localStorage.getItem("sonoran:config:" + product.slug) || "null");
+          saved = raw?.expires > Date.now() && JSON.stringify(raw.value) === JSON.stringify(design);
+        } catch { saved = false; }
+      }
+      setDraftPersistence({ design, saved });
+    }
   }, [design, product.slug, restored, choiceReview, missingDesign]);
   useEffect(
     () => () => {
@@ -829,11 +838,14 @@ export default function Customizer({ product }: { product: Product }) {
           Save & start another design
         </button>
         </fieldset>
-        <p className="privacy-caption">
+        <p className="privacy-caption" aria-live="polite">
           <Icon name="lock" size={13} />
-          {choiceReview ? "Changes are not saved until you confirm the current choices." : store.storageAvailable
-            ? "Drafts save on this device for 30 days."
-            : "Device storage is unavailable; drafts will last for this visit only."}{" "}
+          {choiceReview ? "Changes are not saved until you confirm the current choices."
+            : !restored || design.slug !== product.slug || draftPersistence?.design !== design
+              ? "Current draft storage has not yet been verified."
+              : draftPersistence.saved
+                ? "Current draft saved on this device for 30 days."
+                : "Current draft could not be verified on this device. Keep this page open; your latest edits may last for this visit only."}{" "}
           <Link href="/saved">Manage saved work</Link>
         </p>
         <div className="personal-promise">
