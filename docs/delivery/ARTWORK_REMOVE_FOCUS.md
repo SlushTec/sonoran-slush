@@ -1,0 +1,7 @@
+# Artwork removal focus (UX03)
+
+Isolated from main 6f5fca6d7625bcd7971edf520d011dcdc8cdb105. The explicit Remove artwork handler now calls existing selectStep(1) after its unchanged invalidation, preview/error/name and input clearing. The persistent Personalize tab is the intentional keyboard destination. The upload input may still be disabled in the current render while a pending read is cancelled, so synchronous focus on that input is not reliable. No effect, mount autofocus, new photo policy, storage schema or validation change.
+
+New DOM regressions reproduce three predecessor focus failures (retained filename, loaded preview, pending bitmap decode), while the mount/remount noninterference case already passes. Green checks keep the draft identity and all unrelated fields, verify loaded URL revocation, pending decode closure without URL creation or late preview resurrection, uploader re-enable and stable selected-tab focus. Existing six photo lifecycle cases remain included. Original external uploader-target reproduction is a diagnostic, not the selected focus acceptance target.
+
+External store-artwork-red log: three failed/one passed. Final store-artwork-focused-final: ten passed. Fresh exact npm-ci workspace junction verified. These are DOM proofs, not native browser or aggregate acceptance; those stages remain pending independent source review. No production commerce, artwork upload or remote action.

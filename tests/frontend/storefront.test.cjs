@@ -899,3 +899,35 @@ for(const slug of ['pet-tags','photo-crystal-heart'])test('validation rejection 
  fireEvent.click(screen.getByRole('button',{name:'Finishing touches',exact:true}));fireEvent.click(screen.getByRole('button',{name:'Add design to bag'}));
  assert.equal(readLocal('cart',[]).length,1);assert.equal(readLocal('cart',[])[0].slug,slug);if(slug==='pet-tags')assert.equal(readLocal('cart',[])[0].text,'Ready words');
 });
+
+for(const mode of ['retained','loaded','pending'])test('artwork removal restores stable personalization focus: '+mode,async()=>{
+ const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');
+ writeLocal('config:photo-crystal-heart',{...emptyDesign('photo-crystal-heart'),text:'Keep my words',options:{'Crystal shape':'Heart',Size:'Small'},artworkName:mode==='loaded'?'':'previous.png'});
+ const originalBitmap=global.createImageBitmap,originalCreate=URL.createObjectURL,originalRevoke=URL.revokeObjectURL;
+ let release,started=false,closed=0,created=0;const revoked=[];
+ global.createImageBitmap=()=>{started=true;return mode==='pending'?new Promise(resolve=>{release=resolve;}):Promise.resolve({width:1000,height:1000,close:()=>closed++});};
+ URL.createObjectURL=()=>{created++;return 'blob:removal-focus';};URL.revokeObjectURL=url=>revoked.push(url);
+ try{
+  wrap(React.createElement(Customizer,{product:product('photo-crystal-heart')}));
+  fireEvent.click(await screen.findByRole('button',{name:/Add your personal touch/}));
+  if(mode!=='retained'){
+   fireEvent.change(document.getElementById('artwork'),{target:{files:[{name:'current.png',size:32,slice:()=>({arrayBuffer:async()=>Uint8Array.from([137,80,78,71]).buffer})}]}});
+   if(mode==='pending'){await waitFor(()=>assert.ok(started));assert.equal(document.getElementById('artwork').disabled,true);}
+   else await screen.findByText('current.png');
+  }
+  const before=readLocal('config:photo-crystal-heart',{}),remove=screen.getByRole('button',{name:'Remove artwork'});remove.focus();fireEvent.click(remove);
+  assert.equal(document.activeElement===document.getElementById('config-tab-1'),true);
+  assert.equal(document.getElementById('config-tab-1').getAttribute('aria-selected'),'true');
+  assert.equal(document.getElementById('artwork').disabled,false);
+  if(mode==='pending')await React.act(async()=>{release({width:1000,height:1000,close:()=>closed++});});
+  assert.equal(screen.queryAllByRole('button',{name:'Remove artwork'}).length,0);
+  assert.equal(screen.queryAllByAltText('Your local artwork layout').length,0);
+  const after=readLocal('config:photo-crystal-heart',{});assert.equal(after.artworkName,'');const {artworkName:oldName,updated:oldUpdated,...oldFields}=before,{artworkName:newName,updated:newUpdated,...newFields}=after;assert.deepEqual(newFields,oldFields);
+  assert.equal(document.activeElement===document.getElementById('config-tab-1'),true);
+  assert.equal(created,mode==='loaded'?1:0);assert.equal(closed,mode==='retained'?0:1);assert.deepEqual(revoked,mode==='loaded'?['blob:removal-focus']:[]);
+ }finally{global.createImageBitmap=originalBitmap;URL.createObjectURL=originalCreate;URL.revokeObjectURL=originalRevoke;}
+});
+test('artwork removal focus has no mount or remount side effect',async()=>{
+ const sentinel=document.createElement('button');sentinel.textContent='Outside focus';document.body.append(sentinel);sentinel.focus();
+ try{for(let i=0;i<2;i++){const view=wrap(React.createElement(Customizer,{product:product('photo-crystal-heart')}));await screen.findByRole('button',{name:/Add your personal touch/});assert.equal(document.activeElement===sentinel,true);view.unmount();}}finally{sentinel.remove();}
+});
