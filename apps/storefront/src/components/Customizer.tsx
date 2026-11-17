@@ -102,6 +102,10 @@ export default function Customizer({ product }: { product: Product }) {
     },
     [localURL],
   );
+  function selectStep(next: number) {
+    setStep(next);
+    document.getElementById("config-tab-" + next)?.focus();
+  }
   function update(value: Partial<Design>) {
     if (!restored || missingDesign || design?.slug !== product.slug) return;
     setDesign((d) =>
@@ -543,7 +547,7 @@ export default function Customizer({ product }: { product: Product }) {
               </p>
               <button
                 className="button primary full"
-                onClick={() => setStep(1)}
+                onClick={() => selectStep(1)}
               >
                 Add your personal touch <Icon name="arrow" size={17} />
               </button>
@@ -682,10 +686,10 @@ export default function Customizer({ product }: { product: Product }) {
                 </p>
               )}
               <div className="step-buttons">
-                <button className="button outline" onClick={() => setStep(0)}>
+                <button className="button outline" onClick={() => selectStep(0)}>
                   Back
                 </button>
-                <button className="button primary" onClick={() => setStep(2)}>
+                <button className="button primary" onClick={() => selectStep(2)}>
                   Finishing touches <Icon name="arrow" size={17} />
                 </button>
               </div>
@@ -762,7 +766,7 @@ export default function Customizer({ product }: { product: Product }) {
                 Add design to bag <Icon name="bag" size={18} />
               </button>
               <div className="config-secondary">
-                <button className="link-button" onClick={() => setStep(1)}>
+                <button className="link-button" onClick={() => selectStep(1)}>
                   Edit personalization
                 </button>
                 <Link href="/cart" className="text-link">

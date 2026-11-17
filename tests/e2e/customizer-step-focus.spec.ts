@@ -1,0 +1,9 @@
+import {test,expect} from '@playwright/test';
+for(const width of [390,1280])test('customizer step actions keep keyboard context '+width,async({page})=>{
+ await page.setViewportSize({width,height:900});await page.goto('/products/pet-tags');await expect(page.getByRole('spinbutton',{name:'Quantity',exact:true})).toBeEnabled();
+ const raw=await page.evaluate(()=>localStorage.getItem('sonoran:config:pet-tags'));
+ for(const [name,index] of [['Add your personal touch',1],['Back',0],['Add your personal touch',1],['Finishing touches',2],['Edit personalization',1],['Back',0]] as const){const button=page.getByRole('button',{name,exact:true});await button.focus();await page.keyboard.press('Enter');const tab=page.getByRole('tab',{selected:true});await expect(tab).toHaveAttribute('id','config-tab-'+index);await expect(tab).toBeFocused();expect(await page.evaluate(()=>localStorage.getItem('sonoran:config:pet-tags'))).toBe(raw);}
+ const selected=page.getByRole('tab',{selected:true});await page.keyboard.press('ArrowRight');await expect(page.getByRole('tab',{selected:true})).toHaveAttribute('id','config-tab-1');await expect(page.getByRole('tab',{selected:true})).toBeFocused();
+ await page.reload();await expect(page.getByRole('spinbutton',{name:'Quantity',exact:true})).toBeEnabled();await expect(page.getByRole('tab',{selected:true})).not.toBeFocused();expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('sonoran:config:pet-tags')!).value)).toEqual(JSON.parse(raw!).value);
+ await page.getByRole('button',{name:'Add your personal touch',exact:true}).focus();await page.keyboard.press('Enter');await expect(page.getByRole('tab',{selected:true})).toBeFocused();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:'artifacts/customizer-step-'+width+'.png',fullPage:true});
+});
