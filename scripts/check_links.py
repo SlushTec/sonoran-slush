@@ -6,13 +6,13 @@ from urllib.parse import unquote, urlsplit
 ROOT = Path(__file__).resolve().parents[1]
 
 def check():
-    manifest=json.loads((ROOT/'archive/2026-10-14-pre-native/manifest.json').read_text())
+    manifest=json.loads((ROOT/'archive/2026-10-14-pre-native/manifest.json').read_text(encoding="utf-8"))
     retained={r['original_path'] for r in manifest['files'] if r['retained_active_unchanged']}
     names=subprocess.check_output(['git','ls-files','--cached','--others','--exclude-standard','-z'],cwd=ROOT).decode().split('\0')
     checked=0
     for name in set(names):
         if not name.endswith('.md') or name in retained or name.startswith('archive/') or not (ROOT/name).is_file(): continue
-        for raw in re.findall(r'\[[^\]]+\]\(([^)]+)\)',(ROOT/name).read_text()):
+        for raw in re.findall(r'\[[^\]]+\]\(([^)]+)\)',(ROOT/name).read_text(encoding="utf-8")):
             target=raw.split(' ',1)[0]
             if target.startswith('#') or urlsplit(target).scheme: continue
             path=unquote(target.split('#',1)[0])
