@@ -484,7 +484,7 @@ test('clear saved work detects retained keys and successful explicit retry dismi
 for(const action of ['remove','new-design','unmount']){
  test('pending local photo respects '+action+' rather than reviving old artwork',async()=>{
   const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');
-  writeLocal('config:photo-crystal-heart',{...emptyDesign('photo-crystal-heart'),artworkName:'previous.png'});
+  writeLocal('config:photo-crystal-heart',{...emptyDesign('photo-crystal-heart'),options:{'Crystal shape':'Heart',Size:'Small'},artworkName:'previous.png'});
   const originalBitmap=global.createImageBitmap, originalCreate=URL.createObjectURL, originalRevoke=URL.revokeObjectURL;
   let resolveBitmap,started=false,closed=0,urls=0;
   global.createImageBitmap=()=>{started=true;return new Promise(resolve=>{resolveBitmap=resolve;});};
@@ -528,7 +528,7 @@ test('current local photo still attaches and its object URL is revoked on remova
 });
 test('cancelled local photo failure cannot replace the newer cleared state',async()=>{
  const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');
- writeLocal('config:photo-crystal-heart',{...emptyDesign('photo-crystal-heart'),artworkName:'previous.png'});
+ writeLocal('config:photo-crystal-heart',{...emptyDesign('photo-crystal-heart'),options:{'Crystal shape':'Heart',Size:'Small'},artworkName:'previous.png'});
  const original=global.createImageBitmap;let rejectBitmap,started=false;
  global.createImageBitmap=()=>{started=true;return new Promise((_,reject)=>{rejectBitmap=reject;});};
  try{
@@ -656,7 +656,7 @@ for(const mode of ['healthy','denied','noop','read-denied'])test('design save ou
 test('switching product never writes the former design under the destination draft key', async()=>{
  const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');
  const first={...emptyDesign('pet-tags'),text:'First pet'};
- const second={...emptyDesign('makertwist-40oz-tumbler'),text:'Second gift'};
+ const second={...emptyDesign('makertwist-40oz-tumbler'),options:{Design:'Name or monogram',Placement:'Single placement'},text:'Second gift'};
  writeLocal('config:pet-tags',first);writeLocal('config:makertwist-40oz-tumbler',second);
  const original=dom.window.Storage.prototype.setItem, writes=[];
  dom.window.Storage.prototype.setItem=function(key,value){if(key.startsWith('sonoran:config:'))writes.push({key,value:JSON.parse(value).value});return original.call(this,key,value);};
@@ -771,4 +771,23 @@ test('bag addition preserves full saved collection and permits existing saved up
  await act(async()=>observed.addToCart({...base,id:'new-bag',text:'New bag work'}));assert.deepEqual(observed.designs,originals);assert.equal(observed.cart[0].text,'New bag work');assert.match(screen.getByRole('status').textContent,/saved designs are full/);
  assert.deepEqual(readLocal('designs',[]),originals);
  await act(async()=>observed.addToCart({...originals[50],text:'Edited existing'}));assert.equal(observed.designs.length,100);assert.equal(observed.designs[0].text,'Edited existing');assert.deepEqual(new Set(observed.designs.map(d=>d.id)),new Set(originals.map(d=>d.id)));
+});
+
+function legacyOptionDraft(){const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');return {...emptyDesign('photo-crystal-heart'),id:'old-options',text:'Exact caf\u00e9 words',quantity:3,notes:'Keep original notes',options:{'Crystal shape':'Wrong old shape',Size:'Retired large'},gift:true,giftMessage:'Original gift'};}
+test('restored invalid options wait for explicit confirmation without overwriting original config',async()=>{
+ const old=legacyOptionDraft();writeLocal('config:'+old.slug,old);const raw=localStorage.getItem('sonoran:config:'+old.slug);wrap(React.createElement(Customizer,{product:product(old.slug)}));
+ await screen.findByRole('heading',{name:'Review changed choices'});assert.equal(localStorage.getItem('sonoran:config:'+old.slug),raw);
+ assert.ok(screen.getByText('Retired large',{exact:true}));assert.ok(screen.getByText('Wrong old shape',{exact:true}));
+ for(const name of ['Save this design for later','Save & start another design']){const b=screen.getByRole('button',{name});assert.equal(b.disabled,true);fireEvent.click(b);}
+ fireEvent.click(screen.getByRole('tab',{name:/Finishing touches/}));assert.equal(screen.getByRole('button',{name:'Add design to bag'}).disabled,true);assert.deepEqual(readLocal('cart',[]),[]);assert.deepEqual(readLocal('designs',[]),[]);
+ fireEvent.click(screen.getByRole('tab',{name:/Make it personal/}));fireEvent.change(screen.getByLabelText(/Inscription \(optional\)/),{target:{value:'New unsaved words'}});assert.equal(localStorage.getItem('sonoran:config:'+old.slug),raw);
+ cleanup();wrap(React.createElement(Customizer,{product:product(old.slug)}));await screen.findByRole('heading',{name:'Review changed choices'});assert.equal(localStorage.getItem('sonoran:config:'+old.slug),raw);
+ fireEvent.change(screen.getByLabelText('Size'),{target:{value:'Large'}});fireEvent.click(screen.getByRole('button',{name:'Use these current choices'}));
+ await waitFor(()=>assert.equal(readLocal('config:'+old.slug,null).options.Size,'Large'));const saved=readLocal('config:'+old.slug,null);assert.equal(saved.text,old.text);assert.equal(saved.quantity,3);assert.equal(saved.notes,old.notes);assert.equal(saved.giftMessage,old.giftMessage);assert.equal(saved.options['Crystal shape'],'Heart');assert.deepEqual(readLocal('designs',[]),[]);
+});
+test('named saved draft and product transition preserve originals until deliberate save',async()=>{
+ const old=legacyOptionDraft();writeLocal('designs',[old]);window.history.replaceState({},'', '/products/'+old.slug+'?design='+old.id);
+ const r=wrap(React.createElement(Customizer,{product:product(old.slug)}));await screen.findByRole('heading',{name:'Review changed choices'});assert.deepEqual(readLocal('designs',[]),[old]);
+ fireEvent.click(screen.getByRole('button',{name:'Use these current choices'}));assert.deepEqual(readLocal('designs',[]),[old]);fireEvent.click(screen.getByRole('button',{name:'Save this design for later'}));assert.equal(readLocal('designs',[])[0].options['Crystal shape'],'Heart');
+ r.rerender(React.createElement(StoreProvider,null,React.createElement(Customizer,{product:product('photo-crystal-prestige')})));await waitFor(()=>assert.equal(screen.getByLabelText('Size').value,'Small only'));assert.equal(screen.queryByRole('heading',{name:'Review changed choices'}) === null,true);assert.equal(readLocal('config:photo-crystal-prestige',null).slug,'photo-crystal-prestige');
 });
