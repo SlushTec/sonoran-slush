@@ -88,6 +88,62 @@ export function fixtureCount(
     reservation_floor_conflict: conflict,
   };
 }
+// The response must preserve this API's explicit input order. No partial display.
+export function fixtureCounts(
+  value: unknown,
+  source: Available,
+  observed: readonly Observation[],
+): View[] | null {
+  if (
+    !Array.isArray(observed) ||
+    observed.length < 1 ||
+    observed.length > 100 ||
+    !object(value) ||
+    !Array.isArray(value.observations) ||
+    value.observations.length !== observed.length
+  )
+    return null;
+  const seen = new Set<string>();
+  const views: View[] = [];
+  for (let i = 0; i < observed.length; i++) {
+    const item = observed[i];
+    if (
+      !Object.hasOwn(observed, i) ||
+      !Object.hasOwn(value.observations, i) ||
+      !object(item) ||
+      typeof item.location_id !== "string" ||
+      !key(item.location_id) ||
+      typeof item.condition !== "string" ||
+      !conditions.includes(item.condition as Condition) ||
+      typeof item.observed_units !== "number" ||
+      !Number.isInteger(item.observed_units) ||
+      item.observed_units < 0 ||
+      item.observed_units > 1000000
+    )
+      return null;
+    const bucket = item.location_id + ":" + item.condition;
+    if (seen.has(bucket)) return null;
+    seen.add(bucket);
+    const view = fixtureCount(
+      { ...value, observations: [value.observations[i]] },
+      source,
+      {
+        location_id: item.location_id,
+        condition: item.condition as Condition,
+        observed_units: item.observed_units,
+      },
+    );
+    if (!view) return null;
+    views.push(view);
+  }
+  return views;
+}
+type DraftRow = {
+  id: number;
+  location: string;
+  condition: Condition;
+  count: string;
+};
 function failure(error: unknown) {
   if (error instanceof ServiceError) {
     if (error.status === 401 || error.status === 403)
@@ -101,16 +157,25 @@ function failure(error: unknown) {
   return "Test count comparison could not be read. No stock was changed.";
 }
 export default function FixtureCount({ token }: { token: string }) {
-  const [lot, setLot] = useState(""),
-    [location, setLocation] = useState(""),
-    [condition, setCondition] = useState<Condition>("available");
-  const [count, setCount] = useState(""),
-    [view, setView] = useState<View | null>(null),
+  const [lot, setLot] = useState("");
+  const nextId = useRef(1);
+  const [rows, setRows] = useState<DraftRow[]>([
+    { id: 0, location: "", condition: "available", count: "" },
+  ]);
+  const [view, setView] = useState<View[] | null>(null),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
   const epoch = useRef(0),
     active = useRef(false),
     alive = useRef(true);
+  const rowInputs = useRef(new Map<number, HTMLInputElement>());
+  const pendingFocus = useRef<number | null>(null);
+  useEffect(() => {
+    if (pendingFocus.current !== null) {
+      rowInputs.current.get(pendingFocus.current)?.focus();
+      pendingFocus.current = null;
+    }
+  }, [rows]);
   function invalidate() {
     epoch.current++;
     active.current = false;
@@ -120,10 +185,33 @@ export default function FixtureCount({ token }: { token: string }) {
   }
   function clear() {
     invalidate();
+    pendingFocus.current = null;
     setLot("");
-    setLocation("");
-    setCondition("available");
-    setCount("");
+    setRows([
+      { id: nextId.current++, location: "", condition: "available", count: "" },
+    ]);
+  }
+  function edit(id: number, update: Partial<Omit<DraftRow, "id">>) {
+    invalidate();
+    setRows((previous) =>
+      previous.map((row) => (row.id === id ? { ...row, ...update } : row)),
+    );
+  }
+  function add() {
+    if (rows.length >= 100) return;
+    invalidate();
+    const id = nextId.current++;
+    pendingFocus.current = id;
+    setRows([...rows, { id, location: "", condition: "available", count: "" }]);
+  }
+  function remove(id: number) {
+    if (rows.length <= 1) return;
+    const index = rows.findIndex((row) => row.id === id);
+    if (index < 0) return;
+    invalidate();
+    const remaining = rows.filter((row) => row.id !== id);
+    pendingFocus.current = remaining[Math.min(index, remaining.length - 1)].id;
+    setRows(remaining);
   }
   useEffect(() => {
     alive.current = true;
@@ -132,38 +220,56 @@ export default function FixtureCount({ token }: { token: string }) {
       alive.current = false;
       epoch.current++;
       active.current = false;
+      pendingFocus.current = null;
     };
   }, [token]);
   async function compare(e: React.FormEvent) {
     e.preventDefault();
     if (!alive.current || active.current) return;
     const lotId = lot.trim(),
-      locationId = location.trim(),
-      raw = count.trim(),
       request = ++epoch.current;
     setView(null);
     setError("");
-    if (
-      !key(lotId) ||
-      !key(locationId) ||
-      !conditions.includes(condition) ||
-      !/^[0-9]{1,7}$/.test(raw) ||
-      Number(raw) > 1000000
-    ) {
+    const observations: Observation[] = [];
+    const seen = new Set<string>();
+    if (!key(lotId) || rows.length < 1 || rows.length > 100) {
       setError(
-        "Use test references with 1-100 letters, numbers, hyphens or underscores, and a whole count from 0 to 1000000.",
+        "Use a test lot reference and between 1 and 100 explicit count buckets.",
       );
       return;
+    }
+    for (const row of rows) {
+      const locationId = row.location.trim(),
+        raw = row.count.trim();
+      if (
+        !key(locationId) ||
+        !conditions.includes(row.condition) ||
+        !/^[0-9]{1,7}$/.test(raw) ||
+        Number(raw) > 1000000
+      ) {
+        setError(
+          "Use test references with 1-100 letters, numbers, hyphens or underscores, and a whole count from 0 to 1000000.",
+        );
+        return;
+      }
+      const bucket = locationId + ":" + row.condition;
+      if (seen.has(bucket)) {
+        setError(
+          "Compare each location and condition only once. No comparison was requested.",
+        );
+        return;
+      }
+      seen.add(bucket);
+      observations.push({
+        location_id: locationId,
+        condition: row.condition,
+        observed_units: Number(raw),
+      });
     }
     if (!token) {
       setError("Staff access could not be verified. Lock and sign in again.");
       return;
     }
-    const observed: Observation = {
-      location_id: locationId,
-      condition,
-      observed_units: Number(raw),
-    };
     active.current = true;
     setBusy(true);
     const current = () => alive.current && request === epoch.current;
@@ -186,11 +292,11 @@ export default function FixtureCount({ token }: { token: string }) {
       }
       const result = await commerce<unknown>(
         prefix + "/count-preview",
-        { expected_version: source.version, observations: [observed] },
+        { expected_version: source.version, observations },
         token,
       );
       if (!current()) return;
-      const projected = fixtureCount(result, source, observed);
+      const projected = fixtureCounts(result, source, observations);
       if (!projected) {
         setError(
           "The test count response could not be verified. No quantities are shown.",
@@ -216,8 +322,9 @@ export default function FixtureCount({ token }: { token: string }) {
       <p className="eyebrow">Synthetic count comparison · Read only</p>
       <h2 id="fixture-count-title">Compare a test count</h2>
       <p>
-        Compare one explicit location and condition. This does not apply a
-        correction, reserve stock or approve production.
+        Compare up to 100 explicit location and condition buckets in one
+        version-bound read. This does not apply a correction, reserve stock or
+        approve production.
       </p>
       <form onSubmit={compare}>
         <label className="field" htmlFor="count-lot">
@@ -232,48 +339,74 @@ export default function FixtureCount({ token }: { token: string }) {
             }}
           />
         </label>
-        <label className="field" htmlFor="count-location">
-          Count location reference
-          <input
-            id="count-location"
-            value={location}
-            maxLength={100}
-            onChange={(e) => {
-              invalidate();
-              setLocation(e.target.value);
-            }}
-          />
-        </label>
-        <label className="field" htmlFor="count-condition">
-          Count condition
-          <select
-            id="count-condition"
-            value={condition}
-            onChange={(e) => {
-              invalidate();
-              setCondition(e.target.value as Condition);
-            }}
-          >
-            {conditions.map((v) => (
-              <option key={v} value={v}>
-                {v.replaceAll("_", " ")}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="field" htmlFor="count-observed">
-          Observed test units
-          <input
-            id="count-observed"
-            inputMode="numeric"
-            value={count}
-            maxLength={7}
-            onChange={(e) => {
-              invalidate();
-              setCount(e.target.value);
-            }}
-          />
-        </label>
+        {rows.map((row, index) => {
+          const suffix = index === 0 ? "" : `-${row.id}`;
+          const labelSuffix = index === 0 ? "" : ` ${index + 1}`;
+          return (
+            <fieldset key={row.id} style={{ minWidth: 0 }}>
+              <legend>Count bucket {index + 1}</legend>
+              <label className="field" htmlFor={`count-location${suffix}`}>
+                {`Count location reference${labelSuffix}`}
+                <input
+                  id={`count-location${suffix}`}
+                  value={row.location}
+                  maxLength={100}
+                  ref={(element) => {
+                    if (element) rowInputs.current.set(row.id, element);
+                    else rowInputs.current.delete(row.id);
+                  }}
+                  onChange={(e) => edit(row.id, { location: e.target.value })}
+                />
+              </label>
+              <label className="field" htmlFor={`count-condition${suffix}`}>
+                {`Count condition${labelSuffix}`}
+                <select
+                  id={`count-condition${suffix}`}
+                  value={row.condition}
+                  onChange={(e) =>
+                    edit(row.id, { condition: e.target.value as Condition })
+                  }
+                >
+                  {conditions.map((v) => (
+                    <option key={v} value={v}>
+                      {v.replaceAll("_", " ")}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="field" htmlFor={`count-observed${suffix}`}>
+                {`Observed test units${labelSuffix}`}
+                <input
+                  id={`count-observed${suffix}`}
+                  inputMode="numeric"
+                  value={row.count}
+                  maxLength={7}
+                  onChange={(e) => edit(row.id, { count: e.target.value })}
+                />
+              </label>
+              <button
+                className="button secondary"
+                type="button"
+                disabled={rows.length === 1}
+                onClick={() => remove(row.id)}
+              >
+                Remove count bucket {index + 1}
+              </button>
+            </fieldset>
+          );
+        })}
+        <p>
+          {rows.length} of 100 explicit buckets. This is a request limit, not a
+          counting policy.
+        </p>
+        <button
+          className="button secondary"
+          type="button"
+          disabled={rows.length >= 100}
+          onClick={add}
+        >
+          Add count bucket
+        </button>
         <button className="button" type="submit" disabled={busy}>
           {busy ? "Comparing test count…" : "Compare test count"}
         </button>
@@ -284,37 +417,45 @@ export default function FixtureCount({ token }: { token: string }) {
       {error && <p role="alert">{error}</p>}
       {view && (
         <div aria-label="Verified test count comparison" role="region">
-          <h3>Test lot {view.lot_id}</h3>
+          <h3>Test lot {view[0].lot_id}</h3>
+          {view.map((item, index) => (
+            <div
+              key={item.location_id + ":" + item.condition}
+              aria-label={`Compared bucket ${index + 1}`}
+            >
+              <p>
+                Location {item.location_id}; condition{" "}
+                {item.condition.replaceAll("_", " ")}. Recorded lot version{" "}
+                {item.version}.
+              </p>
+              <dl>
+                <dt>Unit</dt>
+                <dd>{item.unit}</dd>
+                <dt>Recorded units</dt>
+                <dd>{item.recorded_units}</dd>
+                <dt>Observed units</dt>
+                <dd>{item.observed_units}</dd>
+                <dt>Difference (observed minus recorded)</dt>
+                <dd>
+                  {item.variance_units > 0 ? "+" : ""}
+                  {item.variance_units}
+                </dd>
+                <dt>Protected reserved units</dt>
+                <dd>{item.protected_reserved_units}</dd>
+              </dl>
+              {item.reservation_floor_conflict && (
+                <p>
+                  The observed count is below protected reservations. Staff
+                  reconciliation is required; no correction is authorized.
+                </p>
+              )}
+            </div>
+          ))}
           <p>
-            Location {view.location_id}; condition{" "}
-            {view.condition.replaceAll("_", " ")}. Recorded lot version{" "}
-            {view.version}.
-          </p>
-          <dl>
-            <dt>Unit</dt>
-            <dd>{view.unit}</dd>
-            <dt>Recorded units</dt>
-            <dd>{view.recorded_units}</dd>
-            <dt>Observed units</dt>
-            <dd>{view.observed_units}</dd>
-            <dt>Difference (observed minus recorded)</dt>
-            <dd>
-              {view.variance_units > 0 ? "+" : ""}
-              {view.variance_units}
-            </dd>
-            <dt>Protected reserved units</dt>
-            <dd>{view.protected_reserved_units}</dd>
-          </dl>
-          {view.reservation_floor_conflict && (
-            <p>
-              The observed count is below protected reservations. Staff
-              reconciliation is required; no correction is authorized.
-            </p>
-          )}
-          <p>
-            No stock was changed. Only this bucket was compared. Omitted
-            buckets, quarantined and rejected intake were not counted. This is
-            not current checkout availability or permission to change stock.
+            No stock was changed. Only these explicit buckets were compared.
+            Omitted buckets, quarantined and rejected intake were not counted.
+            This is not current checkout availability or permission to change
+            stock.
           </p>
         </div>
       )}
