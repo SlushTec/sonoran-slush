@@ -33,6 +33,7 @@ type StoreState = {
   favorites: string[];
   hydrated: boolean;
   storageAvailable: boolean;
+  cartStorageAvailable: boolean;
   notice: string;
   saveDesign: (d: Design) => boolean;
   addToCart: (d: Design) => void;
@@ -117,6 +118,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [hydrated, setHydrated] = useState(false),
     [storageAvailable, setStorageAvailable] = useState(true),
     [notice, setNotice] = useState("");
+  const [cartPersistence, setCartPersistence] = useState<{ cart: Design[]; saved: boolean } | null>(null);
   useEffect(() => {
     const valid = (v: unknown): Design[] =>
       Array.isArray(v)
@@ -153,12 +155,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, []);
   useEffect(() => {
     if (hydrated) {
-      const ok = [
-        persistVerified("designs", designs),
-        persistVerified("cart", cart),
-        persistVerified("favorites", favorites),
-      ].every(Boolean);
-      setStorageAvailable(ok);
+      const designsSaved = persistVerified("designs", designs);
+      const cartSaved = persistVerified("cart", cart);
+      const favoritesSaved = persistVerified("favorites", favorites);
+      setStorageAvailable([designsSaved, cartSaved, favoritesSaved].every(Boolean));
+      setCartPersistence({ cart, saved: cartSaved });
     }
   }, [designs, cart, favorites, hydrated]);
   useEffect(() => {
@@ -221,6 +222,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         favorites,
         hydrated,
         storageAvailable,
+        cartStorageAvailable: hydrated && cartPersistence?.cart === cart && cartPersistence.saved,
         notice,
         saveDesign,
         addToCart,
