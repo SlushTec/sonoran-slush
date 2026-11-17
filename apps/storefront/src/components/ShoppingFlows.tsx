@@ -197,6 +197,17 @@ export function Saved() {
     const item = store.designs[Math.min(index, store.designs.length - 1)];
     (item ? removeButtons.current.get(item.id) : emptySavedLink.current)?.focus();
   }, [store.designs]);
+  const favoriteRemovalFocus = useRef<number | null>(null), favoriteButtons = useRef(new Map<string, HTMLButtonElement>()), emptyFavoriteLink = useRef<HTMLAnchorElement>(null);
+  function removeFavorite(slug: string) {
+    favoriteRemovalFocus.current = store.favorites.indexOf(slug);
+    store.toggleFavorite(slug);
+  }
+  useEffect(() => {
+    if (favoriteRemovalFocus.current === null) return;
+    const index = favoriteRemovalFocus.current; favoriteRemovalFocus.current = null;
+    const slug = store.favorites[Math.min(index, store.favorites.length - 1)];
+    (slug ? favoriteButtons.current.get(slug) : emptyFavoriteLink.current)?.focus();
+  }, [store.favorites]);
   const clearTrigger = useRef<HTMLButtonElement>(null), keepButton = useRef<HTMLButtonElement>(null), focusClear = useRef(false);
   function showClear(value: boolean) { focusClear.current = true; setClearConfirm(value); }
   useEffect(() => {
@@ -282,6 +293,8 @@ export function Saved() {
             <ProductCard
               key={slug}
               product={catalog.products.find((p) => p.slug === slug)!}
+              onFavoriteToggle={() => removeFavorite(slug)}
+              favoriteButtonRef={node => { if (node) favoriteButtons.current.set(slug, node); else favoriteButtons.current.delete(slug); }}
             />
           ))}
         </div>
@@ -291,7 +304,7 @@ export function Saved() {
           <h2>Something catch your eye?</h2>
           <p>Tap the heart on a gift to keep it here while you decide.</p>
           <div className="actions">
-            <Link href="/shop" className="button primary">
+            <Link ref={emptyFavoriteLink} href="/shop" className="button primary">
               Find a favorite <Icon name="arrow" />
             </Link>
           </div>

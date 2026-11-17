@@ -68,7 +68,11 @@ export function ProductVisual({
     </div>
   );
 }
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({ product, onFavoriteToggle, favoriteButtonRef }: {
+  product: Product;
+  onFavoriteToggle?: () => void;
+  favoriteButtonRef?: React.Ref<HTMLButtonElement>;
+}) {
   const { favorites, toggleFavorite } = useStore(),
     info = infoFor(product),
     saved = favorites.includes(product.slug);
@@ -85,7 +89,8 @@ export default function ProductCard({ product }: { product: Product }) {
           className={"favorite-button" + (saved ? " selected" : "")}
           aria-label={(saved ? "Unsave " : "Save ") + info.title}
           aria-pressed={saved}
-          onClick={() => toggleFavorite(product.slug)}
+          ref={favoriteButtonRef}
+          onClick={onFavoriteToggle ?? (() => toggleFavorite(product.slug))}
         >
           <Icon name="heart" size={18} />
         </button>
