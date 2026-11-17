@@ -849,3 +849,11 @@ for(const index of [0,1,2])test('saved favorite removal restores position '+inde
 test('ordinary catalog favorite keeps its existing focused control',async()=>{
  wrap(React.createElement(ProductCard,{product:product('pet-tags')}));const button=await screen.findByRole('button',{name:'Save The very-good-pet tag'});button.focus();fireEvent.click(button);assert.equal(document.activeElement===button,true);assert.equal(button.getAttribute('aria-pressed'),'true');fireEvent.click(button);assert.equal(document.activeElement===button,true);assert.equal(button.getAttribute('aria-pressed'),'false');
 });
+
+
+test('customizer step buttons preserve keyboard context without changing draft',async()=>{
+ wrap(React.createElement(Customizer,{product:product('pet-tags')}));const first=await screen.findByRole('button',{name:'Add your personal touch'});const raw=localStorage.getItem('sonoran:config:pet-tags');
+ first.focus();fireEvent.click(first);assert.equal(document.activeElement===screen.getByRole('tab',{selected:true}),true);assert.equal(document.activeElement.id,'config-tab-1');
+ const actions=[['Back',0],['Add your personal touch',1],['Finishing touches',2],['Edit personalization',1]];
+ for(const [name,index] of actions){const button=screen.getByRole('button',{name,exact:true});button.focus();fireEvent.click(button);assert.equal(document.activeElement===screen.getByRole('tab',{selected:true}),true);assert.equal(document.activeElement.id,'config-tab-'+index);assert.equal(localStorage.getItem('sonoran:config:pet-tags'),raw);}
+});
