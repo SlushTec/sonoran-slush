@@ -24,6 +24,9 @@ export type Design = {
   giftMessage: string;
   updated: string;
 };
+export function canSaveDesign(designs: readonly Design[], id: string): boolean {
+  return designs.length < 100 || designs.some((d) => d.id === id);
+}
 type StoreState = {
   designs: Design[];
   cart: Design[];
@@ -166,6 +169,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [notice]);
   const notify = useCallback((message: string) => setNotice(message), []);
   const saveDesign = (d: Design) => {
+    if (!canSaveDesign(designs, d.id)) {
+      notify("Your saved designs are full (100 designs). Remove a saved design before saving another. Your current design is still here.");
+      return false;
+    }
     const next = [d, ...designs.filter((x) => x.id !== d.id)].slice(0, 100);
     const persisted = persistVerified("designs", next);
     setDesigns(next);
@@ -183,8 +190,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         ? a.map((x) => (x.id === d.id ? d : x))
         : [...a, d].slice(0, 100),
     );
-    setDesigns((a) => [d, ...a.filter((x) => x.id !== d.id)].slice(0, 100));
-    notify("Design added to your bag.");
+    setDesigns((a) => canSaveDesign(a, d.id) ? [d, ...a.filter((x) => x.id !== d.id)].slice(0, 100) : a);
+    notify(canSaveDesign(designs, d.id)
+      ? "Design added to your bag."
+      : "Design added to your bag. Your saved designs are full (100 designs), so this design was not added to saved designs. Your existing saved designs are unchanged.");
   };
   const toggleFavorite = (slug: string) =>
     setFavorites((a) =>

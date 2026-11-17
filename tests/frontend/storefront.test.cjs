@@ -743,3 +743,32 @@ test('header shopping bag label matches visible quantity through changes and rem
     assert.ok(badge().querySelector('.count-dot') === null, 'empty bag has no count badge');
   } finally { HTMLDialogElement.prototype.close = oldClose; }
 });
+
+
+test('saved design capacity preserves acknowledged drafts and permits explicit recovery',async()=>{
+ const {useStore}=require('../../apps/storefront/src/components/Store.tsx');
+ const base={slug:'makertwist-40oz-tumbler',text:'Synthetic',secondary:'',font:'Classic serif',options:{},quantity:1,notes:'',artworkName:'',gift:false,giftMessage:'',updated:'2026-11-17'};
+ const originals=Array.from({length:100},(_,i)=>({...base,id:'kept-'+i}));writeLocal('designs',originals);
+ let observed,result;const current={...base,id:'new-design',text:'Exact caf\u00e9\nnew work'};
+ function Probe(){observed=useStore();return React.createElement('button',{onClick:()=>{result=observed.saveDesign(current);}},'Save synthetic capacity');}
+ wrap(React.createElement(Probe));await waitFor(()=>assert.equal(observed.designs.length,100));
+ const raw=localStorage.getItem('sonoran:designs');
+ fireEvent.click(screen.getByRole('button',{name:'Save synthetic capacity'}));
+ assert.equal(result,false);assert.deepEqual(observed.designs,originals);assert.equal(localStorage.getItem('sonoran:designs'),raw);
+ assert.match(screen.getByRole('status').textContent,/saved designs.*full/i);assert.equal(current.text,'Exact caf\u00e9\nnew work');
+ fireEvent.click(screen.getByRole('button',{name:'Save synthetic capacity'}));assert.deepEqual(observed.designs,originals);
+ const {act}=require('@testing-library/react');await act(async()=>{result=observed.saveDesign({...originals[50],text:'Updated existing'});});
+ assert.equal(result,true);assert.equal(observed.designs.length,100);assert.equal(observed.designs[0].text,'Updated existing');assert.deepEqual(new Set(observed.designs.map(d=>d.id)),new Set(originals.map(d=>d.id)));
+ await act(async()=>observed.removeDesign('kept-1'));fireEvent.click(screen.getByRole('button',{name:'Save synthetic capacity'}));
+ assert.equal(result,true);assert.equal(observed.designs.length,100);assert.equal(observed.designs[0].text,current.text);assert.equal(observed.designs.some(d=>d.id==='kept-1'),false);
+});
+
+test('bag addition preserves full saved collection and permits existing saved update',async()=>{
+ const {useStore}=require('../../apps/storefront/src/components/Store.tsx'),{act}=require('@testing-library/react');
+ const base={slug:'makertwist-40oz-tumbler',text:'Synthetic',secondary:'',font:'Classic serif',options:{},quantity:1,notes:'',artworkName:'',gift:false,giftMessage:'',updated:'2026-11-17'};
+ const originals=Array.from({length:100},(_,i)=>({...base,id:'kept-'+i}));writeLocal('designs',originals);
+ let observed;function Probe(){observed=useStore();return null;}wrap(React.createElement(Probe));await waitFor(()=>assert.equal(observed.designs.length,100));
+ await act(async()=>observed.addToCart({...base,id:'new-bag',text:'New bag work'}));assert.deepEqual(observed.designs,originals);assert.equal(observed.cart[0].text,'New bag work');assert.match(screen.getByRole('status').textContent,/saved designs are full/);
+ assert.deepEqual(readLocal('designs',[]),originals);
+ await act(async()=>observed.addToCart({...originals[50],text:'Edited existing'}));assert.equal(observed.designs.length,100);assert.equal(observed.designs[0].text,'Edited existing');assert.deepEqual(new Set(observed.designs.map(d=>d.id)),new Set(originals.map(d=>d.id)));
+});

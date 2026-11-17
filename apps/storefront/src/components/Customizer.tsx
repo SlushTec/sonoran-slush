@@ -7,7 +7,7 @@ import { crystalForSlug } from "@/lib/crystals";
 import references from "@/lib/product-references.json";
 import { mediaFor } from "@/lib/media";
 import { readLocal, writeLocal } from "@/lib/client";
-import { useStore, emptyDesign, parseDesign, type Design } from "./Store";
+import { useStore, emptyDesign, parseDesign, canSaveDesign, type Design } from "./Store";
 import { ProductVisual } from "./ProductCard";
 import Icon from "./Icon";
 export default function Customizer({ product }: { product: Product }) {
@@ -740,6 +740,10 @@ export default function Customizer({ product }: { product: Product }) {
           className="link-button"
           style={{ display: "block", margin: "12px auto 0" }}
           onClick={() => {
+            if (!canSaveDesign(store.designs, design.id)) {
+              store.saveDesign(design);
+              return;
+            }
             invalidatePhoto();
             setPhotoError("");
             const persisted = store.saveDesign(design);
