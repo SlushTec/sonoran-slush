@@ -838,3 +838,14 @@ test('whole quantity keeps existing blank and range behavior',async()=>{
  wrap(React.createElement(Customizer,{product:product('pet-tags')}));await screen.findByRole('button',{name:'Add your personal touch'});
  for(const [input,expected] of [['7',7],['501',500],['0',1],['-2',1],['',1]]){fireEvent.change(screen.getByRole('spinbutton'),{target:{value:input}});await waitFor(()=>assert.equal(readLocal('config:pet-tags',null).quantity,expected));}
 });
+
+for(const index of [0,1,2])test('saved favorite removal restores position '+index,async()=>{
+ writeLocal('favorites',['pet-tags','pet-bowls','stainless-pendants']);wrap(React.createElement(Saved));fireEvent.click(await screen.findByRole('button',{name:'Favorite gifts (3)'}));
+ const buttons=screen.getAllByRole('button',{name:/^Unsave /});buttons[index].focus();fireEvent.click(buttons[index]);
+ const remaining=screen.getAllByRole('button',{name:/^Unsave /});assert.equal(document.activeElement===remaining[Math.min(index,1)],true);assert.equal(readLocal('favorites',[]).length,2);
+ while(screen.queryAllByRole('button',{name:/^Unsave /}).length){const button=screen.getAllByRole('button',{name:/^Unsave /})[0];button.focus();fireEvent.click(button);}
+ assert.equal(document.activeElement===screen.getByRole('link',{name:'Find a favorite'}),true);assert.deepEqual(readLocal('favorites',[]),[]);
+});
+test('ordinary catalog favorite keeps its existing focused control',async()=>{
+ wrap(React.createElement(ProductCard,{product:product('pet-tags')}));const button=await screen.findByRole('button',{name:'Save The very-good-pet tag'});button.focus();fireEvent.click(button);assert.equal(document.activeElement===button,true);assert.equal(button.getAttribute('aria-pressed'),'true');fireEvent.click(button);assert.equal(document.activeElement===button,true);assert.equal(button.getAttribute('aria-pressed'),'false');
+});
