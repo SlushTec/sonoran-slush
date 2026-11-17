@@ -958,5 +958,5 @@ test('current config persistence status follows product and skipped review owner
 });
 test('current config storage is not claimed before hydration or for unavailable design',async()=>{
  const html=require('react-dom/server').renderToString(React.createElement(StoreProvider,null,React.createElement(Customizer,{product:product('pet-tags')})));assert.match(html,/Current draft storage has not yet been verified/);assert.equal(html.includes('Current draft saved'),false);
- window.history.replaceState({},'','/products/pet-tags?design=absent');wrap(React.createElement(Customizer,{product:product('pet-tags')}));await screen.findByRole('heading',{name:'This requested design is unavailable'});assert.equal(document.querySelector('.privacy-caption')===null,true);
+ window.history.replaceState({},'','/products/pet-tags?design=absent');wrap(React.createElement(Customizer,{product:product('pet-tags')}));await screen.findByRole('heading',{name:'This requested design is unavailable'});assert.equal(document.querySelectorAll('.privacy-caption').length,0);
 });
