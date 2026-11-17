@@ -39,6 +39,7 @@ export default function Customizer({ product }: { product: Product }) {
     [reading, setReading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const photoGeneration = useRef(0);
+  const newDesignFocus = useRef<{ slug: string; id: string } | null>(null);
   function invalidatePhoto() {
     photoGeneration.current++;
     setReading(false);
@@ -102,6 +103,15 @@ export default function Customizer({ product }: { product: Product }) {
     },
     [localURL],
   );
+  useEffect(() => {
+    const intent = newDesignFocus.current;
+    if (!intent) return;
+    newDesignFocus.current = null;
+    if (intent.slug === product.slug && intent.id === design?.id &&
+        design.slug === product.slug && restored && !missingDesign)
+      document.getElementById("config-tab-0")?.focus();
+  }, [design, product.slug, restored, missingDesign]);
+  useEffect(() => () => { newDesignFocus.current = null; }, []);
   function selectStep(next: number) {
     setStep(next);
     document.getElementById("config-tab-" + next)?.focus();
@@ -225,6 +235,7 @@ export default function Customizer({ product }: { product: Product }) {
       for (const option of info.options) next.options[option.label] = option.values[0];
       if (crystal) next.options["Crystal shape"] = crystal.shape;
       invalidatePhoto(); setLocalURL(""); setPhotoError(""); setPhotoLater(false);
+      newDesignFocus.current = { slug: product.slug, id: next.id };
       setDesign(next); setStep(0); setError(""); setChoiceReview(null); setMissingDesign(null);
     }}>Start a new design</button>
   </section>;

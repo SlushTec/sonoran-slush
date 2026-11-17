@@ -867,3 +867,24 @@ test('pending option review mount and remount do not steal focus',async()=>{
  const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');writeLocal('config:photo-crystal-heart',{...emptyDesign('photo-crystal-heart'),id:'review-focus',options:{'Crystal shape':'Heart',Size:'Retired'}});const outside=document.createElement('button');outside.textContent='Outside focus';document.body.appendChild(outside);outside.focus();
  try{let mounted=wrap(React.createElement(Customizer,{product:product('photo-crystal-heart')}));await screen.findByRole('button',{name:'Use these current choices'});assert.equal(document.activeElement===outside,true);mounted.unmount();mounted=wrap(React.createElement(Customizer,{product:product('photo-crystal-heart')}));await screen.findByRole('button',{name:'Use these current choices'});assert.equal(document.activeElement===outside,true);}finally{outside.remove();}
 });
+
+for(const current of [false,true])test('explicit stale start focuses only its new editor '+current,async()=>{
+ const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');if(current)writeLocal('config:pet-tags',{...emptyDesign('pet-tags'),id:'old-current',text:'Keep until choice'});
+ window.history.replaceState({},'','/products/pet-tags?design=missing');const outside=document.createElement('button');document.body.appendChild(outside);outside.focus();
+ try{let view=wrap(React.createElement(Customizer,{product:product('pet-tags')}));
+ for(let round=0;round<2;round++){const start=await screen.findByRole('button',{name:'Start a new design'});assert.equal(document.activeElement===outside,true);const before=readLocal('config:pet-tags',null);start.focus();fireEvent.click(start);
+ assert.equal(document.activeElement===document.getElementById('config-tab-0'),true);assert.equal(document.activeElement.getAttribute('aria-selected'),'true');assert.notEqual(readLocal('config:pet-tags',{}).id,before?.id);assert.deepEqual(readLocal('designs',[]),[]);assert.deepEqual(readLocal('cart',[]),[]);
+ const raw=localStorage.getItem('sonoran:config:pet-tags');view.unmount();outside.focus();view=wrap(React.createElement(Customizer,{product:product('pet-tags')}));await screen.findByRole('button',{name:'Start a new design'});assert.equal(localStorage.getItem('sonoran:config:pet-tags'),raw);assert.equal(document.activeElement===outside,true);}
+ }finally{outside.remove();}
+});
+for(const interrupt of ['unmount','product'])test('stale start focus intent canceled by '+interrupt,async()=>{
+ const {act}=require('@testing-library/react');window.history.replaceState({},'','/products/pet-tags?design=missing');const outside=document.createElement('button');document.body.appendChild(outside);
+ try{const view=wrap(React.createElement(Customizer,{product:product('pet-tags')}));const start=await screen.findByRole('button',{name:'Start a new design'});outside.focus();
+ act(()=>{fireEvent.click(start);if(interrupt==='unmount')view.unmount();else{window.history.replaceState({},'','/products/pet-bowls');view.rerender(React.createElement(StoreProvider,null,React.createElement(Customizer,{product:product('pet-bowls')})));}});
+ if(interrupt==='unmount'){window.history.replaceState({},'','/products/pet-tags');wrap(React.createElement(Customizer,{product:product('pet-tags')}));}
+ await screen.findByRole('button',{name:'Add your personal touch'});assert.equal(document.activeElement===outside,true);
+ }finally{outside.remove();}
+});
+test('ordinary editor hydration does not request stale-start focus',async()=>{
+ const outside=document.createElement('button');document.body.appendChild(outside);outside.focus();try{wrap(React.createElement(Customizer,{product:product('pet-tags')}));await screen.findByRole('button',{name:'Add your personal touch'});assert.equal(document.activeElement===outside,true);}finally{outside.remove();}
+});
