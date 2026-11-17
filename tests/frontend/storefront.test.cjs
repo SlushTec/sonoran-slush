@@ -791,3 +791,10 @@ test('named saved draft and product transition preserve originals until delibera
  fireEvent.click(screen.getByRole('button',{name:'Use these current choices'}));assert.deepEqual(readLocal('designs',[]),[old]);fireEvent.click(screen.getByRole('button',{name:'Save this design for later'}));assert.equal(readLocal('designs',[])[0].options['Crystal shape'],'Heart');
  r.rerender(React.createElement(StoreProvider,null,React.createElement(Customizer,{product:product('photo-crystal-prestige')})));await waitFor(()=>assert.equal(screen.getByLabelText('Size').value,'Small only'));assert.equal(screen.queryAllByRole('heading',{name:'Review changed choices'}).length,0);assert.equal(readLocal('config:photo-crystal-prestige',null).slug,'photo-crystal-prestige');
 });
+
+for(const index of [0,1,2])test('saved removal retains keyboard position index '+index,async()=>{
+ const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');const rows=[0,1,2].map(i=>({...emptyDesign('pet-tags'),id:'focus-'+i,text:'Draft '+i}));writeLocal('designs',rows);wrap(React.createElement(Saved));
+ let buttons=await screen.findAllByRole('button',{name:'Remove',exact:true});buttons[index].focus();fireEvent.click(buttons[index]);buttons=screen.getAllByRole('button',{name:'Remove',exact:true});assert.equal(document.activeElement===buttons[Math.min(index,1)],true);assert.deepEqual(readLocal('designs',[]).map(d=>d.id),rows.filter((_,i)=>i!==index).map(d=>d.id));
+ while(buttons.length){const target=buttons.indexOf(document.activeElement);fireEvent.click(buttons[target]);buttons=screen.queryAllByRole('button',{name:'Remove',exact:true});if(buttons.length)assert.equal(document.activeElement===buttons[Math.min(target,buttons.length-1)],true);}
+ assert.equal(document.activeElement===screen.getByRole('link',{name:'Explore the collection'}),true);assert.deepEqual(readLocal('designs',[]),[]);
+});

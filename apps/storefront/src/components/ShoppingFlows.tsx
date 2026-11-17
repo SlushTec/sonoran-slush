@@ -186,6 +186,17 @@ export function Saved() {
     [tab, setTab] = useState("designs"),
     [clearConfirm, setClearConfirm] = useState(false),
     [clearFailed, setClearFailed] = useState(false);
+  const removalFocus = useRef<number | null>(null), removeButtons = useRef(new Map<string, HTMLButtonElement>()), emptySavedLink = useRef<HTMLAnchorElement>(null);
+  function removeSaved(id: string) {
+    removalFocus.current = store.designs.findIndex(item => item.id === id);
+    store.removeDesign(id);
+  }
+  useEffect(() => {
+    if (removalFocus.current === null) return;
+    const index = removalFocus.current; removalFocus.current = null;
+    const item = store.designs[Math.min(index, store.designs.length - 1)];
+    (item ? removeButtons.current.get(item.id) : emptySavedLink.current)?.focus();
+  }, [store.designs]);
   const clearTrigger = useRef<HTMLButtonElement>(null), keepButton = useRef<HTMLButtonElement>(null), focusClear = useRef(false);
   function showClear(value: boolean) { focusClear.current = true; setClearConfirm(value); }
   useEffect(() => {
@@ -241,7 +252,8 @@ export function Saved() {
                   </Link>
                   <button
                     className="link-button"
-                    onClick={() => store.removeDesign(d.id)}
+                    ref={node => { if (node) removeButtons.current.set(d.id, node); else removeButtons.current.delete(d.id); }}
+                    onClick={() => removeSaved(d.id)}
                   >
                     Remove
                   </button>
@@ -258,7 +270,7 @@ export function Saved() {
               on this device when you come back.
             </p>
             <div className="actions">
-              <Link href="/shop" className="button primary">
+              <Link ref={emptySavedLink} href="/shop" className="button primary">
                 Explore the collection <Icon name="arrow" />
               </Link>
             </div>
