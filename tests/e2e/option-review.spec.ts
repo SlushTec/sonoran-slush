@@ -1,10 +1,12 @@
 import {test,expect} from '@playwright/test';
 for(const width of [1280,390])test('changed choices require deliberate review '+width,async({page})=>{
- await page.setViewportSize({width,height:900});await page.goto('/products/photo-crystal-heart');
- await page.evaluate(()=>{
+ await page.setViewportSize({width,height:900});
+ await page.addInitScript(()=>{
  const old={id:'old-options',slug:'photo-crystal-heart',text:'Exact caf\u00e9 words',secondary:'',font:'Classic serif',options:{'Crystal shape':'Wrong old shape',Size:'Retired large'},quantity:3,notes:'Keep original notes',artworkName:'',gift:true,giftMessage:'Original gift',updated:'2026-11-17'};
- localStorage.setItem('sonoran:config:photo-crystal-heart',JSON.stringify({expires:Date.now()+86400000,value:old}));
- });const original=await page.evaluate(()=>localStorage.getItem('sonoran:config:photo-crystal-heart'));
+ if(!localStorage.getItem('sonoran:config:photo-crystal-heart'))localStorage.setItem('sonoran:config:photo-crystal-heart',JSON.stringify({expires:Date.now()+86400000,value:old}));
+ });await page.goto('/products/photo-crystal-heart');await expect(page.getByRole('heading',{name:'Review changed choices'})).toBeVisible();
+ expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('sonoran:config:photo-crystal-heart')!).value)).toMatchObject({id:'old-options',options:{'Crystal shape':'Wrong old shape',Size:'Retired large'}});
+ const original=await page.evaluate(()=>localStorage.getItem('sonoran:config:photo-crystal-heart'));
  await page.reload();await expect(page.getByRole('heading',{name:'Review changed choices'})).toBeVisible();
  await expect(page.getByText('Retired large',{exact:true})).toBeVisible();
  for(const name of ['Save this design for later','Save & start another design'])await expect(page.getByRole('button',{name,exact:true})).toBeDisabled();
@@ -31,8 +33,9 @@ for(const width of [1280,390])test('changed choices require deliberate review '+
 });
 
 test('pending review preserves photo ownership and blocked saves; storage failure remains truthful',async({page})=>{
- await page.goto('/products/photo-crystal-heart');
- await page.evaluate(()=>localStorage.setItem('sonoran:config:photo-crystal-heart',JSON.stringify({expires:Date.now()+86400000,value:{id:'photo-old',slug:'photo-crystal-heart',text:'Photo words',secondary:'',font:'Classic serif',options:{'Crystal shape':'Heart',Size:'Retired'},quantity:1,notes:'',artworkName:'',gift:false,giftMessage:'',updated:'2026-11-17'}})));
+ await page.addInitScript(()=>{if(!localStorage.getItem('sonoran:config:photo-crystal-heart'))localStorage.setItem('sonoran:config:photo-crystal-heart',JSON.stringify({expires:Date.now()+86400000,value:{id:'photo-old',slug:'photo-crystal-heart',text:'Photo words',secondary:'',font:'Classic serif',options:{'Crystal shape':'Heart',Size:'Retired'},quantity:1,notes:'',artworkName:'',gift:false,giftMessage:'',updated:'2026-11-17'}}));});
+ await page.goto('/products/photo-crystal-heart');await expect(page.getByRole('heading',{name:'Review changed choices'})).toBeVisible();
+ expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('sonoran:config:photo-crystal-heart')!).value)).toMatchObject({id:'photo-old',options:{'Crystal shape':'Heart',Size:'Retired'}});
  await page.reload();await expect(page.getByRole('heading',{name:'Review changed choices'})).toBeVisible();
  const original=await page.evaluate(()=>localStorage.getItem('sonoran:config:photo-crystal-heart'));
  await page.getByRole('button',{name:'Add your personal touch'}).click();
