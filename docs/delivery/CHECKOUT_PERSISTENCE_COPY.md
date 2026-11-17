@@ -1,0 +1,5 @@
+# Checkout bag-persistence wording
+
+Checkout help previously claimed designs remain saved if a connection fails, even with an unverified current cart. The external rendered red records visible quantity 2 versus stored quantity 1 and no submission attempt. The conditional wording now consumes the accepted exact cartStorageAvailable status, preserves contact-details visit-only wording and existing download control, and explicitly distinguishes local saved/downloaded designs from confirmation that a request reached the studio.
+
+Product change is this polite live help paragraph only. No request, receipt, idempotency, consent, contact, transport or persistence logic changes. Two focused throwing/silent cases preserve contact input, consent unchecked, zero request calls/session attempts and old cart bytes, then restore verified wording only after a successful later current-cart edit. Original red and two focused predecessor wording failures retained. A first exact-match editor assertion failed before product writes; corrected indentation matching only, not source semantics. Native and cumulative gates remain pending independent source peer.
