@@ -888,3 +888,14 @@ for(const interrupt of ['unmount','product'])test('stale start focus intent canc
 test('ordinary editor hydration does not request stale-start focus',async()=>{
  const outside=document.createElement('button');document.body.appendChild(outside);outside.focus();try{wrap(React.createElement(Customizer,{product:product('pet-tags')}));await screen.findByRole('button',{name:'Add your personal touch'});assert.equal(document.activeElement===outside,true);}finally{outside.remove();}
 });
+
+for(const slug of ['pet-tags','photo-crystal-heart'])test('validation rejection returns keyboard context '+slug,async()=>{
+ wrap(React.createElement(Customizer,{product:product(slug)}));await screen.findByRole('button',{name:'Add your personal touch'});
+ const raw=localStorage.getItem('sonoran:config:'+slug);
+ for(let attempt=0;attempt<2;attempt++){fireEvent.click(document.getElementById('config-tab-2'));const add=screen.getByRole('button',{name:'Add design to bag'});add.focus();fireEvent.click(add);
+ assert.equal(document.activeElement===document.getElementById('config-tab-1'),true);assert.equal(document.activeElement.getAttribute('aria-selected'),'true');assert.match(screen.getByRole('alert').textContent,slug==='pet-tags'?/Add a name or message/:/Add a local photo/);assert.deepEqual(readLocal('cart',[]),[]);assert.equal(localStorage.getItem('sonoran:config:'+slug),raw);}
+ if(slug==='pet-tags')fireEvent.change(screen.getByLabelText(/Name, initials, or message/),{target:{value:'Ready words'}});
+ else fireEvent.click(screen.getByLabelText('I will add artwork later.'));
+ fireEvent.click(screen.getByRole('button',{name:'Finishing touches',exact:true}));fireEvent.click(screen.getByRole('button',{name:'Add design to bag'}));
+ assert.equal(readLocal('cart',[]).length,1);assert.equal(readLocal('cart',[])[0].slug,slug);if(slug==='pet-tags')assert.equal(readLocal('cart',[])[0].text,'Ready words');
+});
