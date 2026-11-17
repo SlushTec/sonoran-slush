@@ -1,0 +1,8 @@
+import {test,expect} from '@playwright/test';
+for(const width of [390,1280])test('saved removal keyboard recovery '+width,async({page})=>{
+ await page.setViewportSize({width,height:900});await page.goto('/saved');await page.evaluate(()=>{const base={slug:'pet-tags',secondary:'',font:'Classic serif',options:{},quantity:1,notes:'',artworkName:'',gift:false,giftMessage:'',updated:'2026-11-17'};localStorage.setItem('sonoran:designs',JSON.stringify({expires:Date.now()+86400000,value:[0,1,2].map(i=>({...base,id:'focus-'+i,text:'Draft '+i}))}));});await page.reload();
+ let buttons=page.getByRole('button',{name:'Remove',exact:true});await expect(buttons).toHaveCount(3);await buttons.nth(1).focus();await page.keyboard.press('Enter');await expect(buttons).toHaveCount(2);await expect(buttons.nth(1)).toBeFocused();await expect(page.getByText('“Draft 1”',{exact:true})).toHaveCount(0);
+ await page.screenshot({path:'artifacts/saved-focus-'+width+'.png',fullPage:true});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ await page.keyboard.press('Enter');await expect(buttons).toHaveCount(1);await expect(buttons.first()).toBeFocused();await page.keyboard.press('Enter');await expect(buttons).toHaveCount(0);await expect(page.getByRole('link',{name:'Explore the collection',exact:true})).toBeFocused();
+ expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('sonoran:designs')!).value)).toEqual([]);await page.reload();await expect(page.getByRole('heading',{name:'Keep a good idea close.'})).toBeVisible();
+});
