@@ -789,7 +789,7 @@ test('named saved draft and product transition preserve originals until delibera
  const old=legacyOptionDraft();writeLocal('designs',[old]);window.history.replaceState({},'', '/products/'+old.slug+'?design='+old.id);
  const r=wrap(React.createElement(Customizer,{product:product(old.slug)}));await screen.findByRole('heading',{name:'Review changed choices'});assert.deepEqual(readLocal('designs',[]),[old]);
  fireEvent.click(screen.getByRole('button',{name:'Use these current choices'}));assert.deepEqual(readLocal('designs',[]),[old]);fireEvent.click(screen.getByRole('button',{name:'Save this design for later'}));assert.equal(readLocal('designs',[])[0].options['Crystal shape'],'Heart');
- r.rerender(React.createElement(StoreProvider,null,React.createElement(Customizer,{product:product('photo-crystal-prestige')})));await waitFor(()=>assert.equal(screen.getByLabelText('Size').value,'Small only'));assert.equal(screen.queryAllByRole('heading',{name:'Review changed choices'}).length,0);assert.equal(readLocal('config:photo-crystal-prestige',null).slug,'photo-crystal-prestige');
+ window.history.replaceState({},'','/products/photo-crystal-prestige');r.rerender(React.createElement(StoreProvider,null,React.createElement(Customizer,{product:product('photo-crystal-prestige')})));await waitFor(()=>assert.equal(screen.getByLabelText('Size').value,'Small only'));assert.equal(screen.queryAllByRole('heading',{name:'Review changed choices'}).length,0);assert.equal(readLocal('config:photo-crystal-prestige',null).slug,'photo-crystal-prestige');
 });
 
 for(const index of [0,1,2])test('saved removal retains keyboard position index '+index,async()=>{
@@ -797,4 +797,31 @@ for(const index of [0,1,2])test('saved removal retains keyboard position index '
  let buttons=await screen.findAllByRole('button',{name:'Remove',exact:true});buttons[index].focus();fireEvent.click(buttons[index]);buttons=screen.getAllByRole('button',{name:'Remove',exact:true});assert.equal(document.activeElement===buttons[Math.min(index,1)],true);assert.deepEqual(readLocal('designs',[]).map(d=>d.id),rows.filter((_,i)=>i!==index).map(d=>d.id));
  while(buttons.length){const target=buttons.indexOf(document.activeElement);fireEvent.click(buttons[target]);buttons=screen.queryAllByRole('button',{name:'Remove',exact:true});if(buttons.length)assert.equal(document.activeElement===buttons[Math.min(target,buttons.length-1)],true);}
  assert.equal(document.activeElement===screen.getByRole('link',{name:'Explore the collection'}),true);assert.deepEqual(readLocal('designs',[]),[]);
+});
+
+for(const mode of ['missing','wrong-product','malformed','no-current'])test('stale requested design requires explicit recovery '+mode,async()=>{
+ const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');const current={...emptyDesign('pet-tags'),id:'current-kept',text:'Keep current words',notes:'Keep notes'};
+ if(mode!=='no-current')writeLocal('config:pet-tags',current);const raw=localStorage.getItem('sonoran:config:pet-tags');
+ if(mode==='wrong-product')writeLocal('designs',[{...emptyDesign('makertwist-40oz-tumbler'),id:'requested',text:'Other product'}]);
+ if(mode==='malformed')writeLocal('designs',[{...emptyDesign('pet-tags'),id:'requested',text:'Bad',quantity:0}]);
+ window.history.replaceState({},'','/products/pet-tags?design=requested&from=bag');wrap(React.createElement(Customizer,{product:product('pet-tags')}));
+ await screen.findByRole('heading',{name:'This requested design is unavailable'});assert.equal(localStorage.getItem('sonoran:config:pet-tags'),raw);
+ assert.equal(screen.queryAllByRole('button',{name:/Save|Add design to bag/}).length,0);assert.equal(document.querySelectorAll('input[type=file]').length,0);
+ assert.equal(screen.queryAllByRole('link',{name:'Recover current draft'}).length,mode==='no-current'?0:1);
+ if(mode!=='no-current')assert.equal(screen.getByRole('link',{name:'Recover current draft'}).getAttribute('href'),'/products/pet-tags');
+ const named=readLocal('designs',[]),bag=readLocal('cart',[]);
+ cleanup();wrap(React.createElement(Customizer,{product:product('pet-tags')}));await screen.findByRole('heading',{name:'This requested design is unavailable'});assert.equal(localStorage.getItem('sonoran:config:pet-tags'),raw);
+ fireEvent.click(screen.getByRole('button',{name:'Start a new design'}));await screen.findByRole('button',{name:'Add your personal touch'});assert.equal(readLocal('config:pet-tags',null).text,'');assert.notEqual(readLocal('config:pet-tags',null).id,current.id);assert.deepEqual(readLocal('designs',[]),named);assert.deepEqual(readLocal('cart',[]),bag);
+});
+test('valid requested design preserves precedence and stale product recovery ownership',async()=>{
+ const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');const current={...emptyDesign('pet-tags'),id:'current',text:'Current'},selected={...current,id:'selected',text:'Selected'};
+ writeLocal('config:pet-tags',current);writeLocal('designs',[selected]);window.history.replaceState({},'','/products/pet-tags?design=selected');
+ const view=wrap(React.createElement(Customizer,{product:product('pet-tags')}));await screen.findByRole('button',{name:'Add your personal touch'});assert.equal(readLocal('config:pet-tags',null).text,'Selected');
+ view.rerender(React.createElement(StoreProvider,null,React.createElement(Customizer,{product:product('photo-crystal-heart')})));await screen.findByRole('heading',{name:'This requested design is unavailable'});assert.equal(readLocal('config:photo-crystal-heart',null)===null,true);
+ view.rerender(React.createElement(StoreProvider,null,React.createElement(Customizer,{product:product('pet-tags')})));await screen.findByRole('button',{name:'Add your personal touch'});assert.equal(screen.queryAllByRole('heading',{name:'This requested design is unavailable'}).length,0);assert.equal(readLocal('config:pet-tags',null).text,'Selected');
+});
+
+test('server rendered personalization remains visible but disabled until restoration',()=>{
+ const html=require('react-dom/server').renderToString(React.createElement(StoreProvider,null,React.createElement(Customizer,{product:product('makertwist-40oz-tumbler')})));
+ assert.match(html,/<h1>The everyday tumbler<\/h1>/);assert.match(html,/<fieldset disabled="" aria-label="Personalization controls"/);
 });

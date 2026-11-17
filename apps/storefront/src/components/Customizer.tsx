@@ -25,6 +25,7 @@ export default function Customizer({ product }: { product: Product }) {
       return initial;
     }),
     [restored, setRestored] = useState(false),
+    [missingDesign, setMissingDesign] = useState<{ slug: string; hasCurrent: boolean } | null>(null),
     [choiceReview, setChoiceReview] = useState<{ original: Design; labels: string[] } | null>(null),
     [step, setStep] = useState(0),
     [error, setError] = useState(""),
@@ -64,6 +65,14 @@ export default function Customizer({ product }: { product: Product }) {
         )
       : readLocal<Design | null>("config:" + product.slug, null);
     const parsed = parseDesign(stored);
+    if (id && (!parsed || parsed.slug !== product.slug)) {
+      const current = parseDesign(readLocal("config:" + product.slug, null));
+      setMissingDesign({ slug: product.slug, hasCurrent: current?.slug === product.slug });
+      setChoiceReview(null);
+      setRestored(true);
+      return;
+    }
+    setMissingDesign(null);
     const next =
       parsed?.slug === product.slug ? { ...parsed, options: { ...parsed.options } } : emptyDesign(product.slug);
     for (const o of info.options)
@@ -84,9 +93,9 @@ export default function Customizer({ product }: { product: Product }) {
   useEffect(() => {
     // A product transition renders once with the former product's design.
     // Never persist that stale state into the destination product's draft.
-    if (design && restored && design.slug === product.slug && !choiceReview)
+    if (design && restored && design.slug === product.slug && !choiceReview && !missingDesign)
       writeLocal("config:" + product.slug, design);
-  }, [design, product.slug, restored, choiceReview]);
+  }, [design, product.slug, restored, choiceReview, missingDesign]);
   useEffect(
     () => () => {
       if (localURL) URL.revokeObjectURL(localURL);
@@ -94,6 +103,7 @@ export default function Customizer({ product }: { product: Product }) {
     [localURL],
   );
   function update(value: Partial<Design>) {
+    if (!restored || missingDesign || design?.slug !== product.slug) return;
     setDesign((d) =>
       d ? { ...d, ...value, updated: new Date().toISOString() } : d,
     );
@@ -106,6 +116,7 @@ export default function Customizer({ product }: { product: Product }) {
     update({ options: opts });
   }
   async function attach(file: File | undefined) {
+    if (!restored || missingDesign || design?.slug !== product.slug) return;
     setPhotoError("");
     if (!file) return;
     const owner = ++photoGeneration.current;
@@ -163,7 +174,7 @@ export default function Customizer({ product }: { product: Product }) {
     }
   }
   function validate() {
-    if (!design) return false;
+    if (!restored || !design || missingDesign || design.slug !== product.slug) return false;
     if (isPhoto && !design.artworkName && !photoLater) {
       setError(
         "Add a local photo or choose “I will add artwork later” to save this configuration to your bag.",
@@ -193,12 +204,26 @@ export default function Customizer({ product }: { product: Product }) {
     }
     return true;
   }
-  if (!design)
+  if (!design || (design.slug !== product.slug && missingDesign?.slug !== product.slug))
     return (
       <div className="loading-panel" role="status">
         Preparing your personal workspace…
       </div>
     );
+  if (missingDesign) return <section className="section" aria-labelledby="missing-design-heading">
+    <h1 id="missing-design-heading">This requested design is unavailable</h1>
+    <p>The saved or bag design in this link could not be restored for this product. No current draft has been replaced.</p>
+    {missingDesign.hasCurrent && <p>A different current draft for this product is still on this device. <a className="text-link" href={"/products/" + product.slug}>Recover current draft</a></p>}
+    <p>Starting a new design will replace this product's current autosaved draft, if any. Your named saved designs and bag will not change.</p>
+    <button className="button" onClick={() => {
+      if (missingDesign.slug !== product.slug) return;
+      const next = emptyDesign(product.slug);
+      for (const option of info.options) next.options[option.label] = option.values[0];
+      if (crystal) next.options["Crystal shape"] = crystal.shape;
+      invalidatePhoto(); setLocalURL(""); setPhotoError(""); setPhotoLater(false);
+      setDesign(next); setStep(0); setError(""); setChoiceReview(null); setMissingDesign(null);
+    }}>Start a new design</button>
+  </section>;
   const font = fonts.find((f) => f.name === design.font) || fonts[0];
   const secondary =
     design.options["Engraving placement"]?.includes("Two sides") ||
@@ -410,6 +435,7 @@ export default function Customizer({ product }: { product: Product }) {
             }}>Use these current choices</button>
           </section>
         )}
+        <fieldset disabled={!restored} aria-label="Personalization controls" style={{border:0,padding:0,margin:0,minWidth:0}}>
         <div
           className="config-tabs"
           role="tablist"
@@ -728,9 +754,9 @@ export default function Customizer({ product }: { product: Product }) {
               </div>
               <button
                 className="button primary full"
-                disabled={!!choiceReview || design.slug !== product.slug}
+                disabled={!restored || !!choiceReview || design.slug !== product.slug}
                 onClick={() => {
-                  if (!choiceReview && design.slug === product.slug && validate()) store.addToCart(design);
+                  if (restored && !choiceReview && !missingDesign && design.slug === product.slug && validate()) store.addToCart(design);
                 }}
               >
                 Add design to bag <Icon name="bag" size={18} />
@@ -753,17 +779,17 @@ export default function Customizer({ product }: { product: Product }) {
         </div>
         <button
           className="save-design-button"
-          disabled={!!choiceReview || design.slug !== product.slug}
-          onClick={() => { if (!choiceReview && design.slug === product.slug) store.saveDesign(design); }}
+          disabled={!restored || !!choiceReview || design.slug !== product.slug}
+          onClick={() => { if (restored && !choiceReview && !missingDesign && design.slug === product.slug) store.saveDesign(design); }}
         >
           <Icon name="heart" size={18} /> Save this design for later
         </button>
         <button
           className="link-button"
           style={{ display: "block", margin: "12px auto 0" }}
-          disabled={!!choiceReview || design.slug !== product.slug}
+          disabled={!restored || !!choiceReview || design.slug !== product.slug}
           onClick={() => {
-            if (choiceReview || design.slug !== product.slug) return;
+            if (!restored || choiceReview || missingDesign || design.slug !== product.slug) return;
             if (!canSaveDesign(store.designs, design.id)) {
               store.saveDesign(design);
               return;
@@ -786,6 +812,7 @@ export default function Customizer({ product }: { product: Product }) {
         >
           Save & start another design
         </button>
+        </fieldset>
         <p className="privacy-caption">
           <Icon name="lock" size={13} />
           {choiceReview ? "Changes are not saved until you confirm the current choices." : store.storageAvailable
