@@ -6,7 +6,7 @@ for(const width of [1280,390])test("draft download recovers when device saving i
  await expect(page.getByLabel("Your name")).toHaveValue("Synthetic Person");await expect(page.getByLabel("Email address")).toHaveValue("person@example.test");
  const before=await page.evaluate(()=>({...localStorage}));
  await page.evaluate(()=>{const w=window as any;w.oldSet=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(this===localStorage)throw Error("blocked storage");return w.oldSet.call(this,k,v);};w.oldCreate=URL.createObjectURL;URL.createObjectURL=()=>{throw Error("blocked download");};});
- await page.getByRole("button",{name:"Save draft on this device"}).click();await expect(page.getByRole("status").filter({hasText:"Device storage is unavailable. Download your draft instead."})).toBeVisible();
+ await page.getByRole("button",{name:"Save draft on this device"}).click();await expect(page.getByRole("status").filter({hasText:"This draft could not be verified on this device. Keep this page open and download your draft before leaving."})).toBeVisible();
  const button=page.getByRole("button",{name:"Download draft",exact:true});const errors:string[]=[];page.on("pageerror",e=>errors.push(e.message));await button.focus();await page.keyboard.press("Enter");
  await expect(page.getByRole("status").filter({hasText:"Draft download could not start"})).toBeVisible();await expect(button).toBeFocused();expect(errors).toEqual([]);
  await expect(page.getByLabel("How can we help?")).toHaveValue("Synthetic caf\u00e9\nKeep these details.");expect(await page.evaluate(()=>({...localStorage}))).toEqual(before);expect(requests).toBe(0);
