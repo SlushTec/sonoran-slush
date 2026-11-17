@@ -661,6 +661,7 @@ export default function Customizer({ product }: { product: Product }) {
                           setLocalURL("");
                           update({ artworkName: "" });
                           if (fileRef.current) fileRef.current.value = "";
+                            selectStep(1);
                         }}
                       >
                         <Icon name="close" size={16} />
