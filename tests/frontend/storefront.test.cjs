@@ -986,3 +986,23 @@ for(const mode of ['throw','silent'])test('checkout persistence wording follows 
  blocked=false;fireEvent.click(screen.getByRole('button',{name:'Change synthetic current bag'}));assert.match(note().textContent,/current bag was verified saved/);assert.equal(readLocal('cart',[])[0].quantity,3);assert.equal(name.value,'Synthetic retained contact');assert.equal(sessionStorage.length,0);assert.equal(calls,0);
  }finally{proto.setItem=set;}
 });
+
+for(const failure of ['create','click','revoke'])test('checkout download recovery preserves current state: '+failure,async()=>{
+ const {emptyDesign,useStore}=require('../../apps/storefront/src/components/Store.tsx');const item={...emptyDesign('pet-tags'),id:'download-recovery',text:'Synthetic private design'};writeLocal('cart',[item]);let store;
+ function Probe(){store=useStore();return React.createElement('button',{onClick:()=>store.setQuantity(item.id,2)},'Change current download bag');}
+ let calls=0;global.fetch=async()=>{calls++;throw Error('Unexpected request');};wrap(React.createElement(React.Fragment,null,React.createElement(Checkout),React.createElement(Probe)));
+ const name=await screen.findByLabelText('Full name');fireEvent.change(name,{target:{value:'Synthetic contact'}});const raw=localStorage.getItem('sonoran:cart');
+ const originalCreate=URL.createObjectURL,originalRevoke=URL.revokeObjectURL,originalClick=window.HTMLAnchorElement.prototype.click,originalTimeout=global.setTimeout;
+ let blocked=true,blob,clicks=0,revokes=0,filename;const status=()=>screen.queryAllByRole('status').map(n=>n.textContent).join(' ');
+ try{
+ URL.createObjectURL=value=>{if(blocked&&failure==='create')throw Error('Synthetic creation failure');blob=value;return 'blob:checkout-recovery';};
+ URL.revokeObjectURL=url=>{assert.equal(url,'blob:checkout-recovery');revokes++;if(blocked&&failure==='revoke')throw Error('Synthetic cleanup failure');};
+ window.HTMLAnchorElement.prototype.click=function(){if(blocked&&failure==='click')throw Error('Synthetic click failure');clicks++;filename=this.download;};
+ global.setTimeout=(fn,ms,...args)=>ms===1000?(fn(),0):originalTimeout(fn,ms,...args);
+ fireEvent.click(screen.getByRole('button',{name:'Download design request'}));
+ if(failure==='revoke'){assert.match(status(),/Download started/);assert.equal(clicks,1);assert.equal(revokes,1);}else{assert.match(status(),/Download could not start/);assert.equal(clicks,0);assert.equal(revokes,failure==='click'?1:0);}
+ assert.equal(name.value,'Synthetic contact');assert.equal(localStorage.getItem('sonoran:cart'),raw);assert.equal(document.querySelector('input[type=checkbox][required]').checked,false);assert.equal(sessionStorage.length,0);assert.equal(calls,0);
+ blocked=false;fireEvent.click(screen.getByRole('button',{name:'Download design request'}));assert.match(status(),/Download started\. Check your browser downloads/);assert.doesNotMatch(status(),/could not start/);assert.equal(filename,'sonoran-slush-design-request.json');assert.deepEqual(JSON.parse(await blob.text()),{kind:'retail',items:store.cart,paid:false});assert.equal(localStorage.getItem('sonoran:cart'),raw);
+ fireEvent.click(screen.getByRole('button',{name:'Change current download bag'}));assert.doesNotMatch(status(),/Download started/);fireEvent.click(screen.getByRole('button',{name:'Download design request'}));assert.equal(JSON.parse(await blob.text()).items[0].quantity,2);assert.equal(name.value,'Synthetic contact');assert.equal(calls,0);assert.equal(sessionStorage.length,0);
+ }finally{URL.createObjectURL=originalCreate;URL.revokeObjectURL=originalRevoke;window.HTMLAnchorElement.prototype.click=originalClick;global.setTimeout=originalTimeout;}
+});
