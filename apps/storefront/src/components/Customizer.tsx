@@ -193,7 +193,7 @@ export default function Customizer({ product }: { product: Product }) {
       setError(
         "Add a local photo or choose “I will add artwork later” to save this configuration to your bag.",
       );
-      setStep(1);
+      selectStep(1);
       return false;
     }
     if (
@@ -205,7 +205,7 @@ export default function Customizer({ product }: { product: Product }) {
       setError(
         "Add a name or message, attach a design, or choose to add artwork later.",
       );
-      setStep(1);
+      selectStep(1);
       return false;
     }
     if (
