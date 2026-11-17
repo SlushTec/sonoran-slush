@@ -825,3 +825,16 @@ test('server rendered personalization remains visible but disabled until restora
  const html=require('react-dom/server').renderToString(React.createElement(StoreProvider,null,React.createElement(Customizer,{product:product('makertwist-40oz-tumbler')})));
  assert.match(html,/<h1>The everyday tumbler<\/h1>/);assert.match(html,/<fieldset disabled="" aria-label="Personalization controls"/);
 });
+
+for(const invalid of ['1.5','499.5'])test('fractional quantity preserves acknowledged draft '+invalid,async()=>{
+ const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');const original={...emptyDesign('pet-tags'),id:'whole-quantity',text:'Exact words',notes:'Keep notes',quantity:3,options:{Design:'Name or monogram',Placement:'Single placement'}};
+ writeLocal('config:pet-tags',original);let mounted=wrap(React.createElement(Customizer,{product:product('pet-tags')}));await screen.findByRole('button',{name:'Add your personal touch'});
+ const raw=localStorage.getItem('sonoran:config:pet-tags');fireEvent.change(screen.getByRole('spinbutton'),{target:{value:invalid}});
+ assert.match(screen.getByRole('alert').textContent,/whole-number quantity/);assert.equal(screen.getByRole('spinbutton').value,'3');assert.equal(localStorage.getItem('sonoran:config:pet-tags'),raw);
+ mounted.unmount();mounted=wrap(React.createElement(Customizer,{product:product('pet-tags')}));await screen.findByRole('button',{name:'Add your personal touch'});assert.deepEqual(readLocal('config:pet-tags',null),original);
+ fireEvent.change(screen.getByRole('spinbutton'),{target:{value:'4'}});await waitFor(()=>assert.equal(readLocal('config:pet-tags',null).quantity,4));assert.equal(readLocal('config:pet-tags',null).text,original.text);assert.equal(screen.queryAllByRole('alert').length,0);
+});
+test('whole quantity keeps existing blank and range behavior',async()=>{
+ wrap(React.createElement(Customizer,{product:product('pet-tags')}));await screen.findByRole('button',{name:'Add your personal touch'});
+ for(const [input,expected] of [['7',7],['501',500],['0',1],['-2',1],['',1]]){fireEvent.change(screen.getByRole('spinbutton'),{target:{value:input}});await waitFor(()=>assert.equal(readLocal('config:pet-tags',null).quantity,expected));}
+});

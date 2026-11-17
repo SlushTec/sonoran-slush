@@ -524,14 +524,14 @@ export default function Customizer({ product }: { product: Product }) {
                   min="1"
                   max="500"
                   value={design.quantity}
-                  onChange={(e) =>
-                    update({
-                      quantity: Math.max(
-                        1,
-                        Math.min(500, Number(e.target.value) || 1),
-                      ),
-                    })
-                  }
+                  onChange={(e) => {
+                    const quantity = Number(e.target.value) || 1;
+                    if (!Number.isInteger(quantity)) {
+                      setError("Choose a whole-number quantity between 1 and 500. Your previous quantity and design are unchanged.");
+                      return;
+                    }
+                    update({ quantity: Math.max(1, Math.min(500, quantity)) });
+                  }}
                 />
               </label>
               <p className="field-help">
