@@ -931,3 +931,32 @@ test('artwork removal focus has no mount or remount side effect',async()=>{
  const sentinel=document.createElement('button');sentinel.textContent='Outside focus';document.body.append(sentinel);sentinel.focus();
  try{for(let i=0;i<2;i++){const view=wrap(React.createElement(Customizer,{product:product('photo-crystal-heart')}));await screen.findByRole('button',{name:/Add your personal touch/});assert.equal(document.activeElement===sentinel,true);view.unmount();}}finally{sentinel.remove();}
 });
+
+for(const mode of ['throw','silent','readback'])test('current config persistence disclosure: '+mode,async()=>{
+ const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');const key='sonoran:config:pet-tags';writeLocal('config:pet-tags',{...emptyDesign('pet-tags'),text:'Previous persisted words'});
+ const view=wrap(React.createElement(Customizer,{product:product('pet-tags')}));await screen.findByRole('button',{name:'Add your personal touch'});fireEvent.click(document.getElementById('config-tab-1'));const raw=localStorage.getItem(key);
+ const proto=Object.getPrototypeOf(localStorage),set=proto.setItem,get=proto.getItem;let blocked=true;
+ try{
+  proto.setItem=function(k,v){if(k===key&&blocked){if(mode==='throw')throw Error('synthetic quota');if(mode==='silent')return;}return set.call(this,k,v);};
+  proto.getItem=function(k){if(k===key&&blocked&&mode==='readback')throw Error('synthetic read denial');return get.call(this,k);};
+  fireEvent.change(screen.getByLabelText(/Name, initials, or message/),{target:{value:'New unsaved words'}});
+  assert.match(document.querySelector('.privacy-caption').textContent,/could not be verified/);assert.equal(screen.getByLabelText(/Name, initials, or message/).value,'New unsaved words');if(mode!=='readback')assert.equal(get.call(localStorage,key),raw);
+  fireEvent.click(screen.getByRole('button',{name:'Save this design for later'}));assert.match(screen.getByRole('status').textContent,/Design saved on this device/);assert.match(document.querySelector('.privacy-caption').textContent,/could not be verified/);
+  blocked=false;fireEvent.change(screen.getByLabelText(/Name, initials, or message/),{target:{value:'Verified later edit'}});assert.match(document.querySelector('.privacy-caption').textContent,/Current draft saved/);assert.equal(readLocal('config:pet-tags',{}).text,'Verified later edit');
+  blocked=true;fireEvent.change(screen.getByLabelText(/Name, initials, or message/),{target:{value:'Newest unverified edit'}});assert.match(document.querySelector('.privacy-caption').textContent,/could not be verified/);
+  blocked=false;view.unmount();wrap(React.createElement(Customizer,{product:product('pet-tags')}));await screen.findByRole('button',{name:'Add your personal touch'});fireEvent.click(document.getElementById('config-tab-1'));assert.equal(screen.getByLabelText(/Name, initials, or message/).value,mode==='readback'?'Newest unverified edit':'Verified later edit');assert.match(document.querySelector('.privacy-caption').textContent,/Current draft saved/);
+ }finally{proto.setItem=set;proto.getItem=get;}
+});
+test('current config persistence status follows product and skipped review ownership',async()=>{
+ const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');writeLocal('config:pet-tags',{...emptyDesign('pet-tags'),text:'Pet words'});
+ const legacy={...emptyDesign('photo-crystal-heart'),text:'Keep review words',options:{'Crystal shape':'Heart',Size:'Retired'}};writeLocal('config:photo-crystal-heart',legacy);const original=localStorage.getItem('sonoran:config:photo-crystal-heart');
+ const view=wrap(React.createElement(Customizer,{product:product('pet-tags')}));await screen.findByRole('button',{name:'Add your personal touch'});assert.match(document.querySelector('.privacy-caption').textContent,/Current draft saved/);
+ view.rerender(React.createElement(StoreProvider,null,React.createElement(Customizer,{product:product('photo-crystal-heart')})));await screen.findByRole('heading',{name:'Review changed choices'});assert.match(document.querySelector('.privacy-caption').textContent,/not saved until you confirm/);assert.equal(localStorage.getItem('sonoran:config:photo-crystal-heart'),original);
+ const proto=Object.getPrototypeOf(localStorage),set=proto.setItem;try{proto.setItem=function(k,v){if(k==='sonoran:config:photo-crystal-heart')return;return set.call(this,k,v);};fireEvent.click(screen.getByRole('button',{name:'Use these current choices'}));assert.match(document.querySelector('.privacy-caption').textContent,/could not be verified/);assert.equal(localStorage.getItem('sonoran:config:photo-crystal-heart'),original);
+ view.rerender(React.createElement(StoreProvider,null,React.createElement(Customizer,{product:product('pet-tags')})));await screen.findByRole('button',{name:'Add your personal touch'});assert.match(document.querySelector('.privacy-caption').textContent,/Current draft saved/);
+ }finally{proto.setItem=set;}
+});
+test('current config storage is not claimed before hydration or for unavailable design',async()=>{
+ const html=require('react-dom/server').renderToString(React.createElement(StoreProvider,null,React.createElement(Customizer,{product:product('pet-tags')})));assert.match(html,/Current draft storage has not yet been verified/);assert.equal(html.includes('Current draft saved'),false);
+ window.history.replaceState({},'','/products/pet-tags?design=absent');wrap(React.createElement(Customizer,{product:product('pet-tags')}));await screen.findByRole('heading',{name:'This requested design is unavailable'});assert.equal(document.querySelectorAll('.privacy-caption').length,0);
+});
