@@ -746,10 +746,12 @@ export function Checkout() {
             {error}
           </div>
         )}
-        <p className="field-help" style={{ marginTop: 15 }}>
-          Contact details are held in this form during your visit. Your designs
-          remain saved if the connection fails. You can also download the design
-          request.
+        <p className="field-help" style={{ marginTop: 15 }} aria-live="polite">
+          Contact details are held in this form during your visit.{" "}
+          {store.cartStorageAvailable
+            ? "Your current bag was verified saved on this device."
+            : "Your current bag could not be verified on this device. Keep this page open; current changes may last for this visit only."}{" "}
+          You can also download the design request. A saved bag or downloaded design request does not confirm that a request reached the studio.
         </p>
       </form>
       <aside className="summary-card">
