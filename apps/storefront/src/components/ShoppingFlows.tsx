@@ -367,6 +367,7 @@ export function Saved() {
 export function Checkout() {
   const store = useStore(),
     [busy, setBusy] = useState(false),
+    [designDownloadStatus, setDesignDownloadStatus] = useState(""),
     [error, setError] = useState(""),
     [receipt, setReceipt] = useState<Receipt | null>(null),
     [receiptDownloadStatus, setReceiptDownloadStatus] = useState(""),
@@ -389,6 +390,19 @@ export function Checkout() {
       giftMessage: "",
     }),
     [consent, setConsent] = useState(false);
+  useEffect(() => setDesignDownloadStatus(""), [store.cart]);
+  function downloadDesignRequest() {
+    try {
+      downloadJSON("sonoran-slush-design-request.json", {
+        kind: "retail",
+        items: store.cart,
+        paid: false,
+      });
+      setDesignDownloadStatus("Download started. Check your browser downloads. This does not send a request to the studio.");
+    } catch {
+      setDesignDownloadStatus("Download could not start. Try again before leaving this page. Your bag and contact details are unchanged.");
+    }
+  }
   const locked = useRef(false);
   function downloadReceipt() {
     if (!receipt) return;
@@ -780,16 +794,11 @@ export function Checkout() {
         <button
           className="link-button"
           style={{ display: "block", marginTop: 12 }}
-          onClick={() =>
-            downloadJSON("sonoran-slush-design-request.json", {
-              kind: "retail",
-              items: store.cart,
-              paid: false,
-            })
-          }
+          onClick={downloadDesignRequest}
         >
           Download design request
         </button>
+        <p role="status">{designDownloadStatus}</p>
       </aside>
     </div>
   );
