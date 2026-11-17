@@ -511,14 +511,18 @@ export default function InquiryForm({
             type="button"
             className="button outline"
             onClick={() => {
-              const ok = writeLocal("inquiry:" + kind, {
-                values: v,
-                request_id: requestID,
-              });
+              const draft = { values: v, request_id: requestID };
+              let verified = false;
+              if (writeLocal("inquiry:" + kind, draft)) {
+                try {
+                  const saved = JSON.parse(localStorage.getItem("sonoran:inquiry:" + kind) || "null");
+                  verified = saved?.expires > Date.now() && JSON.stringify(saved.value) === JSON.stringify(draft);
+                } catch { /* A write without readable matching bytes is not a verified save. */ }
+              }
               notify(
-                ok
+                verified
                   ? "Request draft saved on this device for 30 days."
-                  : "Device storage is unavailable. Download your draft instead.",
+                  : "This draft could not be verified on this device. Keep this page open and download your draft before leaving.",
               );
             }}
           >
