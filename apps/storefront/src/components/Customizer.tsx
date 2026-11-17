@@ -7,7 +7,7 @@ import { crystalForSlug } from "@/lib/crystals";
 import references from "@/lib/product-references.json";
 import { mediaFor } from "@/lib/media";
 import { readLocal, writeLocal } from "@/lib/client";
-import { useStore, emptyDesign, parseDesign, type Design } from "./Store";
+import { useStore, emptyDesign, parseDesign, canSaveDesign, type Design } from "./Store";
 import { ProductVisual } from "./ProductCard";
 import Icon from "./Icon";
 export default function Customizer({ product }: { product: Product }) {
@@ -25,6 +25,7 @@ export default function Customizer({ product }: { product: Product }) {
       return initial;
     }),
     [restored, setRestored] = useState(false),
+    [choiceReview, setChoiceReview] = useState<{ original: Design; labels: string[] } | null>(null),
     [step, setStep] = useState(0),
     [error, setError] = useState(""),
     [localURL, setLocalURL] = useState(""),
@@ -64,7 +65,7 @@ export default function Customizer({ product }: { product: Product }) {
       : readLocal<Design | null>("config:" + product.slug, null);
     const parsed = parseDesign(stored);
     const next =
-      parsed?.slug === product.slug ? parsed : emptyDesign(product.slug);
+      parsed?.slug === product.slug ? { ...parsed, options: { ...parsed.options } } : emptyDesign(product.slug);
     for (const o of info.options)
       if (!o.values.includes(next.options[o.label]))
         next.options[o.label] = o.values[0];
@@ -73,15 +74,19 @@ export default function Customizer({ product }: { product: Product }) {
       if (!crystal.sizes.some((s) => s.value === next.options.Size))
         next.options.Size = crystal.sizes[0].value;
     }
+    const labels = parsed?.slug === product.slug
+      ? Object.keys(next.options).filter((label) => next.options[label] !== parsed.options[label])
+      : [];
+    setChoiceReview(labels.length && parsed ? { original: parsed, labels } : null);
     setDesign(next);
     setRestored(true);
   }, [product.slug, store.hydrated]);
   useEffect(() => {
     // A product transition renders once with the former product's design.
     // Never persist that stale state into the destination product's draft.
-    if (design && restored && design.slug === product.slug)
+    if (design && restored && design.slug === product.slug && !choiceReview)
       writeLocal("config:" + product.slug, design);
-  }, [design, product.slug, restored]);
+  }, [design, product.slug, restored, choiceReview]);
   useEffect(
     () => () => {
       if (localURL) URL.revokeObjectURL(localURL);
@@ -390,6 +395,21 @@ export default function Customizer({ product }: { product: Product }) {
           <strong>Made to your request</strong>
           <span>Final pricing & availability confirmed after review</span>
         </div>
+        {choiceReview && choiceReview.original.slug === product.slug && (
+          <section aria-labelledby="choice-review-heading" className="price-review">
+            <h2 id="choice-review-heading">Review changed choices</h2>
+            <p>Some previously requested choices are no longer listed. Review the current selections before keeping this draft.</p>
+            <dl>{choiceReview.labels.map((label) => <div key={label}>
+              <dt>{label}</dt>
+              <dd>Previously requested: <span>{choiceReview.original.options[label] ?? "not previously selected"}</span></dd>
+              <dd>Current choice: <span>{design.options[label]}</span></dd>
+            </div>)}</dl>
+            <p>Edits and previews are not saved while this review is pending. Reloading will restore your previous draft.</p>
+            <button className="button" onClick={() => {
+              if (design.slug === product.slug && choiceReview.original.slug === product.slug && choiceReview.original.id === design.id) setChoiceReview(null);
+            }}>Use these current choices</button>
+          </section>
+        )}
         <div
           className="config-tabs"
           role="tablist"
@@ -708,8 +728,9 @@ export default function Customizer({ product }: { product: Product }) {
               </div>
               <button
                 className="button primary full"
+                disabled={!!choiceReview || design.slug !== product.slug}
                 onClick={() => {
-                  if (validate()) store.addToCart(design);
+                  if (!choiceReview && design.slug === product.slug && validate()) store.addToCart(design);
                 }}
               >
                 Add design to bag <Icon name="bag" size={18} />
@@ -732,14 +753,21 @@ export default function Customizer({ product }: { product: Product }) {
         </div>
         <button
           className="save-design-button"
-          onClick={() => store.saveDesign(design)}
+          disabled={!!choiceReview || design.slug !== product.slug}
+          onClick={() => { if (!choiceReview && design.slug === product.slug) store.saveDesign(design); }}
         >
           <Icon name="heart" size={18} /> Save this design for later
         </button>
         <button
           className="link-button"
           style={{ display: "block", margin: "12px auto 0" }}
+          disabled={!!choiceReview || design.slug !== product.slug}
           onClick={() => {
+            if (choiceReview || design.slug !== product.slug) return;
+            if (!canSaveDesign(store.designs, design.id)) {
+              store.saveDesign(design);
+              return;
+            }
             invalidatePhoto();
             setPhotoError("");
             const persisted = store.saveDesign(design);
@@ -760,7 +788,7 @@ export default function Customizer({ product }: { product: Product }) {
         </button>
         <p className="privacy-caption">
           <Icon name="lock" size={13} />
-          {store.storageAvailable
+          {choiceReview ? "Changes are not saved until you confirm the current choices." : store.storageAvailable
             ? "Drafts save on this device for 30 days."
             : "Device storage is unavailable; drafts will last for this visit only."}{" "}
           <Link href="/saved">Manage saved work</Link>

@@ -49,14 +49,16 @@ export async function commerce<T>(
   }
 }
 export function downloadJSON(name: string, data: unknown) {
-  const url = URL.createObjectURL(
-    new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }),
-  );
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = name;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
+  const revoke = () => { try { URL.revokeObjectURL(url); } catch { /* Cleanup must not replace the result. */ } };
+  try {
+    const a = document.createElement("a");
+    a.href = url; a.download = name; a.click();
+    setTimeout(revoke, 1000);
+  } catch (error) {
+    revoke();
+    throw error;
+  }
 }
 export function newId() {
   return crypto.randomUUID();

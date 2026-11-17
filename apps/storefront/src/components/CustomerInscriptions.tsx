@@ -61,7 +61,7 @@ export function customerInscriptions(record: unknown): CustomerInscriptionView {
   };
 }
 export function visibleInscription(value: string) {
-  return value.replace(
+  return value.replace(/\\/g, "\\\\").replace(
     /[\p{Cf}\u2028\u2029]/gu,
     (c) => "\\u{" + c.codePointAt(0)!.toString(16).toUpperCase() + "}",
   );
@@ -123,7 +123,8 @@ export default function CustomerInscriptions({
         proof approval or permission to manufacture.
       </p>
       <p>
-        Formatting controls are shown as {String.raw`\u{CODE}`}. Stored text is
+        Literal backslashes are doubled; formatting controls are shown as{" "}
+        {String.raw`\u{CODE}`}. Stored text is
         unchanged; these display codes are not engraving text.
       </p>
       {view.availability === "absent" ? (

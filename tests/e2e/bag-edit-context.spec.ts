@@ -2,7 +2,7 @@ import {test,expect} from "@playwright/test";
 for(const source of ["bag","saved"]){
  test(source+" edit uses the selected collection",async({page})=>{
   await page.addInitScript(()=>{
-   const design={id:"synthetic-design",slug:"makertwist-40oz-tumbler",text:"Synthetic",secondary:"",font:"Classic serif",options:{},quantity:1,notes:"",artworkName:"",gift:false,giftMessage:"",updated:"2026-11-14T00:00:00Z"};
+   const design={id:"synthetic-design",slug:"makertwist-40oz-tumbler",text:"Synthetic",secondary:"",font:"Classic serif",options:{Design:"Name or monogram",Placement:"Single placement"},quantity:1,notes:"",artworkName:"",gift:false,giftMessage:"",updated:"2026-11-14T00:00:00Z"};
    for(const key of ["cart","designs"])localStorage.setItem("sonoran:"+key,JSON.stringify({expires:Date.now()+60000,value:[design]}));
   });
   await page.goto("/cart");

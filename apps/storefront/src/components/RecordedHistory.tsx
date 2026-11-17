@@ -58,11 +58,13 @@ export function recordedHistory(record: unknown): History {
   return { kind: "recorded", entries };
 }
 function visible(value: string) {
-  return value.replace(/[\p{Cc}\p{Cf}\u2028\u2029]/gu, (c) =>
-    c === "\n" || c === "\r" || c === "\t"
-      ? c
-      : "\\u{" + c.codePointAt(0)!.toString(16).toUpperCase() + "}",
-  );
+  return value
+    .replace(/\\/g, "\\\\")
+    .replace(/[\p{Cc}\p{Cf}\u2028\u2029]/gu, (c) =>
+      c === "\n" || c === "\r" || c === "\t"
+        ? c
+        : "\\u{" + c.codePointAt(0)!.toString(16).toUpperCase() + "}",
+    );
 }
 export default function RecordedHistory({ record }: { record: unknown }) {
   const [page, setPage] = useState(0);
@@ -95,8 +97,8 @@ export default function RecordedHistory({ record }: { record: unknown }) {
         inferred.
       </p>
       <p className="field-help">
-        Formatting controls are shown as {String.raw`\u{CODE}`}. Stored labels
-        and timestamps are unchanged.
+        Literal backslashes are doubled; formatting controls are shown as{" "}
+        {String.raw`\u{CODE}`}. Stored labels and timestamps are unchanged.
       </p>
       {history.kind === "absent" ? (
         <p>

@@ -22,7 +22,7 @@ for(const count of [99,100])test("bag capacity "+count+" gives truthful result a
 });
 test("existing bag design can be updated at capacity",async({page})=>{
  await page.addInitScript(()=>{
-  const d={slug:"makertwist-40oz-tumbler",text:"Synthetic",secondary:"",font:"Classic serif",options:{},quantity:1,notes:"",artworkName:"",gift:false,giftMessage:"",updated:"2026-11-14"};
+  const d={slug:"makertwist-40oz-tumbler",text:"Synthetic",secondary:"",font:"Classic serif",options:{Design:"Name or monogram",Placement:"Single placement"},quantity:1,notes:"",artworkName:"",gift:false,giftMessage:"",updated:"2026-11-14"};
   localStorage.setItem("sonoran:cart",JSON.stringify({expires:Date.now()+60000,value:Array.from({length:100},(_,i)=>({...d,id:"existing-"+i}))}));
  });
  await page.goto("/products/makertwist-40oz-tumbler?design=existing-0&from=bag");

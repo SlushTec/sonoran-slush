@@ -1,0 +1,5 @@
+# Bag design download recovery
+
+Private bounded local data recovery repair from4ae06e7. Bag export now reports creation/activation failures with explicit retry guidance; successful activation says download started, not a guaranteed saved file. Cart mutation clears stale status. Items, filename, JSON type/created_at/paid fields and cart bytes are unchanged. Shared downloadJSON now cleans up an owned URL on activation failure and rethrows the original error; successful delayed cleanup cannot throw. Other callers retain the same synchronous throw contract.
+
+Actual native create failure reproduced missing status and uncaught error. Two final tests pass creation/click failure, keyboard focus, unchanged stored cart, owned URL cleanup and real retry download JSON equal to the saved items. Full frontend658/types/build/export72pages4399links/archive67+41 passed. The build tool response was interrupted, but existing receipts showed the chain had completed; no relaunch. No live commerce, full browser suite, screenshot/manual-AT or publication claim. Independent review required. Evidence: external store-export-*.log/.exit.

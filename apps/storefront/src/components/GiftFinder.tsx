@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { catalog } from "@/lib/catalog";
 import { infoFor } from "@/lib/shop";
@@ -57,6 +57,13 @@ export default function GiftFinder() {
       style: "Useful, every day",
     }),
     [finished, setFinished] = useState(false);
+  const heading = useRef<HTMLHeadingElement>(null), focusStep = useRef(false);
+  useEffect(() => {
+    if (focusStep.current) {
+      focusStep.current = false;
+      heading.current?.focus();
+    }
+  }, [step, finished]);
   const question = questions[step];
   const recommendations = useMemo(() => {
     const preferred: Record<string, string[]> = {
@@ -94,7 +101,7 @@ export default function GiftFinder() {
         <div className="finder-heading">
           <div>
             <p className="eyebrow">A thoughtful starting point</p>
-            <h2>
+            <h2 ref={heading} tabIndex={-1}>
               {finished ? "A few gifts that feel like them." : question.title}
             </h2>
           </div>
@@ -122,6 +129,7 @@ export default function GiftFinder() {
               <button
                 className="link-button"
                 onClick={() => {
+                  focusStep.current = true;
                   setStep(0);
                   setFinished(false);
                 }}
@@ -159,7 +167,7 @@ export default function GiftFinder() {
             <div className="finder-nav">
               <button
                 className="link-button"
-                onClick={() => setStep((s) => Math.max(0, s - 1))}
+                onClick={() => { focusStep.current = true; setStep((s) => Math.max(0, s - 1)); }}
                 disabled={!step}
               >
                 Back
@@ -167,9 +175,10 @@ export default function GiftFinder() {
               <span className="small muted">{step + 1} / 3</span>
               <button
                 className="button primary"
-                onClick={() =>
-                  step === 2 ? setFinished(true) : setStep((s) => s + 1)
-                }
+                onClick={() => {
+                  focusStep.current = true;
+                  step === 2 ? setFinished(true) : setStep((s) => s + 1);
+                }}
               >
                 {step === 2 ? "Find their gifts" : "Next little detail"}
                 <Icon name="arrow" size={17} />

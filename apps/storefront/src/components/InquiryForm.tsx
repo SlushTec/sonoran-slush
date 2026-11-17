@@ -43,6 +43,8 @@ export default function InquiryForm({
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [receipt, setReceipt] = useState<Receipt | null>(null),
+    [receiptDownloadStatus, setReceiptDownloadStatus] = useState(""),
+    [draftDownloadStatus, setDraftDownloadStatus] = useState(""),
     [newerDraft, setNewerDraft] = useState(false),
     [requestID, setRequestID] = useState(""),
     [step, setStep] = useState(0);
@@ -53,6 +55,7 @@ export default function InquiryForm({
     setBusy(false);
     setError("");
     setReceipt(null);
+    setReceiptDownloadStatus("");
     setNewerDraft(false);
     setConsent(false);
     setStep(0);
@@ -71,6 +74,24 @@ export default function InquiryForm({
       lifecycle.current += 1;
     };
   }, [kind]);
+  useEffect(() => setDraftDownloadStatus(""), [v, kind]);
+  function downloadDraft() {
+    try {
+      downloadJSON("sonoran-slush-" + kind + "-draft.json", { ...payload(), status: "unsent_draft", consent: false });
+      setDraftDownloadStatus("Draft download started. Check your browser downloads and keep the file private. Nothing was submitted.");
+    } catch {
+      setDraftDownloadStatus("Draft download could not start. Your details are still in this form. Try again before leaving; nothing was submitted.");
+    }
+  }
+  function downloadReceipt() {
+    if (!receipt) return;
+    try {
+      downloadJSON("sonoran-slush-private-receipt.json", receipt);
+      setReceiptDownloadStatus("Receipt download started. Check your browser downloads and keep the file private.");
+    } catch {
+      setReceiptDownloadStatus("Receipt download could not start. Try again before leaving this page. The studio has already received your request; do not resubmit it.");
+    }
+  }
   function field(k: keyof Values, val: string) {
     setV((a) => ({ ...a, [k]: val }));
   }
@@ -97,7 +118,7 @@ export default function InquiryForm({
   }
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (busy || !consent) return;
+    if (busy || !consent || !requestID) return;
     const owner = lifecycle.current;
     setBusy(true);
     setError("");
@@ -185,12 +206,11 @@ export default function InquiryForm({
         <button
           className="button primary"
           style={{ marginTop: 20 }}
-          onClick={() =>
-            downloadJSON("sonoran-slush-private-receipt.json", receipt)
-          }
+          onClick={downloadReceipt}
         >
           Download private receipt <Icon name="download" />
         </button>
+        <p role="status">{receiptDownloadStatus}</p>
       </div>
     );
   const minimumDate = new Intl.DateTimeFormat("en-CA", {
@@ -200,7 +220,9 @@ export default function InquiryForm({
     day: "2-digit",
   }).format(new Date());
   return (
-    <form className="inquiry-form" onSubmit={submit}>
+    <form className="inquiry-form" onSubmit={submit} aria-busy={!requestID}>
+      {!requestID && <p role="status">Preparing your form and saved draft...</p>}
+      <fieldset disabled={!requestID} aria-label={event ? "Event inquiry" : contact ? "Contact inquiry" : "Bulk inquiry"} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
       <h3>
         {event
           ? "Tell us about your occasion."
@@ -505,23 +527,19 @@ export default function InquiryForm({
           <button
             type="button"
             className="button outline"
-            onClick={() =>
-              downloadJSON("sonoran-slush-" + kind + "-draft.json", {
-                ...payload(),
-                status: "unsent_draft",
-                consent: false,
-              })
-            }
+            onClick={downloadDraft}
           >
             <Icon name="download" size={14} /> Download draft
           </button>
         </div>
+        <p role="status">{draftDownloadStatus}</p>
         <p className="field-help" style={{ marginTop: 12 }}>
           Saving a draft stores your form details in this browser for 30 days.{" "}
           <Link href="/saved">Clear device data</Link> any time. Downloading
           does not submit a request.
         </p>
       </div>
+      </fieldset>
     </form>
   );
 }

@@ -48,6 +48,7 @@ export default function StaffWorkspace() {
     [tracking, setTracking] = useState(""),
     [carrier, setCarrier] = useState(""),
     [receipt, setReceipt] = useState<Receipt | null>(null),
+    [receiptDownloadStatus, setReceiptDownloadStatus] = useState(""),
     [outcome, setOutcome] = useState("");
   const generation = useRef(0),
     context = useRef(0),
@@ -56,6 +57,7 @@ export default function StaffWorkspace() {
   function clearDrafts() {
     setDoc(null);
     setReceipt(null);
+    setReceiptDownloadStatus("");
     setPrice("");
     setMessage("");
     setProof("");
@@ -241,6 +243,7 @@ export default function StaffWorkspace() {
     setError("");
     setOutcome("");
     setReceipt(null);
+    setReceiptDownloadStatus("");
     let confirmed = false;
     try {
       const result = await commerce<Doc | Receipt>(path, body, s.token);
@@ -259,7 +262,7 @@ export default function StaffWorkspace() {
           r.access_token.length > 1000
         )
           throw Error("Receipt mismatch");
-        setReceipt(r);
+        setReceipt({ id: r.id, status: r.status, access_token: r.access_token });
       } else {
         if (
           !validDoc(result) ||
@@ -285,6 +288,7 @@ export default function StaffWorkspace() {
         else {
           setDoc(null);
           setReceipt(null);
+          setReceiptDownloadStatus("");
           setError(
             "The action could not be confirmed. Reopen the record to reconcile before retrying.",
           );
@@ -307,6 +311,11 @@ export default function StaffWorkspace() {
     }
     const [whole, fraction = ""] = price.split(".");
     const minor = Number(whole) * 100 + Number(fraction.padEnd(2, "0"));
+    // Mirror the existing Offer contract; invalid totals never start an action.
+    if (!Number.isSafeInteger(minor) || minor < 1 || minor > 99999999) {
+      setError("Enter a reviewed USD total from $0.01 to $999,999.99.");
+      return;
+    }
     action("/v1/admin/quotes/" + doc.id + "/offer", {
       version: doc.version,
       total_minor: minor,
@@ -486,12 +495,19 @@ export default function StaffWorkspace() {
                     session.current &&
                     active(session.current, context.current) &&
                     receipt
-                  )
-                    downloadJSON("sonoran-slush-private-receipt.json", receipt);
+                  ) {
+                    try {
+                      downloadJSON("sonoran-slush-private-receipt.json", receipt);
+                      setReceiptDownloadStatus("Receipt download started. Check your browser downloads and keep the file private.");
+                    } catch {
+                      setReceiptDownloadStatus("Receipt download could not start. Try again before locking or leaving. The action is already confirmed; do not repeat it.");
+                    }
+                  }
                 }}
               >
                 Download receipt <Icon name="download" size={16} />
               </button>
+              <p role="status">{receiptDownloadStatus}</p>
               <button
                 className="link-button"
                 style={{ display: "block", marginTop: 10 }}

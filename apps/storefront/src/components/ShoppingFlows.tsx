@@ -14,6 +14,29 @@ function itemProduct(d: Design) {
 }
 export function Bag() {
   const store = useStore();
+  const [downloadStatus, setDownloadStatus] = useState("");
+  const removalFocus = useRef<number | null>(null), removeButtons = useRef(new Map<string, HTMLButtonElement>()), emptyBagLink = useRef<HTMLAnchorElement>(null);
+  function removeItem(id: string) {
+    removalFocus.current = store.cart.findIndex(item => item.id === id);
+    store.removeCart(id);
+  }
+  useEffect(() => {
+    if (removalFocus.current === null) return;
+    const index = removalFocus.current; removalFocus.current = null;
+    const item = store.cart[Math.min(index, store.cart.length - 1)];
+    (item ? removeButtons.current.get(item.id) : emptyBagLink.current)?.focus();
+  }, [store.cart]);
+  useEffect(() => setDownloadStatus(""), [store.cart]);
+  function downloadDesigns() {
+    try {
+      downloadJSON("sonoran-slush-designs.json", {
+        type: "design_request", created_at: new Date().toISOString(), items: store.cart, paid: false,
+      });
+      setDownloadStatus("Download started. Check your browser downloads. Your bag is unchanged.");
+    } catch {
+      setDownloadStatus("Download could not start. Try again. Your bag is unchanged.");
+    }
+  }
   if (!store.hydrated)
     return (
       <p className="loading-panel" role="status">
@@ -31,7 +54,7 @@ export function Bag() {
             add a few details, and keep your ideas together.
           </p>
           <div className="actions">
-            <Link className="button primary" href="/shop">
+            <Link ref={emptyBagLink} className="button primary" href="/shop">
               Find their gift <Icon name="arrow" />
             </Link>
             <Link className="button outline" href="/saved">
@@ -103,7 +126,8 @@ export function Bag() {
                   </Link>
                   <button
                     className="link-button"
-                    onClick={() => store.removeCart(d.id)}
+                    ref={node => { if (node) removeButtons.current.set(d.id, node); else removeButtons.current.delete(d.id); }}
+                    onClick={() => removeItem(d.id)}
                   >
                     Remove
                   </button>
@@ -144,17 +168,11 @@ export function Bag() {
         </Link>
         <button
           className="link-button"
-          onClick={() =>
-            downloadJSON("sonoran-slush-designs.json", {
-              type: "design_request",
-              created_at: new Date().toISOString(),
-              items: store.cart,
-              paid: false,
-            })
-          }
+          onClick={downloadDesigns}
         >
           Download your designs
         </button>
+        <p role="status">{downloadStatus}</p>
         <p className="small">
           <Icon name="shield" size={15} /> No charge or reservation is made by
           saving a design.
@@ -168,6 +186,14 @@ export function Saved() {
     [tab, setTab] = useState("designs"),
     [clearConfirm, setClearConfirm] = useState(false),
     [clearFailed, setClearFailed] = useState(false);
+  const clearTrigger = useRef<HTMLButtonElement>(null), keepButton = useRef<HTMLButtonElement>(null), focusClear = useRef(false);
+  function showClear(value: boolean) { focusClear.current = true; setClearConfirm(value); }
+  useEffect(() => {
+    if (focusClear.current) {
+      focusClear.current = false;
+      (clearConfirm ? keepButton.current : clearTrigger.current)?.focus();
+    }
+  }, [clearConfirm]);
   return (
     <div style={{ paddingBottom: 70 }}>
       <div className="saved-tabs" role="group" aria-label="Saved work">
@@ -279,25 +305,26 @@ export function Saved() {
           </p>
         </div>
         {clearConfirm ? (
-          <div className="form-actions">
+          <div className="form-actions" role="group" aria-label="Clear saved work confirmation" onKeyDown={event => { if (event.key === "Escape") { event.stopPropagation(); showClear(false); } }}>
             <button
               className="danger-button"
               onClick={() => {
                 setClearFailed(!store.clear());
-                setClearConfirm(false);
+                showClear(false);
               }}
             >
               Clear all saved work
             </button>
             <button
               className="link-button"
-              onClick={() => setClearConfirm(false)}
+              ref={keepButton}
+              onClick={() => showClear(false)}
             >
               Keep it
             </button>
           </div>
         ) : (
-          <button className="link-button" onClick={() => setClearConfirm(true)}>
+          <button ref={clearTrigger} className="link-button" aria-expanded={false} onClick={() => showClear(true)}>
             Clear data on this device
           </button>
         )}
@@ -315,6 +342,7 @@ export function Checkout() {
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [receipt, setReceipt] = useState<Receipt | null>(null),
+    [receiptDownloadStatus, setReceiptDownloadStatus] = useState(""),
     [attempt, setAttempt] = useState<RetailAttempt | null>(null),
     [recoveryReady, setRecoveryReady] = useState(false),
     [recoveryError, setRecoveryError] = useState(""),
@@ -335,6 +363,15 @@ export function Checkout() {
     }),
     [consent, setConsent] = useState(false);
   const locked = useRef(false);
+  function downloadReceipt() {
+    if (!receipt) return;
+    try {
+      downloadJSON("sonoran-slush-private-receipt.json", receipt);
+      setReceiptDownloadStatus("Receipt download started. Check your browser downloads and keep the file private.");
+    } catch {
+      setReceiptDownloadStatus("Receipt download could not start. Try again before leaving this page. Your request is already confirmed; do not resubmit it.");
+    }
+  }
   function checkRecovery() {
     try {
       setAttempt(readRetailAttempt());
@@ -353,6 +390,7 @@ export function Checkout() {
       clearConfirmedRetailAttempt(attempt.id);
       setAttempt(null);
       setReceipt(null);
+      setReceiptDownloadStatus("");
       setConsent(false);
       setContact({ name: "", email: "", phone: "", address: "", city: "", region: "", postal: "", country: "US", notes: "", gift: false, recipient: "", giftMessage: "" });
       setDelivery("Ship to an address");
@@ -472,12 +510,11 @@ export function Checkout() {
           <button
             className="button primary"
             style={{ marginTop: 20 }}
-            onClick={() =>
-              downloadJSON("sonoran-slush-private-receipt.json", receipt)
-            }
+            onClick={downloadReceipt}
           >
             Download private receipt <Icon name="download" />
           </button>
+          <p role="status">{receiptDownloadStatus}</p>
           {recoveryError && <p role="alert">{recoveryError}</p>}
           <p>Starting another request creates a separate request for the designs still in your bag.</p>
           <button onClick={startAnother}>Start another request</button>

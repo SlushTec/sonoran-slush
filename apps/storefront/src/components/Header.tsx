@@ -18,6 +18,7 @@ const links = [
 export default function Header() {
   const path = usePathname(),
     { cart, favorites } = useStore();
+  const cartQuantity = cart.reduce((total, design) => total + design.quantity, 0);
   const [q, setQ] = useState("");
   const search = useRef<HTMLDialogElement>(null),
     menu = useRef<HTMLDialogElement>(null);
@@ -110,13 +111,13 @@ export default function Header() {
               className="icon-button"
               href="/cart"
               aria-label={
-                "Shopping bag" + (cart.length ? " (" + cart.length + ")" : "")
+                "Shopping bag" + (cartQuantity ? " (" + cartQuantity + ")" : "")
               }
             >
               <Icon name="bag" />
               {cart.length > 0 && (
                 <span className="count-dot">
-                  {cart.reduce((a, d) => a + d.quantity, 0)}
+                  {cartQuantity}
                 </span>
               )}
             </Link>
@@ -125,13 +126,14 @@ export default function Header() {
       </header>
       <dialog
         ref={search}
+        aria-labelledby="site-search-title"
         className="search-dialog"
         onClick={(e) => {
           if (e.target === e.currentTarget) search.current?.close();
         }}
       >
         <div className="dialog-top">
-          <h2>Find something personal.</h2>
+          <h2 id="site-search-title">Find something personal.</h2>
           <button
             className="icon-button"
             aria-label="Close search"
@@ -140,16 +142,19 @@ export default function Header() {
             <Icon name="close" />
           </button>
         </div>
+        <form action="/shop" method="get" role="search" aria-label="Product search" onSubmit={() => search.current?.close()}>
         <label className="search-field">
           <Icon name="search" />
           <span className="sr-only">Search products</span>
           <input
             autoFocus
+            name="q"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Try a tumbler, a wedding gift, a crystal…"
           />
         </label>
+        </form>
         <p className="eyebrow">
           {q ? "Matching gifts" : "A few places to start"}
         </p>
@@ -179,7 +184,7 @@ export default function Header() {
           Browse all results <Icon name="arrow" />
         </Link>
       </dialog>
-      <dialog ref={menu} className="menu-dialog">
+      <dialog ref={menu} className="menu-dialog" aria-label="Site navigation">
         <div className="dialog-top">
           <span className="eyebrow">Sonoran Slush</span>
           <button
@@ -192,16 +197,21 @@ export default function Header() {
         </div>
         <nav aria-label="Mobile navigation">
           {links.map(([label, url]) => (
-            <Link href={url} key={url} onClick={() => menu.current?.close()}>
+            <Link
+              href={url}
+              key={url}
+              aria-current={path === url || path.startsWith(url + "/") ? "page" : undefined}
+              onClick={() => menu.current?.close()}
+            >
               {label}
               <Icon name="arrow" />
             </Link>
           ))}
-          <Link href="/saved">
+          <Link href="/saved" onClick={() => menu.current?.close()}>
             Saved designs
             <Icon name="heart" />
           </Link>
-          <Link href="/account">
+          <Link href="/account" onClick={() => menu.current?.close()}>
             Your account
             <Icon name="user" />
           </Link>

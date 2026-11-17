@@ -52,7 +52,7 @@ function options(v: unknown): [string, string][] {
   ][];
 }
 function visible(value: string) {
-  return value.replace(
+  return value.replace(/\\/g, "\\\\").replace(
     /[\p{Cf}\u2028\u2029]/gu,
     (c) => "\\u{" + c.codePointAt(0)!.toString(16).toUpperCase() + "}",
   );
@@ -275,7 +275,8 @@ export default function RecordedPersonalization({
         manufacture.
       </p>
       <p className="field-help">
-        Formatting controls are shown as {String.raw`\u{CODE}`}. Stored text is
+        Literal backslashes are doubled; formatting controls are shown as{" "}
+        {String.raw`\u{CODE}`}. Stored text is
         unchanged; do not engrave these display codes.
       </p>
       {view.legacy.map((item) => (

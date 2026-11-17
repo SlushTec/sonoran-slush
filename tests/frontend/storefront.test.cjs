@@ -17,7 +17,7 @@ const React = require('react');
 const originalLoad=Module._load,originalResolve=Module._resolveFilename;
 Module._load=function(request,parent,main){
  if(request==='next/link')return {__esModule:true,default:React.forwardRef(function Link({href,children,prefetch,...props},ref){return React.createElement('a',{href,ref,...props},children);})};
- if(request==='next/navigation')return {usePathname:()=>location.pathname};
+ if(request==='next/navigation')return {usePathname:()=>location.pathname,useSearchParams:()=>new URLSearchParams(location.search)};
  return originalLoad.apply(this,arguments);
 };
 Module._resolveFilename=function(request,parent,...rest){if(request.startsWith('@/'))request=path.join(__dirname,'../../apps/storefront/src',request.slice(2));return originalResolve.call(this,request,parent,...rest);};
@@ -484,7 +484,7 @@ test('clear saved work detects retained keys and successful explicit retry dismi
 for(const action of ['remove','new-design','unmount']){
  test('pending local photo respects '+action+' rather than reviving old artwork',async()=>{
   const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');
-  writeLocal('config:photo-crystal-heart',{...emptyDesign('photo-crystal-heart'),artworkName:'previous.png'});
+  writeLocal('config:photo-crystal-heart',{...emptyDesign('photo-crystal-heart'),options:{'Crystal shape':'Heart',Size:'Small'},artworkName:'previous.png'});
   const originalBitmap=global.createImageBitmap, originalCreate=URL.createObjectURL, originalRevoke=URL.revokeObjectURL;
   let resolveBitmap,started=false,closed=0,urls=0;
   global.createImageBitmap=()=>{started=true;return new Promise(resolve=>{resolveBitmap=resolve;});};
@@ -528,7 +528,7 @@ test('current local photo still attaches and its object URL is revoked on remova
 });
 test('cancelled local photo failure cannot replace the newer cleared state',async()=>{
  const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');
- writeLocal('config:photo-crystal-heart',{...emptyDesign('photo-crystal-heart'),artworkName:'previous.png'});
+ writeLocal('config:photo-crystal-heart',{...emptyDesign('photo-crystal-heart'),options:{'Crystal shape':'Heart',Size:'Small'},artworkName:'previous.png'});
  const original=global.createImageBitmap;let rejectBitmap,started=false;
  global.createImageBitmap=()=>{started=true;return new Promise((_,reject)=>{rejectBitmap=reject;});};
  try{
@@ -656,7 +656,7 @@ for(const mode of ['healthy','denied','noop','read-denied'])test('design save ou
 test('switching product never writes the former design under the destination draft key', async()=>{
  const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');
  const first={...emptyDesign('pet-tags'),text:'First pet'};
- const second={...emptyDesign('makertwist-40oz-tumbler'),text:'Second gift'};
+ const second={...emptyDesign('makertwist-40oz-tumbler'),options:{Design:'Name or monogram',Placement:'Single placement'},text:'Second gift'};
  writeLocal('config:pet-tags',first);writeLocal('config:makertwist-40oz-tumbler',second);
  const original=dom.window.Storage.prototype.setItem, writes=[];
  dom.window.Storage.prototype.setItem=function(key,value){if(key.startsWith('sonoran:config:'))writes.push({key,value:JSON.parse(value).value});return original.call(this,key,value);};
@@ -670,4 +670,124 @@ test('switching product never writes the former design under the destination dra
   for(const write of writes)assert.equal(write.key,'sonoran:config:'+write.value.slug,'every persisted draft must belong to its storage key');
   assert.equal(readLocal('config:pet-tags',null).text,'First pet');
  } finally {dom.window.Storage.prototype.setItem=original;}
+});
+
+test('header dialogs expose names and mobile current route matches desktop', () => {
+  const oldClose = HTMLDialogElement.prototype.close;
+  const oldShow = HTMLDialogElement.prototype.showModal;
+  HTMLDialogElement.prototype.close = function () { this.removeAttribute('open'); };
+  HTMLDialogElement.prototype.showModal = function () { this.setAttribute('open', ''); };
+  try {
+    window.history.replaceState({}, '', '/shop/drinkware');
+    const Header = require('../../apps/storefront/src/components/Header.tsx').default;
+    wrap(React.createElement(Header));
+    fireEvent.click(screen.getByRole('button', { name: 'Search gifts' }));
+    assert.ok(screen.getByRole('dialog', { name: 'Find something personal.' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Close search' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Open navigation' }));
+    assert.ok(screen.getByRole('dialog', { name: 'Site navigation' }));
+    const mobile = screen.getByRole('navigation', { name: 'Mobile navigation' });
+    const current = mobile.querySelectorAll('[aria-current="page"]');
+    assert.equal(current.length, 1);
+    assert.equal(current[0].getAttribute('href'), '/shop');
+  } finally {
+    HTMLDialogElement.prototype.close = oldClose;
+    HTMLDialogElement.prototype.showModal = oldShow;
+  }
+});
+
+for (const [route, label] of [['/saved', 'Saved designs'], ['/account', 'Your account']]) {
+  test('same-route mobile ' + label + ' dismisses navigation repeatedly', () => {
+    const oldClose = HTMLDialogElement.prototype.close;
+    const oldShow = HTMLDialogElement.prototype.showModal;
+    HTMLDialogElement.prototype.close = function () { this.removeAttribute('open'); };
+    HTMLDialogElement.prototype.showModal = function () { this.setAttribute('open', ''); };
+    try {
+      window.history.replaceState({}, '', route);
+      const Header = require('../../apps/storefront/src/components/Header.tsx').default;
+      wrap(React.createElement(Header));
+      for (let i = 0; i < 2; i++) {
+        fireEvent.click(screen.getByRole('button', { name: 'Open navigation' }));
+        const dialog = screen.getByRole('dialog', { name: 'Site navigation' });
+        const link = Array.from(dialog.querySelectorAll('a')).find(a => a.getAttribute('href') === route);
+        link.addEventListener("click", event => event.preventDefault(), { once: true });
+        fireEvent.click(link);
+        assert.equal(dialog.hasAttribute('open'), false);
+        assert.equal(location.pathname, route);
+      }
+    } finally {
+      HTMLDialogElement.prototype.close = oldClose;
+      HTMLDialogElement.prototype.showModal = oldShow;
+    }
+  });
+}
+
+test('header shopping bag label matches visible quantity through changes and removal', async () => {
+  const oldClose = HTMLDialogElement.prototype.close;
+  HTMLDialogElement.prototype.close = function () { this.removeAttribute('open'); };
+  try {
+    const Header = require('../../apps/storefront/src/components/Header.tsx').default;
+    const base = {slug:'makertwist-40oz-tumbler',text:'Synthetic',secondary:'',font:'Classic serif',options:{},quantity:3,notes:'',artworkName:'',gift:false,giftMessage:'',updated:'2026-11-16'};
+    writeLocal('cart', [{...base,id:'count-one'}, {...base,id:'count-two',quantity:2}]);
+    wrap(React.createElement(React.Fragment,null,React.createElement(Header),React.createElement(Bag)));
+    const badge = () => document.querySelector('.header-tools a[href="/cart"]');
+    await waitFor(() => assert.equal(badge().textContent, '5'));
+    assert.equal(badge().getAttribute('aria-label'), 'Shopping bag (5)');
+    fireEvent.click(screen.getAllByRole('button', {name:/Increase quantity for/})[0]);
+    assert.equal(badge().getAttribute('aria-label'), 'Shopping bag (6)');
+    assert.equal(badge().textContent, '6');
+    fireEvent.click(screen.getAllByRole('button', {name:'Remove',exact:true})[0]);
+    assert.equal(badge().getAttribute('aria-label'), 'Shopping bag (2)');
+    fireEvent.click(screen.getByRole('button', {name:'Remove',exact:true}));
+    assert.equal(badge().getAttribute('aria-label'), 'Shopping bag');
+    assert.ok(badge().querySelector('.count-dot') === null, 'empty bag has no count badge');
+  } finally { HTMLDialogElement.prototype.close = oldClose; }
+});
+
+
+test('saved design capacity preserves acknowledged drafts and permits explicit recovery',async()=>{
+ const {useStore}=require('../../apps/storefront/src/components/Store.tsx');
+ const base={slug:'makertwist-40oz-tumbler',text:'Synthetic',secondary:'',font:'Classic serif',options:{},quantity:1,notes:'',artworkName:'',gift:false,giftMessage:'',updated:'2026-11-17'};
+ const originals=Array.from({length:100},(_,i)=>({...base,id:'kept-'+i}));writeLocal('designs',originals);
+ let observed,result;const current={...base,id:'new-design',text:'Exact caf\u00e9\nnew work'};
+ function Probe(){observed=useStore();return React.createElement('button',{onClick:()=>{result=observed.saveDesign(current);}},'Save synthetic capacity');}
+ wrap(React.createElement(Probe));await waitFor(()=>assert.equal(observed.designs.length,100));
+ const raw=localStorage.getItem('sonoran:designs');
+ fireEvent.click(screen.getByRole('button',{name:'Save synthetic capacity'}));
+ assert.equal(result,false);assert.deepEqual(observed.designs,originals);assert.equal(localStorage.getItem('sonoran:designs'),raw);
+ assert.match(screen.getByRole('status').textContent,/saved designs.*full/i);assert.equal(current.text,'Exact caf\u00e9\nnew work');
+ fireEvent.click(screen.getByRole('button',{name:'Save synthetic capacity'}));assert.deepEqual(observed.designs,originals);
+ const {act}=require('@testing-library/react');await act(async()=>{result=observed.saveDesign({...originals[50],text:'Updated existing'});});
+ assert.equal(result,true);assert.equal(observed.designs.length,100);assert.equal(observed.designs[0].text,'Updated existing');assert.deepEqual(new Set(observed.designs.map(d=>d.id)),new Set(originals.map(d=>d.id)));
+ await act(async()=>observed.removeDesign('kept-1'));fireEvent.click(screen.getByRole('button',{name:'Save synthetic capacity'}));
+ assert.equal(result,true);assert.equal(observed.designs.length,100);assert.equal(observed.designs[0].text,current.text);assert.equal(observed.designs.some(d=>d.id==='kept-1'),false);
+});
+
+test('bag addition preserves full saved collection and permits existing saved update',async()=>{
+ const {useStore}=require('../../apps/storefront/src/components/Store.tsx'),{act}=require('@testing-library/react');
+ const base={slug:'makertwist-40oz-tumbler',text:'Synthetic',secondary:'',font:'Classic serif',options:{},quantity:1,notes:'',artworkName:'',gift:false,giftMessage:'',updated:'2026-11-17'};
+ const originals=Array.from({length:100},(_,i)=>({...base,id:'kept-'+i}));writeLocal('designs',originals);
+ let observed;function Probe(){observed=useStore();return null;}wrap(React.createElement(Probe));await waitFor(()=>assert.equal(observed.designs.length,100));
+ await act(async()=>observed.addToCart({...base,id:'new-bag',text:'New bag work'}));assert.deepEqual(observed.designs,originals);assert.equal(observed.cart[0].text,'New bag work');assert.match(screen.getByRole('status').textContent,/saved designs are full/);
+ assert.deepEqual(readLocal('designs',[]),originals);
+ await act(async()=>observed.addToCart({...originals[50],text:'Edited existing'}));assert.equal(observed.designs.length,100);assert.equal(observed.designs[0].text,'Edited existing');assert.deepEqual(new Set(observed.designs.map(d=>d.id)),new Set(originals.map(d=>d.id)));
+});
+
+function legacyOptionDraft(){const {emptyDesign}=require('../../apps/storefront/src/components/Store.tsx');return {...emptyDesign('photo-crystal-heart'),id:'old-options',text:'Exact caf\u00e9 words',quantity:3,notes:'Keep original notes',options:{'Crystal shape':'Wrong old shape',Size:'Retired large'},gift:true,giftMessage:'Original gift'};}
+test('restored invalid options wait for explicit confirmation without overwriting original config',async()=>{
+ const old=legacyOptionDraft();writeLocal('config:'+old.slug,old);const raw=localStorage.getItem('sonoran:config:'+old.slug);wrap(React.createElement(Customizer,{product:product(old.slug)}));
+ await screen.findByRole('heading',{name:'Review changed choices'});assert.equal(localStorage.getItem('sonoran:config:'+old.slug),raw);
+ assert.ok(screen.getByText('Retired large',{exact:true}));assert.ok(screen.getByText('Wrong old shape',{exact:true}));
+ for(const name of ['Save this design for later','Save & start another design']){const b=screen.getByRole('button',{name});assert.equal(b.disabled,true);fireEvent.click(b);}
+ fireEvent.click(screen.getByRole('tab',{name:/Finishing touches/}));assert.equal(screen.getByRole('button',{name:'Add design to bag'}).disabled,true);assert.deepEqual(readLocal('cart',[]),[]);assert.deepEqual(readLocal('designs',[]),[]);
+ fireEvent.click(screen.getByRole('tab',{name:/Make it personal/}));fireEvent.change(screen.getByLabelText(/Inscription \(optional\)/),{target:{value:'New unsaved words'}});assert.equal(localStorage.getItem('sonoran:config:'+old.slug),raw);
+ cleanup();wrap(React.createElement(Customizer,{product:product(old.slug)}));await screen.findByRole('heading',{name:'Review changed choices'});assert.equal(localStorage.getItem('sonoran:config:'+old.slug),raw);
+ fireEvent.change(screen.getByLabelText('Size'),{target:{value:'Large'}});fireEvent.click(screen.getByRole('button',{name:'Use these current choices'}));
+ await waitFor(()=>assert.equal(readLocal('config:'+old.slug,null).options.Size,'Large'));const saved=readLocal('config:'+old.slug,null);assert.equal(saved.text,old.text);assert.equal(saved.quantity,3);assert.equal(saved.notes,old.notes);assert.equal(saved.giftMessage,old.giftMessage);assert.equal(saved.options['Crystal shape'],'Heart');assert.deepEqual(readLocal('designs',[]),[]);
+});
+test('named saved draft and product transition preserve originals until deliberate save',async()=>{
+ const old=legacyOptionDraft();writeLocal('designs',[old]);window.history.replaceState({},'', '/products/'+old.slug+'?design='+old.id);
+ const r=wrap(React.createElement(Customizer,{product:product(old.slug)}));await screen.findByRole('heading',{name:'Review changed choices'});assert.deepEqual(readLocal('designs',[]),[old]);
+ fireEvent.click(screen.getByRole('button',{name:'Use these current choices'}));assert.deepEqual(readLocal('designs',[]),[old]);fireEvent.click(screen.getByRole('button',{name:'Save this design for later'}));assert.equal(readLocal('designs',[])[0].options['Crystal shape'],'Heart');
+ r.rerender(React.createElement(StoreProvider,null,React.createElement(Customizer,{product:product('photo-crystal-prestige')})));await waitFor(()=>assert.equal(screen.getByLabelText('Size').value,'Small only'));assert.equal(screen.queryAllByRole('heading',{name:'Review changed choices'}).length,0);assert.equal(readLocal('config:photo-crystal-prestige',null).slug,'photo-crystal-prestige');
 });

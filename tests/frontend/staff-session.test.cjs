@@ -1077,3 +1077,25 @@ test("count stale version never retries or writes automatically",async()=>{
  await countWorkspace();fillCount();compareCount();await screen.findByText("Test stock changed or needs reconciliation. Compare again after reviewing the fixture.");
  assert.equal(calls.filter(c=>c.url.endsWith("/count-preview")).length,1);assert.equal(calls.filter(c=>!c.url.endsWith("/summary")).length,2);
 });
+
+const CustomerInscriptionDisplay = require("../../apps/storefront/src/components/CustomerInscriptions.tsx");
+test("recorded customer inscription distinguishes literal escapes from formatting controls", () => {
+  const literal = String.raw`prefix\u{202E}suffix`, control = "prefix\u202Esuffix";
+  assert.notEqual(CustomerInscriptionDisplay.visibleInscription(literal), CustomerInscriptionDisplay.visibleInscription(control));
+  assert.equal(CustomerInscriptionDisplay.visibleInscription(literal), String.raw`prefix\\u{202E}suffix`);
+  assert.equal(CustomerInscriptionDisplay.visibleInscription(control), String.raw`prefix\u{202E}suffix`);
+  assert.equal(CustomerInscriptionDisplay.visibleInscription("José 🌵\nline"), "José 🌵\nline");
+});
+test("recorded staff inscription distinguishes literal escapes without changing canonical text", () => {
+  const value = pieceOrder({ mode: "identical", quantity: 1, count: 1 });
+  const text = String.raw`literal\u{202E} and ` + "\u202E";
+  value.items[0].personalization.text = text;
+  value.lines[0].item = structuredClone(value.items[0]);
+  value.lines[0].personalization_snapshot.pieces[0].text = text;
+  const before = JSON.stringify(value);
+  render(React.createElement(PieceDisplay.default, { record: value }));
+  const expected = String.raw`literal\\u{202E} and \u{202E}`;
+  assert.ok(document.body.textContent.includes(expected));
+  assert.equal(JSON.stringify(value), before);
+  assert.equal(PieceDisplay.recordedPersonalization(value).rows[0].text, text);
+});
